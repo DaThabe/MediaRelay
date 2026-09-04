@@ -6,5 +6,5 @@
 /// </summary>
 public interface IPublishExecutor
 {
-    ValueTask<PublishJobId> ExecuteAsync(PublishContent content, CancellationToken cancellationToken = default);
+    ValueTask ExecuteAsync(PublishContent content, CancellationToken cancellationToken = default);
 }

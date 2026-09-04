@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediaRelay.Source;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Publish;
 
@@ -22,4 +23,8 @@ internal sealed partial class PublishOrchestrator(
 
         return new ValueTask(Task.WhenAll(tasks));
     }
+
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "处理完成 < 来源 [{Source}]")]
+    private partial void LogFinish(ISource source);
 }

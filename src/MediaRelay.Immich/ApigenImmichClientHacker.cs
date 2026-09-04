@@ -1,0 +1,452 @@
+﻿using Apigen.Immich.Models;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace MediaRelay.Immich;
+
+internal sealed class ApigenImmichClientHacker
+{
+    private static int _isHacked;
+
+    public static void Hack()
+    {
+        if (Interlocked.CompareExchange(ref _isHacked, 1, 0) == 1)
+            return;
+
+        try
+        {
+            var options = Get_JsonConfig_Default_JsonSerializerOptions();
+
+            options.Converters.Clear();
+            options.TypeInfoResolver = ImmichJsonSerializerContext.Default;
+
+            Test_JsonConfig_Default_JsonSerializerOptions(options);
+        }
+        catch (Exception)
+        {
+            Interlocked.Exchange(ref _isHacked, 0);
+            throw;
+        }
+    }
+
+    private static JsonSerializerOptions Get_JsonConfig_Default_JsonSerializerOptions()
+    {
+        try
+        {
+            var type = Type.GetType("Apigen.Immich.Client.JsonConfig, Apigen.Immich.Client")
+                ?? throw new TypeLoadException("找不到 Apigen.Immich.Client.JsonConfig 类型");
+
+            var field = type.GetField("Default", BindingFlags.Static | BindingFlags.NonPublic)
+                ?? throw new MissingFieldException("Apigen.Immich.Client.JsonConfig", "Default");
+
+            return (JsonSerializerOptions?)field.GetValue(null)
+                ?? throw new ArgumentNullException("Apigen.Immich.Client.JsonConfig.Default");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("无法获取 Apigen.Immich.Client.JsonConfig.Default", ex);
+        }
+    }
+
+    private static void Test_JsonConfig_Default_JsonSerializerOptions(JsonSerializerOptions options)
+    {
+        var dto = new AssetMediaResponseDto()
+        {
+            Id = "123456789",
+            Status = AssetMediaStatus.Created
+        };
+
+        try
+        {
+            // 序列化
+            var jsonString = JsonSerializer.Serialize(dto, options);
+            ArgumentException.ThrowIfNullOrWhiteSpace(jsonString);
+
+            // 反序列化
+            var obj = JsonSerializer.Deserialize<AssetMediaResponseDto>(jsonString, options);
+            ArgumentNullException.ThrowIfNull(obj);
+
+            // 比较
+            if (obj.Id != dto.Id || obj.Status != dto.Status)
+                throw new InvalidOperationException("测试结果不一致");
+        }
+        catch (InvalidOperationException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("测试失败", ex);
+        }
+    }
+}
+
+
+[JsonSourceGenerationOptions(
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,
+    UseStringEnumConverter = true
+)]
+[JsonSerializable(typeof(ActivityCreateDto))]
+[JsonSerializable(typeof(ActivityResponseDto))]
+[JsonSerializable(typeof(ActivityStatisticsResponseDto))]
+[JsonSerializable(typeof(AddUsersDto))]
+[JsonSerializable(typeof(AdminOnboardingUpdateDto))]
+[JsonSerializable(typeof(AlbumResponseDto))]
+[JsonSerializable(typeof(AlbumStatisticsResponseDto))]
+[JsonSerializable(typeof(AlbumUserAddDto))]
+[JsonSerializable(typeof(AlbumUserCreateDto))]
+[JsonSerializable(typeof(AlbumUserResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AlbumUserRole>))]
+[JsonSerializable(typeof(AlbumsAddAssetsDto))]
+[JsonSerializable(typeof(AlbumsAddAssetsResponseDto))]
+[JsonSerializable(typeof(AlbumsResponse))]
+[JsonSerializable(typeof(AlbumsUpdate))]
+[JsonSerializable(typeof(ApiKeyCreateDto))]
+[JsonSerializable(typeof(ApiKeyCreateResponseDto))]
+[JsonSerializable(typeof(ApiKeyResponseDto))]
+[JsonSerializable(typeof(ApiKeyUpdateDto))]
+[JsonSerializable(typeof(AssetBulkDeleteDto))]
+[JsonSerializable(typeof(AssetBulkUpdateDto))]
+[JsonSerializable(typeof(AssetBulkUploadCheckDto))]
+[JsonSerializable(typeof(AssetBulkUploadCheckItem))]
+[JsonSerializable(typeof(AssetBulkUploadCheckResponseDto))]
+[JsonSerializable(typeof(AssetBulkUploadCheckResult))]
+[JsonSerializable(typeof(AssetCopyDto))]
+[JsonSerializable(typeof(AssetDeltaSyncDto))]
+[JsonSerializable(typeof(AssetDeltaSyncResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetEditAction>))]
+[JsonSerializable(typeof(AssetEditActionItemDto))]
+[JsonSerializable(typeof(AssetEditActionItemResponseDto))]
+[JsonSerializable(typeof(AssetEditsCreateDto))]
+[JsonSerializable(typeof(AssetEditsResponseDto))]
+[JsonSerializable(typeof(AssetFaceCreateDto))]
+[JsonSerializable(typeof(AssetFaceDeleteDto))]
+[JsonSerializable(typeof(AssetFaceResponseDto))]
+[JsonSerializable(typeof(AssetFaceUpdateDto))]
+[JsonSerializable(typeof(AssetFaceUpdateItem))]
+[JsonSerializable(typeof(AssetFaceWithoutPersonResponseDto))]
+[JsonSerializable(typeof(AssetFullSyncDto))]
+[JsonSerializable(typeof(AssetIdsDto))]
+[JsonSerializable(typeof(AssetIdsResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetJobName>))]
+[JsonSerializable(typeof(AssetJobsDto))]
+[JsonSerializable(typeof(AssetMediaCreateDto))]
+[JsonSerializable(typeof(AssetMediaReplaceDto))]
+[JsonSerializable(typeof(AssetMediaResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetMediaSize>))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetMediaStatus>))]
+[JsonSerializable(typeof(AssetMetadataBulkDeleteDto))]
+[JsonSerializable(typeof(AssetMetadataBulkDeleteItemDto))]
+[JsonSerializable(typeof(AssetMetadataBulkResponseDto))]
+[JsonSerializable(typeof(AssetMetadataBulkUpsertDto))]
+[JsonSerializable(typeof(AssetMetadataBulkUpsertItemDto))]
+[JsonSerializable(typeof(AssetMetadataResponseDto))]
+[JsonSerializable(typeof(AssetMetadataUpsertDto))]
+[JsonSerializable(typeof(AssetMetadataUpsertItemDto))]
+[JsonSerializable(typeof(AssetOcrResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetOrder>))]
+[JsonSerializable(typeof(AssetResponseDto))]
+[JsonSerializable(typeof(AssetStackResponseDto))]
+[JsonSerializable(typeof(AssetStatsResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetTypeEnum>))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AssetVisibility>))]
+[JsonSerializable(typeof(JsonStringEnumConverter<AudioCodec>))]
+[JsonSerializable(typeof(AuthStatusResponseDto))]
+[JsonSerializable(typeof(AvatarUpdate))]
+[JsonSerializable(typeof(JsonStringEnumConverter<BulkIdErrorReason>))]
+[JsonSerializable(typeof(BulkIdResponseDto))]
+[JsonSerializable(typeof(List<BulkIdResponseDto>))]
+[JsonSerializable(typeof(BulkIdsDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<CQMode>))]
+[JsonSerializable(typeof(CastResponse))]
+[JsonSerializable(typeof(CastUpdate))]
+[JsonSerializable(typeof(ChangePasswordDto))]
+[JsonSerializable(typeof(CheckExistingAssetsDto))]
+[JsonSerializable(typeof(CheckExistingAssetsResponseDto))]
+[JsonSerializable(typeof(ClipConfig))]
+[JsonSerializable(typeof(JsonStringEnumConverter<Colorspace>))]
+[JsonSerializable(typeof(ContributorCountResponseDto))]
+[JsonSerializable(typeof(CreateAlbumDto))]
+[JsonSerializable(typeof(CreateLibraryDto))]
+[JsonSerializable(typeof(CreateProfileImageDto))]
+[JsonSerializable(typeof(CreateProfileImageResponseDto))]
+[JsonSerializable(typeof(CropParameters))]
+[JsonSerializable(typeof(DatabaseBackupConfig))]
+[JsonSerializable(typeof(DatabaseBackupDeleteDto))]
+[JsonSerializable(typeof(DatabaseBackupDto))]
+[JsonSerializable(typeof(DatabaseBackupListResponseDto))]
+[JsonSerializable(typeof(DatabaseBackupUploadDto))]
+[JsonSerializable(typeof(DownloadArchiveDto))]
+[JsonSerializable(typeof(DownloadArchiveInfo))]
+[JsonSerializable(typeof(DownloadInfoDto))]
+[JsonSerializable(typeof(DownloadResponse))]
+[JsonSerializable(typeof(DownloadResponseDto))]
+[JsonSerializable(typeof(DownloadUpdate))]
+[JsonSerializable(typeof(DuplicateDetectionConfig))]
+[JsonSerializable(typeof(DuplicateResolveDto))]
+[JsonSerializable(typeof(DuplicateResolveGroupDto))]
+[JsonSerializable(typeof(DuplicateResponseDto))]
+[JsonSerializable(typeof(EmailNotificationsResponse))]
+[JsonSerializable(typeof(EmailNotificationsUpdate))]
+[JsonSerializable(typeof(ExifResponseDto))]
+[JsonSerializable(typeof(FaceDto))]
+[JsonSerializable(typeof(FacialRecognitionConfig))]
+[JsonSerializable(typeof(FoldersResponse))]
+[JsonSerializable(typeof(FoldersUpdate))]
+[JsonSerializable(typeof(JsonStringEnumConverter<ImageFormat>))]
+[JsonSerializable(typeof(JobCreateDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<JobName>))]
+[JsonSerializable(typeof(JobSettingsDto))]
+[JsonSerializable(typeof(LibraryResponseDto))]
+[JsonSerializable(typeof(LibraryStatsResponseDto))]
+[JsonSerializable(typeof(LicenseKeyDto))]
+[JsonSerializable(typeof(LicenseResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<LogLevel>))]
+[JsonSerializable(typeof(LoginCredentialDto))]
+[JsonSerializable(typeof(LoginResponseDto))]
+[JsonSerializable(typeof(LogoutResponseDto))]
+[JsonSerializable(typeof(MachineLearningAvailabilityChecksDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<MaintenanceAction>))]
+[JsonSerializable(typeof(MaintenanceAuthDto))]
+[JsonSerializable(typeof(MaintenanceDetectInstallResponseDto))]
+[JsonSerializable(typeof(MaintenanceDetectInstallStorageFolderDto))]
+[JsonSerializable(typeof(MaintenanceLoginDto))]
+[JsonSerializable(typeof(MaintenanceStatusResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<ManualJobName>))]
+[JsonSerializable(typeof(MapMarkerResponseDto))]
+[JsonSerializable(typeof(MapReverseGeocodeResponseDto))]
+[JsonSerializable(typeof(MemoriesResponse))]
+[JsonSerializable(typeof(MemoriesUpdate))]
+[JsonSerializable(typeof(MemoryCreateDto))]
+[JsonSerializable(typeof(MemoryResponseDto))]
+[JsonSerializable(typeof(MemorySearchOrder))]
+[JsonSerializable(typeof(MemoryStatisticsResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<MemoryType>))]
+[JsonSerializable(typeof(MemoryUpdateDto))]
+[JsonSerializable(typeof(MergePersonDto))]
+[JsonSerializable(typeof(MetadataSearchDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<MirrorAxis>))]
+[JsonSerializable(typeof(MirrorParameters))]
+[JsonSerializable(typeof(NotificationCreateDto))]
+[JsonSerializable(typeof(NotificationDeleteAllDto))]
+[JsonSerializable(typeof(NotificationDto))]
+[JsonSerializable(typeof(NotificationLevel))]
+[JsonSerializable(typeof(NotificationType))]
+[JsonSerializable(typeof(NotificationUpdateAllDto))]
+[JsonSerializable(typeof(NotificationUpdateDto))]
+[JsonSerializable(typeof(OAuthAuthorizeResponseDto))]
+[JsonSerializable(typeof(OAuthCallbackDto))]
+[JsonSerializable(typeof(OAuthConfigDto))]
+[JsonSerializable(typeof(OAuthTokenEndpointAuthMethod))]
+[JsonSerializable(typeof(OcrConfig))]
+[JsonSerializable(typeof(OnThisDayDto))]
+[JsonSerializable(typeof(OnboardingDto))]
+[JsonSerializable(typeof(OnboardingResponseDto))]
+[JsonSerializable(typeof(PartnerCreateDto))]
+[JsonSerializable(typeof(PartnerDirection))]
+[JsonSerializable(typeof(PartnerResponseDto))]
+[JsonSerializable(typeof(PartnerUpdateDto))]
+[JsonSerializable(typeof(PeopleResponse))]
+[JsonSerializable(typeof(PeopleResponseDto))]
+[JsonSerializable(typeof(PeopleUpdate))]
+[JsonSerializable(typeof(PeopleUpdateDto))]
+[JsonSerializable(typeof(PeopleUpdateItem))]
+[JsonSerializable(typeof(Permission))]
+[JsonSerializable(typeof(PersonCreateDto))]
+[JsonSerializable(typeof(PersonResponseDto))]
+[JsonSerializable(typeof(PersonStatisticsResponseDto))]
+[JsonSerializable(typeof(PersonUpdateDto))]
+[JsonSerializable(typeof(PersonWithFacesResponseDto))]
+[JsonSerializable(typeof(PinCodeChangeDto))]
+[JsonSerializable(typeof(PinCodeResetDto))]
+[JsonSerializable(typeof(PinCodeSetupDto))]
+[JsonSerializable(typeof(PlacesResponseDto))]
+[JsonSerializable(typeof(PluginActionResponseDto))]
+[JsonSerializable(typeof(PluginContextType))]
+[JsonSerializable(typeof(PluginFilterResponseDto))]
+[JsonSerializable(typeof(PluginResponseDto))]
+[JsonSerializable(typeof(PluginTriggerResponseDto))]
+[JsonSerializable(typeof(PluginTriggerType))]
+[JsonSerializable(typeof(PurchaseResponse))]
+[JsonSerializable(typeof(PurchaseUpdate))]
+[JsonSerializable(typeof(QueueCommand))]
+[JsonSerializable(typeof(QueueCommandDto))]
+[JsonSerializable(typeof(QueueDeleteDto))]
+[JsonSerializable(typeof(QueueJobResponseDto))]
+[JsonSerializable(typeof(QueueJobStatus))]
+[JsonSerializable(typeof(QueueName))]
+[JsonSerializable(typeof(QueueResponseDto))]
+[JsonSerializable(typeof(QueueResponseLegacyDto))]
+[JsonSerializable(typeof(QueueStatisticsDto))]
+[JsonSerializable(typeof(QueueStatusLegacyDto))]
+[JsonSerializable(typeof(QueueUpdateDto))]
+[JsonSerializable(typeof(QueuesResponseLegacyDto))]
+[JsonSerializable(typeof(RandomSearchDto))]
+[JsonSerializable(typeof(RatingsResponse))]
+[JsonSerializable(typeof(RatingsUpdate))]
+[JsonSerializable(typeof(ReactionLevel))]
+[JsonSerializable(typeof(ReactionType))]
+[JsonSerializable(typeof(ReverseGeocodingStateResponseDto))]
+[JsonSerializable(typeof(RotateParameters))]
+[JsonSerializable(typeof(SearchAlbumResponseDto))]
+[JsonSerializable(typeof(SearchAssetResponseDto))]
+[JsonSerializable(typeof(SearchExploreItem))]
+[JsonSerializable(typeof(SearchExploreResponseDto))]
+[JsonSerializable(typeof(SearchFacetCountResponseDto))]
+[JsonSerializable(typeof(SearchFacetResponseDto))]
+[JsonSerializable(typeof(SearchResponseDto))]
+[JsonSerializable(typeof(SearchStatisticsResponseDto))]
+[JsonSerializable(typeof(SearchSuggestionType))]
+[JsonSerializable(typeof(ServerAboutResponseDto))]
+[JsonSerializable(typeof(ServerApkLinksDto))]
+[JsonSerializable(typeof(ServerConfigDto))]
+[JsonSerializable(typeof(ServerFeaturesDto))]
+[JsonSerializable(typeof(ServerMediaTypesResponseDto))]
+[JsonSerializable(typeof(ServerPingResponse))]
+[JsonSerializable(typeof(ServerStatsResponseDto))]
+[JsonSerializable(typeof(ServerStorageResponseDto))]
+[JsonSerializable(typeof(ServerThemeDto))]
+[JsonSerializable(typeof(ServerVersionHistoryResponseDto))]
+[JsonSerializable(typeof(ServerVersionResponseDto))]
+[JsonSerializable(typeof(SessionCreateDto))]
+[JsonSerializable(typeof(SessionCreateResponseDto))]
+[JsonSerializable(typeof(SessionResponseDto))]
+[JsonSerializable(typeof(SessionUnlockDto))]
+[JsonSerializable(typeof(SessionUpdateDto))]
+[JsonSerializable(typeof(SetMaintenanceModeDto))]
+[JsonSerializable(typeof(SharedLinkCreateDto))]
+[JsonSerializable(typeof(SharedLinkEditDto))]
+[JsonSerializable(typeof(SharedLinkLoginDto))]
+[JsonSerializable(typeof(SharedLinkResponseDto))]
+[JsonSerializable(typeof(SharedLinkType))]
+[JsonSerializable(typeof(SharedLinksResponse))]
+[JsonSerializable(typeof(SharedLinksUpdate))]
+[JsonSerializable(typeof(SignUpDto))]
+[JsonSerializable(typeof(SmartSearchDto))]
+[JsonSerializable(typeof(SourceType))]
+[JsonSerializable(typeof(StackCreateDto))]
+[JsonSerializable(typeof(StackResponseDto))]
+[JsonSerializable(typeof(StackUpdateDto))]
+[JsonSerializable(typeof(StatisticsSearchDto))]
+[JsonSerializable(typeof(StorageFolder))]
+[JsonSerializable(typeof(SyncAckDeleteDto))]
+[JsonSerializable(typeof(SyncAckDto))]
+[JsonSerializable(typeof(SyncAckSetDto))]
+[JsonSerializable(typeof(SyncAckV1))]
+[JsonSerializable(typeof(SyncAlbumDeleteV1))]
+[JsonSerializable(typeof(SyncAlbumToAssetDeleteV1))]
+[JsonSerializable(typeof(SyncAlbumToAssetV1))]
+[JsonSerializable(typeof(SyncAlbumUserDeleteV1))]
+[JsonSerializable(typeof(SyncAlbumUserV1))]
+[JsonSerializable(typeof(SyncAlbumV1))]
+[JsonSerializable(typeof(SyncAssetDeleteV1))]
+[JsonSerializable(typeof(SyncAssetEditDeleteV1))]
+[JsonSerializable(typeof(SyncAssetEditV1))]
+[JsonSerializable(typeof(SyncAssetExifV1))]
+[JsonSerializable(typeof(SyncAssetFaceDeleteV1))]
+[JsonSerializable(typeof(SyncAssetFaceV1))]
+[JsonSerializable(typeof(SyncAssetFaceV2))]
+[JsonSerializable(typeof(SyncAssetMetadataDeleteV1))]
+[JsonSerializable(typeof(SyncAssetMetadataV1))]
+[JsonSerializable(typeof(SyncAssetV1))]
+[JsonSerializable(typeof(SyncAuthUserV1))]
+[JsonSerializable(typeof(SyncCompleteV1))]
+[JsonSerializable(typeof(SyncEntityType))]
+[JsonSerializable(typeof(SyncMemoryAssetDeleteV1))]
+[JsonSerializable(typeof(SyncMemoryAssetV1))]
+[JsonSerializable(typeof(SyncMemoryDeleteV1))]
+[JsonSerializable(typeof(SyncMemoryV1))]
+[JsonSerializable(typeof(SyncPartnerDeleteV1))]
+[JsonSerializable(typeof(SyncPartnerV1))]
+[JsonSerializable(typeof(SyncPersonDeleteV1))]
+[JsonSerializable(typeof(SyncPersonV1))]
+[JsonSerializable(typeof(SyncRequestType))]
+[JsonSerializable(typeof(SyncResetV1))]
+[JsonSerializable(typeof(SyncStackDeleteV1))]
+[JsonSerializable(typeof(SyncStackV1))]
+[JsonSerializable(typeof(SyncStreamDto))]
+[JsonSerializable(typeof(SyncUserDeleteV1))]
+[JsonSerializable(typeof(SyncUserMetadataDeleteV1))]
+[JsonSerializable(typeof(SyncUserMetadataV1))]
+[JsonSerializable(typeof(SyncUserV1))]
+[JsonSerializable(typeof(SystemConfigBackupsDto))]
+[JsonSerializable(typeof(SystemConfigDto))]
+[JsonSerializable(typeof(SystemConfigFFmpegDto))]
+[JsonSerializable(typeof(SystemConfigFacesDto))]
+[JsonSerializable(typeof(SystemConfigGeneratedFullsizeImageDto))]
+[JsonSerializable(typeof(SystemConfigGeneratedImageDto))]
+[JsonSerializable(typeof(SystemConfigImageDto))]
+[JsonSerializable(typeof(SystemConfigJobDto))]
+[JsonSerializable(typeof(SystemConfigLibraryDto))]
+[JsonSerializable(typeof(SystemConfigLibraryScanDto))]
+[JsonSerializable(typeof(SystemConfigLibraryWatchDto))]
+[JsonSerializable(typeof(SystemConfigLoggingDto))]
+[JsonSerializable(typeof(SystemConfigMachineLearningDto))]
+[JsonSerializable(typeof(SystemConfigMapDto))]
+[JsonSerializable(typeof(SystemConfigMetadataDto))]
+[JsonSerializable(typeof(SystemConfigNewVersionCheckDto))]
+[JsonSerializable(typeof(SystemConfigNightlyTasksDto))]
+[JsonSerializable(typeof(SystemConfigNotificationsDto))]
+[JsonSerializable(typeof(SystemConfigOAuthDto))]
+[JsonSerializable(typeof(SystemConfigPasswordLoginDto))]
+[JsonSerializable(typeof(SystemConfigReverseGeocodingDto))]
+[JsonSerializable(typeof(SystemConfigServerDto))]
+[JsonSerializable(typeof(SystemConfigSmtpDto))]
+[JsonSerializable(typeof(SystemConfigSmtpTransportDto))]
+[JsonSerializable(typeof(SystemConfigStorageTemplateDto))]
+[JsonSerializable(typeof(SystemConfigTemplateEmailsDto))]
+[JsonSerializable(typeof(SystemConfigTemplateStorageOptionDto))]
+[JsonSerializable(typeof(SystemConfigTemplatesDto))]
+[JsonSerializable(typeof(SystemConfigThemeDto))]
+[JsonSerializable(typeof(SystemConfigTrashDto))]
+[JsonSerializable(typeof(SystemConfigUserDto))]
+[JsonSerializable(typeof(TagBulkAssetsDto))]
+[JsonSerializable(typeof(TagBulkAssetsResponseDto))]
+[JsonSerializable(typeof(TagCreateDto))]
+[JsonSerializable(typeof(TagResponseDto))]
+[JsonSerializable(typeof(TagUpdateDto))]
+[JsonSerializable(typeof(TagUpsertDto))]
+[JsonSerializable(typeof(TagsResponse))]
+[JsonSerializable(typeof(TagsUpdate))]
+[JsonSerializable(typeof(TemplateDto))]
+[JsonSerializable(typeof(TemplateResponseDto))]
+[JsonSerializable(typeof(TestEmailResponseDto))]
+[JsonSerializable(typeof(TimeBucketAssetResponseDto))]
+[JsonSerializable(typeof(TimeBucketsResponseDto))]
+[JsonSerializable(typeof(ToneMapping))]
+[JsonSerializable(typeof(TranscodeHWAccel))]
+[JsonSerializable(typeof(TranscodePolicy))]
+[JsonSerializable(typeof(TrashResponseDto))]
+[JsonSerializable(typeof(UpdateAlbumDto))]
+[JsonSerializable(typeof(UpdateAlbumUserDto))]
+[JsonSerializable(typeof(UpdateAssetDto))]
+[JsonSerializable(typeof(UpdateLibraryDto))]
+[JsonSerializable(typeof(UsageByUserDto))]
+[JsonSerializable(typeof(UserAdminCreateDto))]
+[JsonSerializable(typeof(UserAdminDeleteDto))]
+[JsonSerializable(typeof(UserAdminResponseDto))]
+[JsonSerializable(typeof(UserAdminUpdateDto))]
+[JsonSerializable(typeof(UserAvatarColor))]
+[JsonSerializable(typeof(UserLicense))]
+[JsonSerializable(typeof(UserMetadataKey))]
+[JsonSerializable(typeof(UserPreferencesResponseDto))]
+[JsonSerializable(typeof(UserPreferencesUpdateDto))]
+[JsonSerializable(typeof(UserResponseDto))]
+[JsonSerializable(typeof(UserStatus))]
+[JsonSerializable(typeof(UserUpdateMeDto))]
+[JsonSerializable(typeof(ValidateAccessTokenResponseDto))]
+[JsonSerializable(typeof(ValidateLibraryDto))]
+[JsonSerializable(typeof(ValidateLibraryImportPathResponseDto))]
+[JsonSerializable(typeof(ValidateLibraryResponseDto))]
+[JsonSerializable(typeof(VersionCheckStateResponseDto))]
+[JsonSerializable(typeof(JsonStringEnumConverter<VideoCodec>))]
+[JsonSerializable(typeof(VideoContainer))]
+[JsonSerializable(typeof(WorkflowActionItemDto))]
+[JsonSerializable(typeof(WorkflowActionResponseDto))]
+[JsonSerializable(typeof(WorkflowCreateDto))]
+[JsonSerializable(typeof(WorkflowFilterItemDto))]
+[JsonSerializable(typeof(WorkflowFilterResponseDto))]
+[JsonSerializable(typeof(WorkflowResponseDto))]
+[JsonSerializable(typeof(WorkflowUpdateDto))]
+public partial class ImmichJsonSerializerContext : JsonSerializerContext;

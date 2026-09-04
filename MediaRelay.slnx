@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Destinations/">
+    <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
+  </Folder>
+  <Folder Name="/Module/">
+    <Project Path="src/MediaRelay.Http/MediaRelay.Http.csproj" />
+    <Project Path="src/MediaRelay.Playwright/MediaRelay.Playwright.csproj" />
+    <Project Path="src/MediaRelay.Storage/MediaRelay.Storage.csproj" />
+  </Folder>
+  <Folder Name="/Sources/">
+    <Project Path="src/MediaRelay.Pixiv/MediaRelay.Pixiv.csproj" />
+  </Folder>
+  <Project Path="src/MediaRelay.Abstractions/MediaRelay.Abstractions.csproj" />
+  <Project Path="src/MediaRelay.Console/MediaRelay.Console.csproj" />
+  <Project Path="src/MediaRelay/MediaRelay.csproj" />
+  <Project Path="test/MediaRelay.Tests/MediaRelay.Tests.csproj" />
+</Solution>

@@ -1,6 +1,0 @@
-<Solution>
-
-  <Project Path="src/ImageHub.Abstractions/ImageHub.Abstractions.csproj" />
-  <Project Path="src/ImageHub.Cli/ImageHub.Cli.csproj" />
-  <Project Path="src/ImageHub/ImageHub.csproj" />
-</Solution>

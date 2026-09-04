@@ -1,8 +1,5 @@
 ﻿using ImageHub.Domain.Entities;
-using ImageHub.Enums;
-using ImageHub.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.Playwright;
 
 namespace ImageHub.Infrastructure.Services.Metadatas;

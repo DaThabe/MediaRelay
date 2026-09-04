@@ -6,5 +6,5 @@
 /// </summary>
 public interface IPublishOrchestrator
 {
-    ValueTask<PublishId> PublishAsync(PublishContent content, CancellationToken cancellationToken = default);
+    ValueTask PublishAsync(PublishContent content, CancellationToken cancellationToken = default);
 }

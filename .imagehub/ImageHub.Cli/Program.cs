@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Spectre.Console;
+using System.Text;
 using ThabeSoft.Mediator;
 
 namespace ImageHub.Cli;
@@ -39,7 +40,10 @@ internal static class Program
 
         while (true)
         {
-            var url = AnsiConsole.Ask<string>("[bold blue] 请输入网址>>> [/]");
+            // 我是直接从网页拖动过来的, 几乎是瞬间就把网址输入了
+            //var url = AnsiConsole.Ask<string>("[bold blue] 请输入网址>>> [/]");
+
+            var url = await ReadInputWithTimeoutAsync(TimeSpan.FromSeconds(0.5));
             if (url == "exit") break;
 
 
@@ -90,5 +94,52 @@ internal static class Program
             .Build();
 
         return host;
+    }
+
+
+    // 读取输入并设置超时
+    private static async Task<string?> ReadInputWithTimeoutAsync(TimeSpan timeout)
+    {
+        var input = new StringBuilder();
+        var lastInputTime = DateTime.Now;
+        var hasStarted = false;
+
+        // 监听按键
+        while (true)
+        {
+            if (Console.KeyAvailable)
+            {
+                var key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input.ToString();
+                }
+                else if (key.Key == ConsoleKey.Backspace && input.Length > 0)
+                {
+                    input.Length--;
+                    Console.Write("\b \b");
+                    lastInputTime = DateTime.Now; // 退格也重置计时器
+                    hasStarted = true;
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    input.Append(key.KeyChar);
+                    Console.Write(key.KeyChar);
+                    lastInputTime = DateTime.Now; // 有输入重置计时器
+                    hasStarted = true;
+                }
+            }
+
+            // 只有在已经开始输入后，才检查空闲超时
+            if (hasStarted && (DateTime.Now - lastInputTime) >= timeout)
+            {
+                Console.WriteLine();  // 换行
+                return input.ToString();  // 自动确认
+            }
+
+            await Task.Delay(1);  // 避免CPU空转
+        }
     }
 }

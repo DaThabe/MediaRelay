@@ -1,0 +1,21 @@
+﻿<Project Sdk="MSTest.Sdk/4.0.2">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<RootNamespace>MediaRelay</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Moq" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\src\MediaRelay.Http\MediaRelay.Http.csproj" />
+		<ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
+	</ItemGroup>
+
+</Project>
