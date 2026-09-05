@@ -3,7 +3,7 @@
 namespace MediaRelay.Input;
 
 
-internal sealed partial class InputParserSelector(
+internal sealed class InputParserSelector(
         IEnumerable<IInputParser> parsers,
         ILogger<InputParserSelector> logger
     ) : IInputParserSelector
@@ -16,14 +16,14 @@ internal sealed partial class InputParserSelector(
         {
             if (!parser.CanParse(input)) continue;
 
-            LogSelected(parser.GetType().Name, input);
+            using var _ = logger.Scope()
+                .Add("InputParserName", parser.GetType().Name)
+                .Begin();
+            logger.LogDebug("已经选择输入解析器");
+
             return parser;
         }
 
         throw new NotSupportedException($"无法解析的输入: {input}");
     }
-
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "已选择 [{ParserType}] < 输入 [{Input}]")]
-    private partial void LogSelected(string parserType, string input);
 }

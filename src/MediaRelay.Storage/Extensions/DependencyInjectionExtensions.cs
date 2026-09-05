@@ -13,11 +13,9 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddStorage()
         {
             services.AddOptions<StorageOptions>()
-               .PostConfigure<IConfiguration>((options, configuration) =>
-               {
-                   var selection = configuration.GetSection("Storage");
-                   selection.Bind(options);
-               });
+               .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(StorageOptions.Name)
+                    .Bind(options));
 
             services.AddSingleton<IHasher, SHA256Hasher>();
 

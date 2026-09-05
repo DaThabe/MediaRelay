@@ -1,18 +1,19 @@
-﻿using MediaRelay.Source;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Publish;
 
 
-internal sealed partial class PublishOrchestrator(
+internal sealed class PublishOrchestrator(
     IEnumerable<IPublishExecutor> executors,
     ILogger<PublishOrchestrator> logger
     ) : IPublishOrchestrator
 {
     private readonly IPublishExecutor[] _executors = [.. executors];
 
-    public ValueTask PublishAsync(PublishContent content, CancellationToken cancellationToken = default)
+    public async ValueTask PublishAsync(PublishContent content, CancellationToken cancellationToken = default)
     {
+        if (_executors.Length == 0) return;
+
         var tasks = new List<Task>();
 
         foreach (var executor in _executors)
@@ -21,10 +22,10 @@ internal sealed partial class PublishOrchestrator(
             tasks.Add(task);
         }
 
-        return new ValueTask(Task.WhenAll(tasks));
+        logger.LogInformation("正在推送");
+
+        await Task.WhenAll(tasks);
+
+        logger.LogInformation("推送完成");
     }
-
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "处理完成 < 来源 [{Source}]")]
-    private partial void LogFinish(ISource source);
 }

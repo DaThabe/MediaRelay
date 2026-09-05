@@ -14,6 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\src\MediaRelay.Console\MediaRelay.Console.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Http\MediaRelay.Http.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
 	</ItemGroup>

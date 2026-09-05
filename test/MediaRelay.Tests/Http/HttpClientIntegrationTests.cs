@@ -17,8 +17,7 @@ public sealed class HttpClientIntegrationTests
         {
             IgnoreSslErrors = true,
             Timeout = TimeSpan.FromSeconds(30),
-            UserAgent = "TestAgent",
-            Proxy = null
+            UserAgent = "TestAgent"
         };
 
         var mockOptions = Mock.Of<IOptions<HttpOptions>>(x => x.Value == options);

@@ -17,7 +17,11 @@ internal sealed partial class MediaRelay(
         ISource source,
         CancellationToken cancellationToken = default)
     {
-        LogBegin(source);
+        using var _ = logger.Scope()
+            .Add("SourceId", source.Id)
+            .Begin();
+
+        logger.LogInformation("开始处理");
 
         var content = await extractorSelector
             .Select(source)
@@ -30,14 +34,6 @@ internal sealed partial class MediaRelay(
         await publishOrchestrator
             .PublishAsync(publishContent, cancellationToken);
 
-        LogFinish(source);
+        logger.LogInformation("处理完成");
     }
-
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "开始处理 < 来源 [{Source}]")]
-    private partial void LogBegin(ISource source);
-
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "处理完成 < 来源 [{Source}]")]
-    private partial void LogFinish(ISource source);
 }

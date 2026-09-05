@@ -9,7 +9,7 @@ public interface IPlaywrightService
     ValueTask<IPlaywright> GetPlaywrightAsync();
 }
 
-internal sealed partial class PlaywrightService(
+internal sealed class PlaywrightService(
         ILogger<PlaywrightService> logger
     ) : IPlaywrightService, IDisposable
 {
@@ -27,9 +27,9 @@ internal sealed partial class PlaywrightService(
         {
             if (_playwright is not null) return _playwright;
 
-            LogInit();
+            logger.LogInformation("开始初始化");
             _playwright ??= await Microsoft.Playwright.Playwright.CreateAsync();
-            LogComplete();
+            logger.LogInformation("初始化完成");
 
             return _playwright;
         }
@@ -49,12 +49,4 @@ internal sealed partial class PlaywrightService(
 
         _lock.Dispose();
     }
-
-
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "开始初始化")]
-    private partial void LogInit();
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "初始化完成")]
-    private partial void LogComplete();
 }

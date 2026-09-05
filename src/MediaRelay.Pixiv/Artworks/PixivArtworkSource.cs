@@ -6,5 +6,4 @@ internal sealed record class PixivArtworkSource(Uri Url, long ArtworkId) : IWebP
 {
     public SourceId Id { get; } = SourceId.Create($"Pixiv:{ArtworkId}");
     public Uri Url { get; } = Url;
-    public override string ToString() => Id.ToString();
 }

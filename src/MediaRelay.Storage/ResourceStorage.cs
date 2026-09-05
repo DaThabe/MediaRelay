@@ -1,23 +1,34 @@
 ﻿using MediaRelay.Resources;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Storage;
 
 
-internal sealed class ResourceStorage(IStorage storage) : IResourceStorage
+internal sealed class ResourceStorage(IStorage storage, ILogger<ResourceStorage> logger) : IResourceStorage
 {
     public async ValueTask<IReadOnlyDictionary<ResourceId, StorageResource>> StoreAllAsync(
         IEnumerable<IResource> resources,
         CancellationToken cancellationToken = default)
     {
         var uris = new Dictionary<ResourceId, StorageResource>();
+        var index = 0;
+        var resourcesArray = resources.ToArray();
 
-        foreach (var resource in resources)
+        using var _ = logger.BeginScope("ResourceCount", resourcesArray.Length);
+        logger.LogInformation("开始储存资源");
+
+        foreach (var resource in resourcesArray)
         {
             await using var stream = await resource
                 .GetStreamAsync(cancellationToken);
 
+            using var __ = logger.BeginScope("Index", index++);
+            logger.LogInformation("正在储存资源");
+
             var info = await storage
                 .StoreAsync(stream, resource.Extensions, cancellationToken);
+
+            logger.LogInformation("资源储已储存");
 
             uris[resource.Id] = new StorageResource()
             {
@@ -28,6 +39,8 @@ internal sealed class ResourceStorage(IStorage storage) : IResourceStorage
                 Extensions = info.Extensions
             };
         }
+
+        logger.LogInformation("资源储存完毕");
 
         return uris;
     }

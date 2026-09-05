@@ -16,10 +16,23 @@ public abstract partial class BrowserContentScriptExtractor(
         ExtractionContext context,
         CancellationToken cancellationToken)
     {
+        LogBeginExecuteScript();
+
         // 执行脚本
         var scriptResult = await ExecuteScriptAsync(context.Page, cancellationToken);
+        LoScriptExecuteComplete();
+
         // 解析脚本结果
-        return ParseScriptResult(context.Source, scriptResult);
+        var content =  ParseScriptResult(context.Source, scriptResult);
+
+        using var _ = _logger.BeginScope(new
+        {
+            ContentId = content.Id,
+            ResourceIds = content.MediaResources.Select(x => x.Id).ToArray()
+        });
+
+        LogParsedContent();
+        return content;
     }
 
 
@@ -40,6 +53,12 @@ public abstract partial class BrowserContentScriptExtractor(
     }
 
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "开始提取内容")]
-    private partial void LogBeginExtract();
+    [LoggerMessage(Level = LogLevel.Information, Message = "开始执行脚本")]
+    private partial void LogBeginExecuteScript();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "脚本执行完毕")]
+    private partial void LoScriptExecuteComplete();
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "解析完成")]
+    private partial void LogParsedContent();
 }

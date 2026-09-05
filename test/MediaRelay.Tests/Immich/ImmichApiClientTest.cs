@@ -24,7 +24,7 @@ public sealed class ImmichApiClientTest
 
         
 
-        Console.WriteLine(my);
+        System.Console.WriteLine(my);
     }
 
     public TestContext TestContext { get; set; }

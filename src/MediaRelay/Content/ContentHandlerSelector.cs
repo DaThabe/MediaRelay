@@ -1,10 +1,10 @@
-﻿using MediaRelay.Content;
-using MediaRelay.Publish;
+﻿using MediaRelay.Publish;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay;
+namespace MediaRelay.Content;
 
-internal sealed partial class ContentHandlerSelector(
+
+internal sealed class ContentHandlerSelector(
         IEnumerable<IPublishContentConverter> handlers,
         ILogger<ContentHandlerSelector> logger
     ) : IPublishContentConverterSelector
@@ -17,15 +17,15 @@ internal sealed partial class ContentHandlerSelector(
         {
             if (handler.CanConvert(content))
             {
-                LogSelected(handler.GetType().Name, content);
+                using var _ = logger.Scope()
+                   .Add("ContentHandlerName", handler.GetType().Name)
+                   .Begin();
+                logger.LogDebug("已经选内容处理器");
+
                 return handler;
             }
         }
 
         throw new NotSupportedException($"无法提取该输入: {content.GetType().Name}");
     }
-
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "已选择 [{HandlerType}] < 内容 [{Content}]")]
-    private partial void LogSelected(string handlerType, IContent content);
 }

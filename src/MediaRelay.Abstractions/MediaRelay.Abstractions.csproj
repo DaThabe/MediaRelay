@@ -4,4 +4,8 @@
 		<RootNamespace>MediaRelay</RootNamespace>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+	</ItemGroup>
+
 </Project>

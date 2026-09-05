@@ -30,12 +30,6 @@ internal sealed partial class HttpClient : IHttpClient
             handler.ServerCertificateCustomValidationCallback = delegate { return true; };
         }
 
-        if (options.Value.Proxy is ProxyOptions proxy)
-        {
-            handler.UseProxy = proxy.Enable;
-            handler.Proxy = new WebProxy { Address = new Uri(proxy.Address) };
-        }
-
         _inner = new System.Net.Http.HttpClient(handler)
         {
             Timeout = options.Value.Timeout
@@ -75,11 +69,17 @@ internal sealed partial class HttpClient : IHttpClient
 
     public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
     {
-        LogAction("Send", request.RequestUri?.ToString() ?? "null");
+        LogAction(request.Method.ToString(), request.RequestUri?.ToString() ?? "null");
         return _inner.SendAsync(request, cancellationToken);
     }
 
 
-    [LoggerMessage(Level = LogLevel.Debug, Message = "[ {Action} ] < {url}")]
-    private partial void LogAction(string action, string? url);
+    private void LogAction(string action, string url)
+    {
+        using var _ = _logger.Scope()
+            .Add("Url", url)
+            .Begin();
+
+        _logger.LogDebug("{Action}", action);
+    }
 }

@@ -3,6 +3,9 @@
 
 public sealed record class ImmichOptions
 {
-    public string BaseUrl { get; set; } = string.Empty;
-    public string ApiKey { get; set; } = string.Empty;
+    public static string Name { get; set; } = "Immich";
+
+
+    public required string BaseUrl { get; set; }
+    public required string ApiKey { get; set; }
 }

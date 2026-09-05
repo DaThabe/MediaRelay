@@ -10,7 +10,7 @@ public interface IPixivDownloader
     ValueTask<Stream> DownloadAsync(string url, CancellationToken cancellationToken = default);
 }
 
-internal sealed partial class PixivDownloader(IOptions<PixivOptions> options, IHttpClient httpClient, ILogger<PixivDownloader> logger) : IPixivDownloader
+internal sealed class PixivDownloader(IOptions<PixivOptions> options, IHttpClient httpClient, ILogger<PixivDownloader> logger) : IPixivDownloader
 {
     private readonly SemaphoreSlim _lock = new(options.Value.MaxConcurrentDownloads, options.Value.MaxConcurrentDownloads);
     private readonly ResiliencePipeline<Stream> pipeline = new ResiliencePipelineBuilder<Stream>()
@@ -46,32 +46,21 @@ internal sealed partial class PixivDownloader(IOptions<PixivOptions> options, IH
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
                 request.Headers.Referrer = new Uri(options.Value.Referrer);
 
-                LogDownloading(url);
+                logger.LogDebug("下载中");
 
                 var response = await httpClient.SendAsync(request, cancellationToken);
                 //response.EnsureSuccessStatusCode();
                 var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
 
-                LogDownloaded(url);
+                logger.LogInformation("下载完成");
 
                 return stream;
             }
             catch (Exception ex)
             {
-                LogDownloadError(url, ex.Message);
+                logger.LogError(ex, "下载失败");
                 throw;
             }
         }
     }
-
-
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "下载中 < Url [{url}]")]
-    private partial void LogDownloading(string url);
-
-    [LoggerMessage(Level = LogLevel.Information, Message = "下载完成 < Url [{url}]")]
-    private partial void LogDownloaded(string url);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "下载失败 < Url [{url}], 错误信息 [{message}]")]
-    private partial void LogDownloadError(string url, string message);
 }

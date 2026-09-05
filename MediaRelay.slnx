@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/Module/">
     <Project Path="src/MediaRelay.Http/MediaRelay.Http.csproj" />
+    <Project Path="src/MediaRelay.Logging/MediaRelay.Logging.csproj" />
     <Project Path="src/MediaRelay.Playwright/MediaRelay.Playwright.csproj" />
     <Project Path="src/MediaRelay.Storage/MediaRelay.Storage.csproj" />
   </Folder>

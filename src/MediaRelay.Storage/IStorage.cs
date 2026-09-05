@@ -9,7 +9,7 @@ public interface IStorage
     ValueTask<StorageInfo> StoreAsync(Stream stream, string extension, CancellationToken cancellationToken = default);
 }
 
-internal sealed partial class Storage(
+internal sealed class Storage(
     IOptions<StorageOptions> options,
     IHasher hasher,
     ILogger<Storage> logger) : IStorage
@@ -23,10 +23,16 @@ internal sealed partial class Storage(
 
         // Hash信息
         var (hashAlgorithm, hash) = await GetHashInfoAsync(stream, cancellationToken);
+
+        using var _ = logger.Scope("Hash", hash)
+            .Add("HashAlgorithm", hashAlgorithm)
+            .Begin();
+        logger.LogInformation("文件Hash计算完成");
+
         // 完整路径
-        var fullPath = await CombineFullPathAsync(hash, extension, cancellationToken);
+        var fullPath = CombineFullPath(hash, extension);
         // 保存流
-        var fullUri =  await SaveStreamToFileAsync(stream, fullPath, cancellationToken);
+        var fullUri = await SaveStreamToFileAsync(stream, fullPath, cancellationToken);
 
         return new StorageInfo()
         {
@@ -50,24 +56,26 @@ internal sealed partial class Storage(
         return (hasher.Algorithm, hash);
     }
 
-    private async Task<string> CombineFullPathAsync(string hash, string extension, CancellationToken cancellationToken)
+    private string CombineFullPath(string hash, string extension)
     {
         // 格式化扩展名
         extension = extension.TrimStart('.');
 
         // 合并路径
         var fileName = $"{hash}.{extension}";
-        return Path.Combine(AppContext.BaseDirectory, options.Value.Data.RootPath, fileName);
+        return Path.Combine(AppContext.BaseDirectory, options.Value.RootPath, fileName);
     }
 
     private async Task<Uri> SaveStreamToFileAsync(Stream source, string fullPath, CancellationToken cancellationToken)
     {
         var uri = new Uri($"file://{fullPath.Replace('\\', '/')}");
-        Directory.CreateDirectory(options.Value.Data.RootPath);
+        Directory.CreateDirectory(options.Value.RootPath);
+
+        using var _ = logger.BeginScope("Uri", uri);
 
         if (File.Exists(fullPath))
         {
-            LogFileExisted(fullPath);
+            logger.LogInformation("文件已存在");
             return uri;
         }
 
@@ -75,14 +83,7 @@ internal sealed partial class Storage(
         await using var fs = new FileStream(fullPath, FileMode.CreateNew, FileAccess.Write, FileShare.Write, 4096);
         await source.CopyToAsync(fs, cancellationToken);
 
-        LogFileSaved(fullPath);
+        logger.LogInformation("文件已储存");
         return uri;
     }
-
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "文件已存在 < 路径 [{path}]")]
-    private partial void LogFileExisted(string path);
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "文件已保存 < 路径 [{path}]")]
-    private partial void LogFileSaved(string path);
 }

@@ -11,12 +11,10 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddHttpClient()
         {
-             services.AddOptions<HttpOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) =>
-                {
-                    var selection = configuration.GetSection("Http");
-                    selection.Bind(options);
-                });
+            services.AddOptions<HttpOptions>()
+              .Configure<IConfiguration>((options, configuration) => configuration
+                   .GetSection(HttpOptions.Name)
+                   .Bind(options));
 
             services.AddSingleton<IHttpClient, MediaRelay.Http.HttpClient>();
 

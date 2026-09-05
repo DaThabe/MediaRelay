@@ -1,11 +1,13 @@
-﻿using MediaRelay.Immich;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 
 await Host.CreateDefaultBuilder()
+    .ConfigureLogging(builder => builder.ClearProviders())
     .ConfigureServices(x => x
         //Module
+        //.UseMediaRelayLogging()
         .AddPlaywright()
         .AddHttpClient()
         .AddStorage()
@@ -16,7 +18,7 @@ await Host.CreateDefaultBuilder()
         // Destinations
         .AddImmichDestination()
 
-        // Console
+        // Core
         .AddMediaRelay()
         .AddMediaRelayConsole()
         )

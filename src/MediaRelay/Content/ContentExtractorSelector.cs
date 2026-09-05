@@ -1,10 +1,10 @@
-﻿using MediaRelay.Content;
-using MediaRelay.Source;
+﻿using MediaRelay.Source;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay;
+namespace MediaRelay.Content;
 
-internal sealed partial class ContentExtractorSelector(
+
+internal sealed class ContentExtractorSelector(
         IEnumerable<IContentExtractor> extractors,
         ILogger<ContentExtractorSelector> logger
     ) : IContentExtractorSelector
@@ -17,15 +17,15 @@ internal sealed partial class ContentExtractorSelector(
         {
             if (extractor.CanExtract(source))
             {
-                LogSelected(extractor.GetType().Name, source);
+                using var _ = logger.Scope()
+                   .Add("ContentExtractorName", extractor.GetType().Name)
+                   .Begin();
+                logger.LogDebug("已经选内容提取器");
+
                 return extractor;
             }
         }
 
         throw new NotSupportedException($"无法提取该输入: {source.GetType().Name}");
     }
-
-
-    [LoggerMessage(Level = LogLevel.Debug, Message = "已选择 [{ExtractorType}] < 来源 [{Source}]")]
-    private partial void LogSelected(string extractorType, ISource source);
 }

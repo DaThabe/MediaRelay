@@ -20,9 +20,6 @@ internal sealed partial record class PixivArtworkContent : IWebContent
 
     private PixivArtworkContent() { }
     public static Builder BuilderFromArtworkId(Uri sourceUri, long artworkId) => new(sourceUri, artworkId);
-
-
-    public override string ToString() => Id.ToString();
 }
 
 

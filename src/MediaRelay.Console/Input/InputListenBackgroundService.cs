@@ -6,37 +6,50 @@ namespace MediaRelay.Console.Input;
 
 
 internal sealed class InputListenBackgroundService(
-    IMediaRelay mediaRelay,
-    IInputParserSelector sourceParserSelector,
-    ILogger<InputListenBackgroundService> logger) : BackgroundService
+        IMediaRelay mediaRelay,
+        IInputParserSelector sourceParserSelector,
+        ILogger<InputListenBackgroundService> logger
+    ) : BackgroundService
 {
+    private int _requestId;
+    private readonly CancellationTokenSource _cts = new();
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            try
-            {
-                System.Console.Write(">>> ");
-                var rawInput = System.Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(rawInput)) continue;
+            var input = System.Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(input)) continue;
 
-                _ = Task.Run(async () => await HandleInputAsync(rawInput, stoppingToken), stoppingToken);
-            }
-            catch (Exception ex)
-            {
-                System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine($"发生错误: {ex.Message}");
-                System.Console.ResetColor();
-            }
+            if (input == "exit") break;
+            OnInputHistoryAdded(new() { Input = input });
         }
     }
 
-    private async ValueTask HandleInputAsync(string rawInput, CancellationToken cancellationToken)
-    {
-        var input = sourceParserSelector
-                    .Select(rawInput)
-                    .Parse(rawInput);
 
-        await mediaRelay.HandleAsync(input, cancellationToken);
+    public override void Dispose()
+    {
+        _cts.Cancel();
+        base.Dispose();
+    }
+
+
+    private async void OnInputHistoryAdded(InputMessage message)
+    {
+        var requestId = Interlocked.Increment(ref _requestId);
+        using var _ = logger.BeginScope("RequestId", requestId);
+
+        try
+        {
+            var input = sourceParserSelector
+                       .Select(message.Input)
+                       .Parse(message.Input);
+
+            await mediaRelay.HandleAsync(input, _cts.Token);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "处理失败");
+        }
     }
 }
