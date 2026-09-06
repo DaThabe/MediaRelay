@@ -12,11 +12,17 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddMediaRelayConsole()
         {
-            // 日志
-            services.AddSingleton<ILoggerProvider, ConsoleLoggerProvider>();
             services.AddHostedService<InputListenBackgroundService>();
-
             return services;
+        }
+    }
+
+    extension(ILoggingBuilder builder)
+    {
+        public ILoggingBuilder AddMediaRelayConsole()
+        {
+            builder.Services.AddSingleton<ILoggerProvider, ConsoleLoggerProvider>();
+            return builder;
         }
     }
 }

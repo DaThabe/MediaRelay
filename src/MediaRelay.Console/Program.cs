@@ -4,10 +4,14 @@ using Microsoft.Extensions.Logging;
 
 
 await Host.CreateDefaultBuilder()
-    .ConfigureLogging(builder => builder.ClearProviders())
+    .ConfigureLogging(builder =>
+    {
+        builder.ClearProviders();
+        builder.AddDebug();
+        builder.AddMediaRelayConsole();
+    })
     .ConfigureServices(x => x
         //Module
-        //.UseMediaRelayLogging()
         .AddPlaywright()
         .AddHttpClient()
         .AddStorage()
