@@ -4,20 +4,15 @@ using Microsoft.Extensions.Logging;
 
 
 await Host.CreateDefaultBuilder()
-    .ConfigureLogging(builder =>
-    {
-        builder.ClearProviders();
-        builder.AddDebug();
-        builder.AddMediaRelayConsole();
-    })
-    .ConfigureServices(x => x
-        //Module
-        .AddPlaywright()
-        .AddHttpClient()
-        .AddStorage()
-
+    .ConfigureLogging(builder => builder
+        .ClearProviders()
+        .AddMediaRelayDebug()
+        .AddMediaRelayConsole()
+    )
+    .ConfigureServices(services => services
         // Sources
         .AddPixivSource()
+        .AddTwitterSource()
 
         // Destinations
         .AddImmichDestination()

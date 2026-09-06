@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Content;
-using MediaRelay.Resources;
+using MediaRelay.Storage;
 
 namespace MediaRelay.Publish;
 
@@ -7,11 +7,11 @@ namespace MediaRelay.Publish;
 public sealed record class PublishContent
 {
     public required ContentId ContentId { get; init; }
-    public required Uri SourceUri { get; init; }
-    public required IReadOnlySet<StorageResource> Resources { get; init; }
+    public required Uri SourceUrl { get; init; }
+    public required IReadOnlySet<StorageInfo> Resources { get; init; }
 
     public string Title { get; init; } = string.Empty;
-    public string Description { get; init; } = string.Empty;
+    public string? Description { get; init; }
     public DateTimeOffset UploadAt { get; init; }
 
 

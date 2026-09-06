@@ -2,13 +2,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
-		<ProjectReference Include="..\MediaRelay.Http\MediaRelay.Http.csproj" />
-		<ProjectReference Include="..\MediaRelay.Playwright\MediaRelay.Playwright.csproj" />
-		<ProjectReference Include="..\MediaRelay.Storage\MediaRelay.Storage.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Polly.Core" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -16,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Scripts\PixivExtractScript.js">
+		<None Update="Browser\Scripts\PixivArtwork.js">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

@@ -109,7 +109,7 @@ internal sealed partial class SpectreConsoleLogger
 
         foreach (var i in datas)
         {
-            var item = $"[{_scopeDataKeyStyle.ToMarkup()}]{i.Key.EscapeMarkup()}[/] [{_scopeDataEqualSignStyle.ToMarkup()}]=[/] [{_scopeDataValueStyle.ToMarkup()}]{i.Value.ToString().EscapeMarkup()}[/] ";
+            var item = $"[{_scopeDataKeyStyle.ToMarkup()}]{i.Key.EscapeMarkup()}[/][{_scopeDataEqualSignStyle.ToMarkup()}]=[/][{_scopeDataValueStyle.ToMarkup()}]{i.Value.ToString().EscapeMarkup()}[/] ";
             items.Add(item);
         }
 

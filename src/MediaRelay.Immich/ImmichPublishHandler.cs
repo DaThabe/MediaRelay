@@ -51,7 +51,7 @@ internal sealed class ImmichPublishHandler(ImmichApiClient apiClient) : IPublish
 
             }, cancellationToken: cancellationToken);
 
-            var describe = $"{content.Title}{Environment.NewLine}{content.Description}{Environment.NewLine}{content.SourceUri}";
+            var describe = $"{content.Title}{Environment.NewLine}{content.Description}{Environment.NewLine}{content.SourceUrl}";
 
             _ = await apiClient.Assets.UpdateAsync(uploadResult.Id!,
                 new() { Description = describe }, cancellationToken);

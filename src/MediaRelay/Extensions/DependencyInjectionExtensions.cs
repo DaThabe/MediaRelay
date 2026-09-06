@@ -1,7 +1,14 @@
 ﻿using MediaRelay;
+using MediaRelay.Browser;
+using MediaRelay.Console.Logging;
 using MediaRelay.Content;
-using MediaRelay.Input;
+using MediaRelay.Http;
+using MediaRelay.Playwright;
 using MediaRelay.Publish;
+using MediaRelay.Source.Url;
+using MediaRelay.Storage;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -14,14 +21,78 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddMediaRelay()
         {
-            services.AddSingleton<IMediaRelay, MediaRelay.MediaRelay>();
-            services.AddSingleton<IInputParserSelector, InputParserSelector>();
+            return services.AddCore()
+                .AddHttpClient()
+                .AddPlaywright()
+                .AddStorage();
+        }
+
+        private IServiceCollection AddCore()
+        {
+            services.AddSingleton<IUrlSourceParserSelector, UrlSourceParserSelector>();
             services.AddSingleton<IPublishContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
-
             services.AddSingleton<IPublishOrchestrator, PublishOrchestrator>();
 
+            services.AddSingleton<IMediaRelay, MediaRelay.MediaRelay>();
+
             return services;
+        }
+
+        private IServiceCollection AddHttpClient()
+        {
+            services.AddOptions<HttpOptions>()
+              .Configure<IConfiguration>((options, configuration) => configuration
+                   .GetSection(HttpOptions.Name)
+                   .Bind(options));
+
+            services.AddSingleton<IHttpClient, MediaRelay.Http.HttpClient>();
+
+            return services;
+        }
+
+        private IServiceCollection AddPlaywright()
+        {
+            services.AddOptions<BrowserOptions>()
+               .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(BrowserOptions.Name)
+                    .Bind(options));
+
+            services.AddOptions<BrowserLaunchOptions>()
+               .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(BrowserOptions.Name)
+                    .GetSection(BrowserLaunchOptions.Name)
+                    .Bind(options));
+
+
+            services.AddSingleton<IPlaywrightService, PlaywrightService>();
+            services.AddSingleton<IBrowserService, ChromiumBrowserService>();
+
+            return services;
+        }
+
+        private IServiceCollection AddStorage()
+        {
+            services.AddOptions<StorageOptions>()
+               .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(StorageOptions.Name)
+                    .Bind(options));
+
+            services.AddSingleton<IHasher, SHA256Hasher>();
+
+            services.AddSingleton<IStorage, Storage>();
+            services.AddSingleton<IResourceStorage, ResourceStorage>();
+
+            return services;
+        }
+    }
+
+    extension(ILoggingBuilder builder)
+    {
+        public ILoggingBuilder AddMediaRelayDebug()
+        {
+            builder.Services.AddSingleton<ILoggerProvider, DebugLoggerProvider>();
+            return builder;
         }
     }
 }

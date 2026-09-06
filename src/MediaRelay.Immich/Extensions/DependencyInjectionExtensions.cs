@@ -17,8 +17,9 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddImmichDestination()
         {
             services.AddOptions<ImmichOptions>()
-              .Configure<IConfiguration>((options, configuration) =>
-                configuration.GetSection(ImmichOptions.Name).Bind(options));
+                .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(ImmichOptions.Name)
+                    .Bind(options));
 
             services.AddSingleton(sp =>
             {

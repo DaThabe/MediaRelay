@@ -13,17 +13,18 @@ public readonly record struct ContentId : IEquatable<ContentId>
 
     public static ContentId Create(string value)
     {
-        ArgumentNullException.ThrowIfNull(value);
-
         var trimmed = value.Trim();
 
-        ArgumentException.ThrowIfNullOrWhiteSpace(trimmed);
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("内容Id值不可为空", nameof(value));
 
         return new ContentId(trimmed);
     }
     public static ContentId Create(Guid guid)
     {
-        if (guid == Guid.Empty) throw new ArgumentException("GUID cannot be empty.", nameof(guid));
+        if (guid == Guid.Empty)
+            throw new ArgumentException("内容Id使用Guid创建时不可使用空值", nameof(guid));
+
         return new ContentId(guid.ToString("N"));
     }
 

@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Polly.Core" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="MediaRelay.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Browser\Scripts\TwitterTweet.js">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>

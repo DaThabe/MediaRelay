@@ -2,6 +2,7 @@
 
 namespace MediaRelay.Console.Logging;
 
+
 internal sealed class LoggerScope(LoggerScope? parent = null) : IEnumerable<KeyValuePair<string, object>>, IDisposable
 {
     private bool _disposed;

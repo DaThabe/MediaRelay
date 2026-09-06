@@ -69,7 +69,7 @@ internal sealed class ApigenImmichClientHacker
 
             // 比较
             if (obj.Id != dto.Id || obj.Status != dto.Status)
-                throw new InvalidOperationException("测试结果不一致");
+                throw new InvalidOperationException("Json序列化前后比对结果不一致");
         }
         catch (InvalidOperationException)
         {
@@ -77,7 +77,7 @@ internal sealed class ApigenImmichClientHacker
         }
         catch (Exception ex)
         {
-            throw new InvalidOperationException("测试失败", ex);
+            throw new InvalidOperationException("Json序列化测试失败", ex);
         }
     }
 }

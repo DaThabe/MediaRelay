@@ -1,4 +1,6 @@
 ﻿using MediaRelay.Resources;
+using MediaRelay.Source;
+using MediaRelay.Source.Url;
 
 namespace MediaRelay.Content;
 
@@ -9,10 +11,12 @@ namespace MediaRelay.Content;
 public interface IContent
 {
     ContentId Id { get; }
+    ISource Source { get; }
     IReadOnlySet<IResource> MediaResources { get; }
 }
 
 public interface IWebContent : IContent
 {
-    Uri SourceUri { get; }
+    ISource IContent.Source => Source;
+    new IUrlSource Source { get; }
 }

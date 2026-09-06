@@ -1,15 +1,11 @@
 <Solution>
-  <Folder Name="/Destinations/">
+  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/Destinations/">
     <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
   </Folder>
-  <Folder Name="/Module/">
-    <Project Path="src/MediaRelay.Http/MediaRelay.Http.csproj" />
-    <Project Path="src/MediaRelay.Logging/MediaRelay.Logging.csproj" />
-    <Project Path="src/MediaRelay.Playwright/MediaRelay.Playwright.csproj" />
-    <Project Path="src/MediaRelay.Storage/MediaRelay.Storage.csproj" />
-  </Folder>
-  <Folder Name="/Sources/">
+  <Folder Name="/Modules/Sources/">
     <Project Path="src/MediaRelay.Pixiv/MediaRelay.Pixiv.csproj" />
+    <Project Path="src/MediaRelay.Twitter/MediaRelay.Twitter.csproj" />
   </Folder>
   <Project Path="src/MediaRelay.Abstractions/MediaRelay.Abstractions.csproj" />
   <Project Path="src/MediaRelay.Console/MediaRelay.Console.csproj" />

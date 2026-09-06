@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Content;
+using MediaRelay.Extensions;
 using MediaRelay.Publish;
 using MediaRelay.Source;
 using Microsoft.Extensions.Logging;
@@ -6,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay;
 
 
-internal sealed partial class MediaRelay(
+internal sealed class MediaRelay(
         IContentExtractorSelector extractorSelector,
         IPublishContentConverterSelector converterSelector,
         IPublishOrchestrator publishOrchestrator,

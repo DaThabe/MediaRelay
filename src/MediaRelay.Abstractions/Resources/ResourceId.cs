@@ -13,20 +13,12 @@ public readonly record struct ResourceId : IEquatable<ResourceId>
 
     public static ResourceId Create(string value)
     {
-        ArgumentNullException.ThrowIfNull(value);
-
         var trimmed = value.Trim();
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(trimmed);
+        if (string.IsNullOrWhiteSpace(trimmed))
+            throw new ArgumentException("创建资源 Id 时不可使用空字符串", nameof(value));
 
         return new ResourceId(trimmed);
     }
-    public static ResourceId Create(Guid guid)
-    {
-        if (guid == Guid.Empty) throw new ArgumentException("GUID cannot be empty.", nameof(guid));
-        return new ResourceId(guid.ToString("N"));
-    }
-
 
 
     public bool Equals(ResourceId? other) => _value.Equals(other?._value, StringComparison.OrdinalIgnoreCase);

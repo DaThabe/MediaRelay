@@ -12,7 +12,7 @@ public interface IPixivDownloader
 
 internal sealed class PixivDownloader(IOptions<PixivOptions> options, IHttpClient httpClient, ILogger<PixivDownloader> logger) : IPixivDownloader
 {
-    private readonly SemaphoreSlim _lock = new(options.Value.MaxConcurrentDownloads, options.Value.MaxConcurrentDownloads);
+    private readonly SemaphoreSlim _lock = new(options.Value.Http.MaxConcurrentDownloads, options.Value.Http.MaxConcurrentDownloads);
     private readonly ResiliencePipeline<Stream> pipeline = new ResiliencePipelineBuilder<Stream>()
         .AddRetry(new()
         {
@@ -44,7 +44,7 @@ internal sealed class PixivDownloader(IOptions<PixivOptions> options, IHttpClien
             try
             {
                 var request = new HttpRequestMessage(HttpMethod.Get, url);
-                request.Headers.Referrer = new Uri(options.Value.Referrer);
+                request.Headers.Referrer = new Uri(options.Value.Http.Referrer);
 
                 logger.LogDebug("下载中");
 
