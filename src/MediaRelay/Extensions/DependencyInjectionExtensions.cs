@@ -1,8 +1,8 @@
 ﻿using MediaRelay;
 using MediaRelay.Browser;
-using MediaRelay.Console.Logging;
 using MediaRelay.Content;
 using MediaRelay.Http;
+using MediaRelay.Logging;
 using MediaRelay.Playwright;
 using MediaRelay.Publish;
 using MediaRelay.Source.Url;
@@ -89,9 +89,14 @@ public static class DependencyInjectionExtensions
 
     extension(ILoggingBuilder builder)
     {
-        public ILoggingBuilder AddMediaRelayDebug()
+        public ILoggingBuilder AddEmojiDebug()
         {
-            builder.Services.AddSingleton<ILoggerProvider, DebugLoggerProvider>();
+            builder.Services.AddSingleton<ILoggerProvider>(EmojiLoggerProvider.Debug);
+            return builder;
+        }
+        public ILoggingBuilder AddEmojiConsole()
+        {
+            builder.Services.AddSingleton<ILoggerProvider>(EmojiLoggerProvider.Console);
             return builder;
         }
     }

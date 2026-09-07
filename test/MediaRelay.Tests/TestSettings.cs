@@ -154,5 +154,5 @@ public static class MockExtensions
     }
 
 
-    private readonly static ILoggerFactory _loggerFactory = LoggerFactory.Create(x => x.AddMediaRelayDebug());
+    private readonly static ILoggerFactory _loggerFactory = LoggerFactory.Create(x => x.AddEmojiDebug());
 }

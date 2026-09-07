@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Frozen;
-using System.Diagnostics;
 
 namespace MediaRelay.Logging;
 
 
-internal sealed class DebugLogger(string categoryName) : ILogger
+internal sealed class EmojiLogger(string categoryName, ILoggerWriter writer) : ILogger
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
@@ -41,8 +40,8 @@ internal sealed class DebugLogger(string categoryName) : ILogger
         var category = $"[{categoryName}]";
         var scopeData = GetScopeDataString(_currentScope?.ToFrozenDictionary());
 
-        Debug.WriteLine($"{time} {level} {category} {message} {scopeData}");
-        if (exception is not null) Debug.WriteLine(exception.ToString());
+        writer.WriteLine($"{time} {level} {category} {message} {scopeData}");
+        if (exception is not null) writer.WriteLine(exception.ToString());
     }
 
     private static string GetLevelString(LogLevel level) => level switch

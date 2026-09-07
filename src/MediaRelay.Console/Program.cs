@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 await Host.CreateDefaultBuilder()
     .ConfigureLogging(builder => builder
         .ClearProviders()
-        .AddMediaRelayDebug()
+        .AddEmojiDebug()
         .AddMediaRelayConsole()
     )
     .ConfigureServices(services => services
