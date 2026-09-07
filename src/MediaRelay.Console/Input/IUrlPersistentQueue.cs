@@ -12,10 +12,10 @@ public interface IUrlPersistentQueue
     ValueTask<Uri> ReadWaitAsync(CancellationToken cancellationToken);
 }
 
-internal sealed class InputUrlBuffer : IUrlPersistentQueue, IDisposable
+internal sealed class UrlPersistentQueue : IUrlPersistentQueue, IDisposable
 {
     private bool _disposed;
-    private readonly Queue<Uri> _values;
+    private readonly Queue<Uri> _values = new();
     private readonly SemaphoreSlim _lock = new(1, 1);
     private TaskCompletionSource? writeTcs;
     private readonly Func<CancellationToken, Task> _saveHandler;
@@ -24,24 +24,25 @@ internal sealed class InputUrlBuffer : IUrlPersistentQueue, IDisposable
     public int Count => _values.Count;
 
 
-    public InputUrlBuffer(IOptions<ConsoleOptions> options, ILogger<ConsoleOptions> logger)
+    public UrlPersistentQueue(IOptions<ConsoleOptions> options, ILogger<ConsoleOptions> logger)
     {
         // Load
-        var lines = File.ReadAllLines(options.Value.UnprocessedInputFile);
-
-        Queue<Uri> uris = new();
-        foreach (var i in lines)
+        if (File.Exists(options.Value.UnprocessedInputFile))
         {
-            if (!Uri.TryCreate(i, UriKind.Absolute, out var uri)) continue;
-            uris.Enqueue(uri);
+            foreach (var i in File.ReadAllLines(options.Value.UnprocessedInputFile))
+            {
+                if (!Uri.TryCreate(i, UriKind.Absolute, out var uri)) continue;
+                _values.Enqueue(uri);
+            }
         }
-        _values = uris;
-
 
         // Saver
         _saveHandler = ct =>
         {
             var lines = _values.ToArray().Select(x => x.ToString());
+            var folder = Path.GetDirectoryName(options.Value.UnprocessedInputFile);
+            if (!string.IsNullOrWhiteSpace(folder)) Directory.CreateDirectory(folder);
+
             return File.WriteAllLinesAsync(options.Value.UnprocessedInputFile, lines, ct);
         };
     }
