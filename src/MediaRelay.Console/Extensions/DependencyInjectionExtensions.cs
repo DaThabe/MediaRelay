@@ -12,6 +12,7 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddMediaRelayConsole()
         {
+            services.AddSingleton<IInputUrlBuffer, InputUrlBuffer>();
             services.AddHostedService<InputListenBackgroundService>();
             return services;
         }

@@ -3,43 +3,25 @@ using MediaRelay.Source.Url;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using System.Text;
-using System.Threading.Channels;
 
 namespace MediaRelay.Console.Input;
 
 
 internal sealed class InputListenBackgroundService(
         IMediaRelay mediaRelay,
+        IInputUrlBuffer inputUrlBuffer,
         IUrlSourceParserSelector urlSourceParserSelector,
         ILogger<InputListenBackgroundService> logger
-    ) : BackgroundService, IAsyncDisposable
+    ) : BackgroundService
 {
     private int _requestId;
-    private Task? _consumerTask;
-    private readonly Channel<Uri> _urlChannel = Channel.CreateBounded<Uri>(50);
-
 
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _consumerTask = ConsumeAsync(stoppingToken);
+        _ = ConsumeAsync(stoppingToken);
         return InputAsync(stoppingToken);
     }
-
-
-    public override void Dispose()
-    {
-        DisposeAsync().AsTask().GetAwaiter().GetResult();
-    }
-    public async ValueTask DisposeAsync()
-    {
-        _urlChannel.Writer.TryComplete();
-        if (_consumerTask is not null) await _consumerTask;
-
-        _urlChannel.Writer.TryComplete();
-    }
-
 
     private Task ConsumeAsync(CancellationToken cancellationToken)
     {
@@ -49,21 +31,18 @@ internal sealed class InputListenBackgroundService(
 
             try
             {
-                await foreach (var i in _urlChannel.Reader.ReadAllAsync(cancellationToken))
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    await HandleInputAsync(i, cancellationToken);
+                    var url = await inputUrlBuffer.WaitPeepAsync(cancellationToken);
+                    await HandleInputAsync(url, cancellationToken);
 
-                    logger.LogInformation("剩余任务: {count}", _urlChannel.Reader.Count);
+                    var removeUrl = await inputUrlBuffer.WaitReadAsync(cancellationToken);
+                    logger.LogInformation("剩余任务: {count}", inputUrlBuffer.Count);
                 }
             }
-            catch (OperationCanceledException)
+            catch (Exception ex)
             {
-                List<Uri> remainingUrls = [];
-                while (_urlChannel.Reader.TryRead(out var url)) remainingUrls.Add(url);
-
-                using var _ = logger.BeginScope("RemainingUrls", $"[ {string.Join(',', remainingUrls)} ]");
-                logger.LogWarning("请求处理任务已取消");
+                logger.LogError(ex, "输入消费队列任务异常");
             }
 
         }, cancellationToken);
@@ -72,38 +51,30 @@ internal sealed class InputListenBackgroundService(
     {
         logger.LogInformation("请求输入任务已启动");
 
-        try
+        while (!cancellationToken.IsCancellationRequested)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            System.Console.CursorVisible = true;
+
+            try
             {
-                System.Console.CursorVisible = true;
+                var input = AsyncConsole.ReadLine(cancellationToken)?.Trim();
+                if (string.IsNullOrEmpty(input)) continue;
 
-                try
+
+                if (!Uri.TryCreate(input, UriKind.Absolute, out var url))
                 {
-                    var input = AsyncConsole.ReadLine(cancellationToken)?.Trim();
-                    if (string.IsNullOrEmpty(input)) continue;
-
-
-                    if (!Uri.TryCreate(input, UriKind.Absolute, out var url))
-                    {
-                        logger.LogWarning("请输入网址");
-                        continue;
-                    }
-                    await _urlChannel.Writer.WriteAsync(url, cancellationToken);
-
-                    using var _ = logger.BeginScope("Url", url);
-                    logger.LogInformation("已加入消费队列");
+                    logger.LogWarning("请输入网址");
+                    continue;
                 }
-                catch (OperationCanceledException)
-                {
-                    logger.LogError("消费队列已关闭, 无法添加");
-                }
+                await inputUrlBuffer.WriteAsync(url, cancellationToken);
+
+                using var _ = logger.BeginScope("Url", url);
+                logger.LogInformation("已加入消费队列");
             }
-        }
-        finally
-        {
-            _urlChannel.Writer.TryComplete();
-            logger.LogInformation("请求通道已关闭");
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "消费队列已关闭, 无法添加");
+            }
         }
     }
 
