@@ -14,5 +14,15 @@ public static class SemaphoreSlimExtensions
 
 file sealed class Releaser(SemaphoreSlim semaphoreSlim) : IDisposable
 {
-    public void Dispose() => semaphoreSlim.Release();
+    public void Dispose()
+    {
+        try
+        {
+            semaphoreSlim.Release();
+        }
+        catch
+        {
+
+        }
+    }
 }

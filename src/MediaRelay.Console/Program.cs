@@ -22,3 +22,4 @@ await Host.CreateDefaultBuilder()
         .AddMediaRelayConsole()
         )
     .RunConsoleAsync();
+

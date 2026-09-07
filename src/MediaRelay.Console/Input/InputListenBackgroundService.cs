@@ -9,7 +9,7 @@ namespace MediaRelay.Console.Input;
 
 internal sealed class InputListenBackgroundService(
         IMediaRelay mediaRelay,
-        IInputUrlBuffer inputUrlBuffer,
+        IUrlPersistentQueue urlPersistentQueue,
         IUrlSourceParserSelector urlSourceParserSelector,
         ILogger<InputListenBackgroundService> logger
     ) : BackgroundService
@@ -23,33 +23,50 @@ internal sealed class InputListenBackgroundService(
         return InputAsync(stoppingToken);
     }
 
-    private Task ConsumeAsync(CancellationToken cancellationToken)
+    private async Task ConsumeAsync(CancellationToken cancellationToken)
     {
-        return Task.Run(async () =>
+        logger.LogInformation("请求处理任务已启动");
+
+        while (!cancellationToken.IsCancellationRequested)
         {
-            logger.LogInformation("请求处理任务已启动");
+            var url = await urlPersistentQueue.ReadWaitAsync(cancellationToken);
+            var requestId = Interlocked.Increment(ref _requestId);
+            var beginTime = Stopwatch.GetTimestamp();
+
+            using var _ = logger.Scope("RequestId", requestId)
+                .Add("Url", url)
+                .Begin();
 
             try
             {
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    var url = await inputUrlBuffer.WaitPeepAsync(cancellationToken);
-                    await HandleInputAsync(url, cancellationToken);
+                logger.LogInformation("开始处理请求");
+                var source = urlSourceParserSelector
+                           .Select(url)
+                           .Parse(url);
 
-                    var removeUrl = await inputUrlBuffer.WaitReadAsync(cancellationToken);
-                    logger.LogInformation("剩余任务: {count}", inputUrlBuffer.Count);
-                }
+                await mediaRelay.HandleAsync(source, cancellationToken);
+
+                using var __ = logger.BeginScope("ElapsedTime", Stopwatch.GetElapsedTime(beginTime));
+                logger.LogInformation("请求处理完成");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "输入消费队列任务异常");
+                try
+                {
+                    using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                    await urlPersistentQueue.WriteAsync(url, cts.Token);
+                    logger.LogError(ex, "请求处理失败, 已重新追加至队列");
+                }
+                catch (Exception writeEx)
+                {
+                    logger.LogCritical(writeEx, "无法储存至队列");
+                }
             }
-
-        }, cancellationToken);
+        }
     }
     private async Task InputAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("请求输入任务已启动");
+        logger.LogInformation("网址输入任务已启动");
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -60,42 +77,33 @@ internal sealed class InputListenBackgroundService(
                 var input = AsyncConsole.ReadLine(cancellationToken)?.Trim();
                 if (string.IsNullOrEmpty(input)) continue;
 
-
                 if (!Uri.TryCreate(input, UriKind.Absolute, out var url))
                 {
                     logger.LogWarning("请输入网址");
                     continue;
                 }
-                await inputUrlBuffer.WriteAsync(url, cancellationToken);
+
+                await urlPersistentQueue.WriteAsync(url, cancellationToken);
 
                 using var _ = logger.BeginScope("Url", url);
-                logger.LogInformation("已加入消费队列");
+                logger.LogInformation("已加入持久队列");
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "消费队列已关闭, 无法添加");
+                logger.LogError(ex, "无法处理输入");
             }
         }
     }
 
     private async Task HandleInputAsync(Uri url, CancellationToken cancellationToken)
     {
-        var requestId = Interlocked.Increment(ref _requestId);
-        using var _ = logger.Scope("RequestId", requestId)
-            .Add("Url", url)
-            .Begin();
 
-        var beginTime = Stopwatch.GetTimestamp();
+
+
 
         try
         {
-            logger.LogInformation("开始处理请求");
-            var source = urlSourceParserSelector
-                       .Select(url)
-                       .Parse(url);
 
-            await mediaRelay.HandleAsync(source, cancellationToken);
-            logger.LogInformation("请求处理完成, 耗时: {s}s", Stopwatch.GetElapsedTime(beginTime).TotalSeconds);
         }
         catch (NotSupportedException ex)
         {
