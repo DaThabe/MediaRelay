@@ -21,7 +21,7 @@ public static class DependencyInjectionExtensions
     {
         public ILoggingBuilder AddMediaRelayConsole()
         {
-            builder.Services.AddSingleton<ILoggerProvider, ConsoleLoggerProvider>();
+            builder.Services.AddSingleton<ILoggerProvider, SpectreConsoleLoggerProvider>();
             return builder;
         }
     }

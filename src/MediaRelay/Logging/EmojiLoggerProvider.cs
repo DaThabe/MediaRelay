@@ -12,6 +12,6 @@ internal sealed class EmojiLoggerProvider : ILoggerProvider
     public void Dispose() { }
 
 
-    public static EmojiLoggerProvider Debug { get; } = new(ConsoleLoggerWriter.Instance);
-    public static EmojiLoggerProvider Console { get; } = new(DebugLoggerWriter.Instance);
+    public static EmojiLoggerProvider Debug { get; } = new(DebugLoggerWriter.Instance);
+    public static EmojiLoggerProvider Console { get; } = new(ConsoleLoggerWriter.Instance);
 }

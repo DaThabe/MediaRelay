@@ -3,7 +3,7 @@
 namespace MediaRelay.Console.Logging;
 
 
-internal sealed class ConsoleLoggerProvider : ILoggerProvider
+internal sealed class SpectreConsoleLoggerProvider : ILoggerProvider
 {
     public ILogger CreateLogger(string categoryName) => new SpectreConsoleLogger(categoryName);
     public void Dispose() { }

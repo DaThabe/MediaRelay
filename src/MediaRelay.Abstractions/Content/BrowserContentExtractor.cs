@@ -1,11 +1,9 @@
-﻿using MediaRelay.Browser;
-using MediaRelay.Content;
-using MediaRelay.Extensions;
+﻿using MediaRelay.Content;
 using MediaRelay.Source;
 using MediaRelay.Source.Url;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Playwright;
+namespace MediaRelay.Browser;
 
 
 public abstract partial class BrowserContentExtractor(

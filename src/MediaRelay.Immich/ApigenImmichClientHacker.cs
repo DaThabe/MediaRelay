@@ -449,4 +449,4 @@ internal sealed class ApigenImmichClientHacker
 [JsonSerializable(typeof(WorkflowFilterResponseDto))]
 [JsonSerializable(typeof(WorkflowResponseDto))]
 [JsonSerializable(typeof(WorkflowUpdateDto))]
-public partial class ImmichJsonSerializerContext : JsonSerializerContext;
+internal partial class ImmichJsonSerializerContext : JsonSerializerContext;
