@@ -76,6 +76,35 @@ internal sealed class TweetContentExtractor(
     }
 }
 
+
+internal sealed class TweetContentExtractorNew(IBrowserService browserService) : IContentExtractor
+{
+    public bool CanExtract(ISource source)
+    {
+        return source is TweetSource;
+    }
+
+    public async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
+    {
+        if (source is not TweetSource tweetSource)
+            throw new NotSupportedException($"不支持的推文来源: {source}");
+
+
+        await using var context = await browserService.GetSharedContextAsync();
+        await using var page = await context.NewPageAsync();
+        await page.GotoAsync("https://savetwitter.net/");
+
+
+        var script = await File.ReadAllTextAsync(options.Value.ExtractScriptPath, cancellationToken);
+        var downloadUrl = await page.EvaluateAsync<string>(script, source.Url.ToString());
+
+
+        var snapshot = JsonSerializer.Deserialize(scriptResult, SnapshotSerializerContext.Default.Snapshot)
+            ?? throw new ArgumentNullException($"未解析到推文内容: {source}");
+
+    }
+}
+
 internal sealed record class Snapshot
 {
     public required HashSet<string> Resources { get; init; }
