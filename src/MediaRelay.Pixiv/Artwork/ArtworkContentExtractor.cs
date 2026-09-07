@@ -58,7 +58,10 @@ internal sealed class ArtworkContentExtractor(
     private async Task<ArtworkContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, ArtworkSource source, CancellationToken cancellationToken)
     {
         await using var page = await context.NewPageAsync();
-        await page.GotoAsync(source.Url.ToString(), new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded });
+        await page.GotoAsync(
+            source.Url.ToString(),
+            new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded },
+            cancellationToken);
 
         var extractResult = await page
             .EvaluateScriptFileAsync(options.Value.Artwork.ExtractScriptPath, cancellationToken: cancellationToken);

@@ -130,7 +130,10 @@ internal sealed class TweetContentExtractor(
     private async Task<TweetContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, TweetSource source, CancellationToken cancellationToken)
     {
         await using var page = await context.NewPageAsync();
-        await page.GotoAsync(source.Url.ToString(), new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded });
+        await page.GotoAsync(
+            source.Url.ToString(),
+            new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded },
+            cancellationToken);
 
         var extractResult = await page
             .EvaluateScriptFileAsync(options.Value.Tweet.ExtractScriptPath, cancellationToken: cancellationToken);

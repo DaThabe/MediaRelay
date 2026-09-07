@@ -10,9 +10,21 @@ internal sealed class Page(Microsoft.Playwright.IPage page) : IPage
         return page.EvaluateAsync<T>(expression, arg);
     }
 
-    public Task GotoAsync(string url, PageGotoOptions? options = null)
+    public async Task GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
     {
-        return page.GotoAsync(url, Parse(options));
+        await using var registration = cancellationToken.Register(async () =>
+            await page.CloseAsync());
+
+        try
+        {
+            await page.GotoAsync(url, Parse(options));
+            return;
+        }
+        catch (Exception)
+        {
+            await page.CloseAsync();
+            throw;
+        }
     }
 
     public ValueTask DisposeAsync()
