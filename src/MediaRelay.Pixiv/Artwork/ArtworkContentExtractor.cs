@@ -1,10 +1,7 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Content;
-using MediaRelay.Http;
 using MediaRelay.Pixiv.Image;
 using MediaRelay.Source;
-using MediaRelay.Source.Url;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -14,72 +11,67 @@ namespace MediaRelay.Pixiv.Artwork;
 
 internal sealed class ArtworkContentExtractor(
         IBrowserService browserService,
-        IOptions<HttpOptions> httpOptions,
-        IOptions<PixivHttpOptions> pixivHttpOptions,
-        IOptions<PixivArtworkOptions> artworkOptions,
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
-        ILogger<ArtworkContentExtractor> logger
-    ) : BrowserContentScriptExtractor(browserService, logger)
+        IOptions<PixivOptions> options
+    ) : IContentExtractor
 {
-    public override bool CanExtract(ISource source)
+    public bool CanExtract(ISource source)
     {
         return source is ArtworkSource;
     }
 
-    protected override void OnNavigating(PageGotoOptions options)
+    public async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
     {
-        options.Timeout = httpOptions.Value.Timeout;
-        options.WaitUntil = WaitUntilState.DOMContentLoaded;
-    }
-    protected override void OnContextCreating(BrowserNewContextOptions options)
-    {
-        //options.BypassCSP = true;
-    }
-    protected override async ValueTask OnContextCreated(IBrowserContext context)
-    {
-        await context.AddCookiesAsync(httpOptions.Value.Cookies);
-        await context.AddCookiesAsync(pixivHttpOptions.Value.Cookies);
-    }
+        if (source is not ArtworkSource artworkSource)
+            throw new NotSupportedException($"不支持的Pixiv作品来源: {source}");
 
-    protected override async ValueTask<string> LoadScriptAsync(CancellationToken cancellationToken)
-    {
-        return await File.ReadAllTextAsync(artworkOptions.Value.ExtractScriptPath, cancellationToken);
-    }
-
-    protected override IContent ParseScriptResult(IUrlSource webPageSource, string scriptResult)
-    {
-        if (webPageSource is not ArtworkSource source)
-            throw new NotSupportedException($"不是有效的Pixiv作品来源: {webPageSource}");
-
-        var snapshot = JsonSerializer.Deserialize(scriptResult, SnapshotSerializerContext.Default.Snapshot)
-          ?? throw new ArgumentNullException($"未解析到Pixiv作品内容: {source}");
-
-        if (snapshot.Resources.Count <= 0) throw new ArgumentException($"Pixiv作品内容解析中不包含媒体资源: {source}");
+        // Browser
+        await using var browser = await browserService.GetSharedAsync();
+        await using var context = await browser.NewContextAsync();
+        await context.AddCookiesAsync(options.Value.Http.Cookies);
 
 
-        var builder = ArtworkContent.BuilderFromSource(source)
-            .SetTitle(snapshot.Title)
-            .SetDescription(snapshot.Describe)
-            .SetUploadTime(snapshot.UploadAt)
-            .AddTags(snapshot.Tags);
+        // Extract
+        var builder = ArtworkContent.BuilderFromSource(artworkSource);
 
-        var authorUrl = new Uri(new Uri(pixivHttpOptions.Value.BaseUrl), snapshot.AuthorUrl).ToString();
-        builder.SetAuthor(snapshot.AuthorName, authorUrl);
-
-        foreach (var resourceUrl in snapshot.Resources)
-        {
-            var url = parser.Parse(resourceUrl);
-            var resource = factory.Create(url);
-
-            builder.AddResource(resource);
-        }
+        // Image
+        var extractSnapshot = await GetExtractSnapshotAsync(context, artworkSource, cancellationToken);
+        FillToBuilder(builder, extractSnapshot);
 
         return builder.Build();
     }
+
+    private void FillToBuilder(ArtworkContent.Builder builder, ArtworkContentSnapshot snapshot)
+    {
+        builder.SetTitle(snapshot.Title)
+            .SetDescription(snapshot.Describe)
+            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
+            .SetUploadTime(snapshot.UploadAt)
+            .AddTags(snapshot.Tags)
+            .AddResources(snapshot.Resources.Select(url =>
+            {
+                var imageUrl = parser.Parse(url);
+                return factory.Create(imageUrl);
+            }));
+    }
+    private async Task<ArtworkContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, ArtworkSource source, CancellationToken cancellationToken)
+    {
+        await using var page = await context.NewPageAsync();
+        await page.GotoAsync(source.Url.ToString(), new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded });
+
+        var extractResult = await page
+            .EvaluateScriptFileAsync(options.Value.Artwork.ExtractScriptPath, cancellationToken: cancellationToken);
+
+        return JsonSerializer
+            .Deserialize(extractResult, ArtworkContentSnapshotJsonSerializerContext.Default.ArtworkContentSnapshot)
+            ?? throw new ArgumentNullException($"未解析到Pixiv作品内容: {source}");
+    }
 }
 
-internal sealed record class Snapshot
+
+
+internal sealed record class ArtworkContentSnapshot
 {
     public required HashSet<string> Resources { get; init; }
     public string Title { get; init; } = string.Empty;
@@ -96,5 +88,5 @@ internal sealed record class Snapshot
     // 格式化输出
     WriteIndented = true
 )]
-[JsonSerializable(typeof(Snapshot))]
-internal partial class SnapshotSerializerContext : JsonSerializerContext;
+[JsonSerializable(typeof(ArtworkContentSnapshot))]
+internal partial class ArtworkContentSnapshotJsonSerializerContext : JsonSerializerContext;

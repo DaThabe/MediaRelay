@@ -16,17 +16,18 @@
     };
     await waitForInput();
 
-
+    // div.container-main button
     // 输入框
     var inputBox = document.querySelector("input[id='s_input']");
     // 搜索按钮
-    var searchButton = document.querySelector("button[class= 'btn-red']");
+    var searchButton = document.querySelector("button[class='btn-red']");
 
     if (!inputBox || !searchButton) return;
 
     // 输入后点击
     inputBox.value = url;
-    await new Promise(resolve => setTimeout(resolve, 300));
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
     searchButton.click();
 
     // 等待加载下载连接

@@ -92,54 +92,71 @@ internal sealed class TweetContentExtractor(
         if (source is not TweetSource tweetSource)
             throw new NotSupportedException($"不支持的推文来源: {source}");
 
+        // Browser
         await using var browser = await browserService.GetSharedAsync();
         await using var context = await browser.NewContextAsync();
         await context.AddCookiesAsync(options.Value.Http.Cookies);
 
-        await using var page = await context.NewPageAsync();
-        await page.GotoAsync(tweetSource.Url.ToString(), new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded });
 
+        // Extract
+        var builder = TweetContent.BuilderFromSource(tweetSource);
 
-        var extractResult = await page
-            .EvaluateScriptFileAsync(options.Value.Tweet.ExtractScriptPath, cancellationToken: cancellationToken);
-        var imageExtractSnapshot = JsonSerializer
-            .Deserialize(extractResult, SnapshotSerializerContext.Default.TweetImageExtractSnapshot)
-            ?? throw new ArgumentNullException($"未解析到推文内容: {source}");
+        // Image
+        var extractSnapshot = await GetExtractSnapshotAsync(context, tweetSource, cancellationToken);
+        FillToBuilder(builder, extractSnapshot);
 
-        // Data
-        var builder = TweetContent.BuilderFromSource(tweetSource)
-            .SetContent(imageExtractSnapshot.Content)
-            .SetAuthor(imageExtractSnapshot.AuthorName, imageExtractSnapshot.AuthorUrl)
-            .SetUploadTime(imageExtractSnapshot.UploadAt)
-            .AddTags(imageExtractSnapshot.Tags)
-            .AddResources(imageExtractSnapshot.Resources.Select(url =>
-            {
-                var imageUrl = parser.Parse(url, ImageSize.Original);
-                return factory.Create(imageUrl);
-            }));
-
-        if (imageExtractSnapshot.Resources.Count == 0)
+        // Video
+        if (extractSnapshot.Resources.Count == 0)
         {
-            await using var videoDownlaodPage = await context.NewPageAsync();
-            await videoDownlaodPage.GotoAsync(options.Value.Tweet.VideoDownloadUrl, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
-
-            var downloadUrl = await videoDownlaodPage
-                .EvaluateScriptFileAsync(options.Value.Tweet.VideoDownloadUrlScriptPath, tweetSource.Url.ToString(), cancellationToken);
-
-            var videoResource = urlResourceFactory.Create
-            (
-                ResourceId.CreateVideoId(tweetSource.Username, tweetSource.TweetId),
-                new Uri(downloadUrl),
-                "mp4"
-            );
+            var videoResource = await GetVideoExtractResourceAsync(context, tweetSource, cancellationToken);
             builder.AddResources(videoResource);
         }
 
         return builder.Build();
     }
+
+    private void FillToBuilder(TweetContent.Builder builder, TweetContentSnapshot snapshot)
+    {
+        builder.SetContent(snapshot.Content)
+            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
+            .SetUploadTime(snapshot.UploadAt)
+            .AddTags(snapshot.Tags)
+            .AddResources(snapshot.Resources.Select(url =>
+            {
+                var imageUrl = parser.Parse(url, ImageSize.Original);
+                return factory.Create(imageUrl);
+            }));
+    }
+    private async Task<TweetContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, TweetSource source, CancellationToken cancellationToken)
+    {
+        await using var page = await context.NewPageAsync();
+        await page.GotoAsync(source.Url.ToString(), new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded });
+
+        var extractResult = await page
+            .EvaluateScriptFileAsync(options.Value.Tweet.ExtractScriptPath, cancellationToken: cancellationToken);
+
+        return JsonSerializer
+            .Deserialize(extractResult, TweetContentSnapshotJsonSerializerContext.Default.TweetContentSnapshot)
+            ?? throw new ArgumentNullException($"未解析到推文内容: {source}");
+    }
+    private async Task<IResource> GetVideoExtractResourceAsync(IBrowserContext context, TweetSource source, CancellationToken cancellationToken)
+    {
+        await using var videoDownlaodPage = await context.NewPageAsync();
+        await videoDownlaodPage.GotoAsync(options.Value.Tweet.VideoDownloadUrl, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
+
+        var downloadUrl = await videoDownlaodPage
+            .EvaluateScriptFileAsync(options.Value.Tweet.VideoDownloadUrlScriptPath, source.Url.ToString(), cancellationToken);
+
+        return urlResourceFactory.Create
+        (
+            ResourceId.CreateVideoId(source.Username, source.TweetId),
+            new Uri(downloadUrl),
+            "mp4"
+        );
+    }
 }
 
-internal sealed record class TweetImageExtractSnapshot
+internal sealed record class TweetContentSnapshot
 {
     public required HashSet<string> Resources { get; init; }
     public string Content { get; init; } = string.Empty;
@@ -155,5 +172,5 @@ internal sealed record class TweetImageExtractSnapshot
     // 格式化输出
     WriteIndented = true
 )]
-[JsonSerializable(typeof(TweetImageExtractSnapshot))]
-internal partial class SnapshotSerializerContext : JsonSerializerContext;
+[JsonSerializable(typeof(TweetContentSnapshot))]
+internal partial class TweetContentSnapshotJsonSerializerContext : JsonSerializerContext;
