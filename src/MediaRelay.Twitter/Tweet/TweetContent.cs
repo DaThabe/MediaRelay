@@ -16,6 +16,7 @@ internal sealed partial record class TweetContent : IWebContent
     public required string AuthorName { get; init; }
     public required string AuthorUrl { get; init; }
     public required DateTimeOffset UploadAt { get; init; }
+    public required IReadOnlySet<string> Tags { get; init; }
 
 
     private TweetContent() { }
@@ -33,6 +34,7 @@ internal sealed partial record class TweetContent
         private string _authorName = string.Empty;
         private string _authorUrl = string.Empty;
         private DateTimeOffset _uploadTime = DateTimeOffset.MinValue;
+        private readonly HashSet<string> _tags = [];
 
 
         public Builder AddResources(params IEnumerable<IResource> resources)
@@ -40,9 +42,9 @@ internal sealed partial record class TweetContent
             _resources.UnionWith(resources);
             return this;
         }
-        public Builder AddResource(IResource resources)
+        public Builder AddTags(params IEnumerable<string> tags)
         {
-            _resources.Add(resources);
+            _tags.UnionWith(tags.Where(x => !string.IsNullOrWhiteSpace(x)));
             return this;
         }
 
@@ -67,7 +69,7 @@ internal sealed partial record class TweetContent
 
         public TweetContent Build()
         {
-            if (_resources.Count <= 0) 
+            if (_resources.Count == 0)
                 throw new ArgumentException($"推文媒体必须要有1个以上: {_id}");
 
             return new()
@@ -80,7 +82,8 @@ internal sealed partial record class TweetContent
                 AuthorUrl = _authorUrl,
 
                 Content = _content,
-                UploadAt = _uploadTime
+                UploadAt = _uploadTime,
+                Tags = _tags
             };
         }
     }

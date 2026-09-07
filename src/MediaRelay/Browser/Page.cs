@@ -2,7 +2,8 @@
 
 namespace MediaRelay.Browser;
 
-internal sealed class PageWapper(Microsoft.Playwright.IPage page) : IPage
+
+internal sealed class Page(Microsoft.Playwright.IPage page) : IPage
 {
     public Task<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(string expression, object? arg = default)
     {

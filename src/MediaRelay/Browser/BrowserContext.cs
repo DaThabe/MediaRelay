@@ -3,12 +3,12 @@
 namespace MediaRelay.Browser;
 
 
-internal sealed class BrowserContextWapper(Microsoft.Playwright.IBrowserContext context) : IBrowserContext
+internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext context) : IBrowserContext
 {
     public async Task<IPage> NewPageAsync()
     {
         var page = await context.NewPageAsync();
-        return new PageWapper(page);
+        return new Page(page);
     }
     public ValueTask DisposeAsync()
     {

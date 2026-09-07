@@ -4,6 +4,7 @@ using MediaRelay.Http;
 using MediaRelay.Source;
 using MediaRelay.Source.Url;
 using MediaRelay.Twitter.Image;
+using MediaRelay.Twitter.Video;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -16,6 +17,7 @@ internal sealed class TweetContentExtractor(
         IOptions<HttpOptions> httpOptions,
         IOptions<TwitterHttpOptions> twitterHttpOptions,
         IOptions<TwitterTweetOptions> tweetOptions,
+        IVideoDownloader videoDownloader,
         ImageUrl.Parser parser,
         ImageUrlResource.Factory factory,
         ILogger<TweetContentExtractor> logger
@@ -51,15 +53,20 @@ internal sealed class TweetContentExtractor(
         if (webPageSource is not TweetSource source)
             throw new NotSupportedException($"不支持的推文来源: {webPageSource}");
 
-        var snapshot = JsonSerializer.Deserialize(scriptResult, SnapshotSerializerContext.Default.Snapshot) 
+        var snapshot = JsonSerializer.Deserialize(scriptResult, SnapshotSerializerContext.Default.Snapshot)
             ?? throw new ArgumentNullException($"未解析到推文内容: {source}");
 
-        if (snapshot.Resources.Count <= 0) throw new ArgumentException($"推文解析内容中不包含媒体资源: {source}");
+        // 如果1张图像都没有试一试视频
+        if (snapshot.Resources.Count == 0)
+        {
+            throw new ArgumentException($"推文解析内容中不包含媒体资源: {source}");
+        }
 
         return TweetContent.BuilderFromSource(source)
             .SetContent(snapshot.Content)
             .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
             .SetUploadTime(snapshot.UploadAt)
+            .AddTags(snapshot.Tags)
             .AddResources(snapshot.Resources.Select(url =>
             {
                 var imageUrl = parser.Parse(url, ImageSize.Original);

@@ -7,7 +7,7 @@ internal sealed class LoggerScope(LoggerScope? parent = null) : IEnumerable<KeyV
 {
     private bool _disposed;
     private readonly Dictionary<string, object> _datas = [];
-    private LoggerScope? _parent = parent;
+    private readonly LoggerScope? _parent = parent;
     private readonly List<LoggerScope> _childs = [];
 
 

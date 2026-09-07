@@ -31,11 +31,8 @@
         ?.innerText?.trim() || "";
 
     // 标签（#标签）
-    const tags = [];
-    if (content) {
-        const tagMatches = content.match(/#[\w\u4e00-\u9fa5]+/g) || [];
-        tags.push(...tagMatches);
-    }
+    const tags = [content.matchAll(/#([^\s#]+)/g)]
+        .map(m => m[1]);
 
     // 发布时间
     const uploadAt = tweet.querySelector("time")
@@ -53,7 +50,7 @@
         UploadAt: uploadAt,
         AuthorName: authorName,
         AuthorUrl: authorUrl,
-        Tags: tags
+        Tags: [... new Set(tags)]
     };
 
     return JSON.stringify(result);

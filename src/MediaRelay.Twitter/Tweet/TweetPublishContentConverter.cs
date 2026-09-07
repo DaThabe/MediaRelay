@@ -29,7 +29,8 @@ internal sealed class TweetPublishContentConverter(
             Title = tweet.Content,
             UploadAt = tweet.UploadAt,
 
-            Resources = resourceUris.Values.ToHashSet()
+            Tags = tweet.Tags.ToHashSet(),
+            Resources = resourceUris.Values.ToHashSet(),
         };
     }
 }

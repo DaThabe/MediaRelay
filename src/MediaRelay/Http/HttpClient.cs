@@ -69,6 +69,6 @@ internal sealed class HttpClient : IHttpClient
             .Add("Url", url)
             .Begin();
 
-        _logger.LogDebug("{Action}", action);
+        if (_logger.IsEnabled(LogLevel.Debug)) _logger.LogDebug("{Action}", action);
     }
 }

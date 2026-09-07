@@ -62,6 +62,7 @@ public sealed record class TwitterTweetOptions
     public TwitterTweetUrlOptions Url { get; set; } = new();
     
     public string ExtractScriptPath { get; set; } = "Browser/Scripts/TwitterTweet.js";
+    public string VideoDownloadUrlScriptPath { get; set; } = "Browser/Scripts/TwitterTweetVideoDownloadUrl.js";
 }
 public sealed record class TwitterTweetUrlOptions
 {

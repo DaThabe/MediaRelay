@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Browser;
+﻿namespace MediaRelay.Browser.Shared;
 
 
 internal sealed class SharedBrowserWrapper(IBrowser inner) : IBrowser
@@ -7,7 +7,6 @@ internal sealed class SharedBrowserWrapper(IBrowser inner) : IBrowser
 
     public Task<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
         => inner.NewContextAsync(options);
-
     public ValueTask DisposeAsync()
        => ValueTask.CompletedTask;
 }

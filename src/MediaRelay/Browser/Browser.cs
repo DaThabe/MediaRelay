@@ -1,14 +1,14 @@
 ﻿namespace MediaRelay.Browser;
 
 
-internal sealed class BrowserWapper(Microsoft.Playwright.IBrowser browser) : IBrowser
+internal sealed class Browser(Microsoft.Playwright.IBrowser browser) : IBrowser
 {
     public string Version => browser.Version;
 
     public async Task<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
     {
         var context = await browser.NewContextAsync(Parse(options));
-        return new BrowserContextWapper(context);
+        return new BrowserContext(context);
     }
 
     public ValueTask DisposeAsync()

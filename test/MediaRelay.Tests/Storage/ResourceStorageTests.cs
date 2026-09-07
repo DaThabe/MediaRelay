@@ -28,7 +28,7 @@ public class ResourceStorageTests
             storageResources.Select(x => x.Key).ToArray());
 
         // Clean
-        CleanFiles(storageResources.Select(x => x.Value.Uri.LocalPath).ToList());
+        CleanFiles([.. storageResources.Select(x => x.Value.Uri.LocalPath)]);
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public class ResourceStorageTests
             storageResources.Select(x => x.Key).ToArray());
 
         // Clean
-        CleanFiles(storageResources.Select(x => x.Value.Uri.LocalPath).ToList());
+        CleanFiles([.. storageResources.Select(x => x.Value.Uri.LocalPath)]);
     }
 
     [TestMethod]
