@@ -3,9 +3,9 @@ using Spectre.Console;
 using System.Collections.Frozen;
 using System.Text;
 
-namespace MediaRelay.Console.Logging;
+namespace MediaRelay.Console.Logging.Text;
 
-internal sealed partial class SpectreConsoleLogger(string categoryName) : ILogger
+internal sealed class TextConsoleLogger(string categoryName) : ILogger
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
@@ -34,41 +34,42 @@ internal sealed partial class SpectreConsoleLogger(string categoryName) : ILogge
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        var messageMarkup = ToMarkup(
+        var messageMarkupString = MessagaeStyle.ToMarkupString(
             timestamp: DateTime.Now,
             level: logLevel,
             categoryName: categoryName,
             message: formatter(state, exception),
             scopeDatas: _currentScope?.ToFrozenDictionary() ?? FrozenDictionary<string, object>.Empty);
 
-        AnsiConsole.MarkupLine(messageMarkup);
+        AnsiConsole.MarkupLine(messageMarkupString);
         if (exception is not null) AnsiConsole.WriteException(exception, ExceptionFormats.NoStackTrace);
     }
 }
 
-internal sealed partial class SpectreConsoleLogger
+
+file sealed class MessagaeStyle
 {
-    private readonly Style _timestampStyle = new(Color.Grey74, null, Decoration.Dim);
+    private static readonly Style _timestampStyle = new(Color.Grey74, null, Decoration.Dim);
 
-    private readonly Style _levelTraceStyle = new(Color.Grey85, null, Decoration.Dim);
-    private readonly Style _levelDebugStyle = new(Color.DarkSlateGray2, null, Decoration.Bold);
-    private readonly Style _levelInformationStyle = new(Color.Gray69, null, null);
-    private readonly Style _levelWarningStyle = new(Color.SandyBrown, null, null);
-    private readonly Style _levelErrorStyle = new(Color.Red1, null, null);
-    private readonly Style _levelCriticalStyle = new(Color.Black, Color.Red1, null);
-    private readonly Style _levelNoneStyle = new(Color.Silver, null, null);
+    private static readonly Style _levelTraceStyle = new(Color.Grey85, null, Decoration.Dim);
+    private static readonly Style _levelDebugStyle = new(Color.DarkSlateGray2, null, Decoration.Bold);
+    private static readonly Style _levelInformationStyle = new(Color.Gray69, null, null);
+    private static readonly Style _levelWarningStyle = new(Color.SandyBrown, null, null);
+    private static readonly Style _levelErrorStyle = new(Color.Red1, null, null);
+    private static readonly Style _levelCriticalStyle = new(Color.Black, Color.Red1, null);
+    private static readonly Style _levelNoneStyle = new(Color.Silver, null, null);
 
-    private readonly Style _categoryNameStyle = new(Color.Gray30, null, null);
-    private readonly Style _messageStyle = new(Color.White, null, Decoration.Bold);
+    private static readonly Style _categoryNameStyle = new(Color.Gray30, null, null);
+    private static readonly Style _messageStyle = new(Color.White, null, Decoration.Bold);
 
-    private readonly Style _scopeDataKeyStyle = new(Color.Gray30, null, Decoration.Bold);
-    private readonly Style _scopeDataValueStyle = new(Color.Gray30, null, Decoration.Bold);
+    private static readonly Style _scopeDataKeyStyle = new(Color.Gray30, null, Decoration.Bold);
+    private static readonly Style _scopeDataValueStyle = new(Color.Gray30, null, Decoration.Bold);
 
-    private readonly Style _scopeDataParenthesesStyle = new(Color.Gray30, null, null);
-    private readonly Style _scopeDataEqualSignStyle = new(Color.Gray30, null, null);
+    private static readonly Style _scopeDataParenthesesStyle = new(Color.Gray30, null, null);
+    private static readonly Style _scopeDataEqualSignStyle = new(Color.Gray30, null, null);
 
 
-    private string ToMarkup(DateTime timestamp, LogLevel level, string categoryName, string message, IReadOnlyDictionary<string, object> scopeDatas)
+    public static string ToMarkupString(DateTime timestamp, LogLevel level, string categoryName, string message, IReadOnlyDictionary<string, object> scopeDatas)
     {
         StringBuilder sb = new();
 
@@ -90,7 +91,7 @@ internal sealed partial class SpectreConsoleLogger
     }
 
 
-    private (string Name, Style Style) GetLevelStyle(LogLevel level) => level switch
+    private static (string Name, Style Style) GetLevelStyle(LogLevel level) => level switch
     {
         LogLevel.Trace => ("TRC", _levelTraceStyle),
         LogLevel.Debug => ("DBG", _levelDebugStyle),
@@ -101,7 +102,7 @@ internal sealed partial class SpectreConsoleLogger
         _ => ("NON", _levelNoneStyle)
     };
 
-    private string GetScopeDataMarkup(IReadOnlyDictionary<string, object> datas)
+    private static string GetScopeDataMarkup(IReadOnlyDictionary<string, object> datas)
     {
         if (datas.Count <= 0) return string.Empty;
 

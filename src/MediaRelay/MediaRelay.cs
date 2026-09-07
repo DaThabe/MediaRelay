@@ -17,23 +17,26 @@ internal sealed class MediaRelay(
         ISource source,
         CancellationToken cancellationToken = default)
     {
-        using var _ = logger.Scope()
-            .Add("SourceId", source.Id)
-            .Begin();
-
         logger.LogInformation("开始处理");
 
+        // Extract
         var content = await extractorSelector
             .Select(source)
             .ExtractAsync(source, cancellationToken);
 
+        using var _ = logger.BeginScope("content", content);
+        logger.LogInformation("提取到内容");
+
+        // Convert
         var publishContent = await converterSelector
             .Select(content)
             .ConvertAsync(content, cancellationToken);
 
+        using var __ = logger.BeginScope("PublishContent", publishContent);
+        logger.LogInformation("提取到内容");
+
+        // Publish
         await publishOrchestrator
             .PublishAsync(publishContent, cancellationToken);
-
-        logger.LogInformation("处理完成");
     }
 }

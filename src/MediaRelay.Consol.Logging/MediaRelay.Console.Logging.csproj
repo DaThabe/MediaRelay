@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Spectre.Console" />
+		<PackageReference Include="Spectre.Console.Json" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
+		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
+		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
+		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
+	</ItemGroup>
+
+</Project>

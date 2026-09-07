@@ -1,5 +1,7 @@
 <Solution>
-  <Folder Name="/Modules/" />
+  <Folder Name="/Modules/">
+    <Project Path="src/MediaRelay.Consol.Logging/MediaRelay.Console.Logging.csproj" />
+  </Folder>
   <Folder Name="/Modules/Destinations/">
     <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
   </Folder>

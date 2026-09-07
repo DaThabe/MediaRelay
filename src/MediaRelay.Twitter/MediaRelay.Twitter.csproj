@@ -12,6 +12,7 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="MediaRelay.Tests" />
+		<InternalsVisibleTo Include="MediaRelay.Console.Logging" />
 	</ItemGroup>
 
 	<ItemGroup>

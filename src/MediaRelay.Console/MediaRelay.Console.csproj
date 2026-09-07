@@ -8,14 +8,13 @@
 	<ItemGroup>
 		<PackageReference Include="AsyncConsoleReader" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
-		<PackageReference Include="Microsoft.Extensions.Telemetry" />
-		<PackageReference Include="Spectre.Console" />
 	</ItemGroup>
 
 
 	<ItemGroup>
-		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
+		<ProjectReference Include="..\MediaRelay.Consol.Logging\MediaRelay.Console.Logging.csproj" />
+		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
 		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
 	</ItemGroup>

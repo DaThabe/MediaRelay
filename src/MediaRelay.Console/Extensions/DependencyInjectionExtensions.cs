@@ -1,6 +1,4 @@
 ﻿using MediaRelay.Console.Input;
-using MediaRelay.Console.Logging;
-using Microsoft.Extensions.Logging;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -15,15 +13,6 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlPersistentQueue, UrlPersistentQueue>();
             services.AddHostedService<InputListenBackgroundService>();
             return services;
-        }
-    }
-
-    extension(ILoggingBuilder builder)
-    {
-        public ILoggingBuilder AddMediaRelayConsole()
-        {
-            builder.Services.AddSingleton<ILoggerProvider, SpectreConsoleLoggerProvider>();
-            return builder;
         }
     }
 }
