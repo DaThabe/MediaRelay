@@ -1,8 +1,12 @@
 ﻿using Apigen.Immich.Client;
 using Apigen.Immich.Models;
+using MediaRelay.Http;
 using MediaRelay.Publish;
 using MediaRelay.Storage;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using System.Text;
+using System.Text.Json;
 
 namespace MediaRelay.Immich;
 
@@ -87,14 +91,25 @@ internal sealed class ImmichPublishHandler(
         var upsertResults = await apiClient.Tags
             .UpsertTagsAsync(new() { Tags = [.. tags] }, cancellationToken);
 
+        List<string> addedTags = [];
+
         foreach (var result in upsertResults)
         {
-            await apiClient.Tags
-                .TagAssetsAsync(result.Id!, new() { Ids = [assetsId] }, cancellationToken);
-
-            using var _ = logger.BeginScope("TagId", result.Id ?? string.Empty);
-            logger.LogWarning("已为标签添加媒体");
+            var tagName = result.Name;
+            try
+            {
+                await apiClient.Tags
+                    .TagAssetsAsync(result.Id!, new() { Ids = [assetsId] }, cancellationToken);
+                addedTags.Add(tagName ?? "Empty");
+            }
+            catch(Exception ex)
+            {
+                logger.LogError(ex, "媒体添加标签失败");
+            }
         }
+
+        using var _ = logger.BeginScope("Tags", $"[{string.Join(',', addedTags)}]");
+        logger.LogWarning("已为媒体添加标签");
     }
 
 

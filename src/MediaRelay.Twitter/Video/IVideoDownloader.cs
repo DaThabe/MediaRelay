@@ -11,18 +11,19 @@ internal interface IVideoDownloader
     ValueTask<StorageInfo> DownloadAsync(TweetSource source, CancellationToken cancellationToken);
 }
 
-internal sealed class VideoDownloader(IBrowserService browserService, IStorage storage, IHttpClient httpClient, IOptions<TwitterTweetOptions> options) : IVideoDownloader
+internal sealed class VideoDownloader(
+    IBrowserService browserService,
+    IStorage storage,
+    IHttpClient httpClient,
+    IOptions<TwitterTweetOptions> options) : IVideoDownloader
 {
     public async ValueTask<StorageInfo> DownloadAsync(TweetSource source, CancellationToken cancellationToken)
     {
         await using var context = await browserService.GetSharedContextAsync();
         await using var page = await context.NewPageAsync();
-        await page.GotoAsync("https://savetwitter.net/");
+        await page.GotoAsync(options.Value.VideoDownloadUrl);
 
-
-        var script = await File.ReadAllTextAsync(options.Value.ExtractScriptPath, cancellationToken);
-        var downloadUrl = await page.EvaluateAsync<string>(script, source.Url.ToString());
-
+        var downloadUrl = await page.EvaluateScriptFileAsync(options.Value.ExtractScriptPath, null, cancellationToken);
 
         var stream = await httpClient.GetStreamAsync(downloadUrl, cancellationToken);
         return await storage.StoreAsync(stream, "mp4", cancellationToken);

@@ -43,7 +43,7 @@ public sealed class TwitterImageUrlOptions
     public const string Name  = "ImageUrl";
 
 
-    public string Format { get; set; } = @"https://pbs.twimg.com/media/{0}?format={1}&name={2}";
+    public string Format { get; set; } = "https://pbs.twimg.com/media/{0}?format={1}&name={2}";
     public string Pattern { get; set; } = @"pbs\.twimg\.com/media/(?<mid>[A-Za-z0-9\-_]+)\?*(?:format=(?<fmt>[^&]+)&?|name=(?<size>[^&]+)&?)*";
     public string MediaIdKey { get; set; } = "mid";
     public string FormatKey { get; set; } = "fmt";
@@ -60,8 +60,9 @@ public sealed record class TwitterTweetOptions
 
     [JsonPropertyName(TwitterTweetUrlOptions.Name)]
     public TwitterTweetUrlOptions Url { get; set; } = new();
-    
+
     public string ExtractScriptPath { get; set; } = "Browser/Scripts/TwitterTweet.js";
+    public string VideoDownloadUrl { get; set; } = "https://savetwitter.net/";
     public string VideoDownloadUrlScriptPath { get; set; } = "Browser/Scripts/TwitterTweetVideoDownloadUrl.js";
 }
 public sealed record class TwitterTweetUrlOptions

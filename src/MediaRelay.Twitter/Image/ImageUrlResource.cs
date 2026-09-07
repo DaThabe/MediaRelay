@@ -23,7 +23,6 @@ internal sealed partial class ImageUrlResource : IResource
     }
 }
 
-
 internal sealed partial class ImageUrlResource : IResource
 {
     public sealed class Factory(IHttpClient httpClient)
@@ -32,7 +31,7 @@ internal sealed partial class ImageUrlResource : IResource
         {
             return new ImageUrlResource(httpClient)
             {
-                Id = ResourceId.FromMediaIdAndImageSize(url.MediaId, url.Size),
+                Id = ResourceId.CreateImageId(url.MediaId, url.Size),
                 Url = url
             };
         }

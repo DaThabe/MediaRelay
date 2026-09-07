@@ -5,6 +5,7 @@ using MediaRelay.Http;
 using MediaRelay.Logging;
 using MediaRelay.Playwright;
 using MediaRelay.Publish;
+using MediaRelay.Resources;
 using MediaRelay.Source.Url;
 using MediaRelay.Storage;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IPublishContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
             services.AddSingleton<IPublishOrchestrator, PublishOrchestrator>();
+            services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
 
             services.AddSingleton<IMediaRelay, MediaRelay.MediaRelay>();
 

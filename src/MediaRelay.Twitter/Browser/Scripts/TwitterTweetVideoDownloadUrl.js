@@ -26,6 +26,7 @@
 
     // 输入后点击
     inputBox.value = url;
+    await new Promise(resolve => setTimeout(resolve, 300));
     searchButton.click();
 
     // 等待加载下载连接

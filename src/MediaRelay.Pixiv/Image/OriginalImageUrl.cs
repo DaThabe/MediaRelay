@@ -11,6 +11,7 @@ internal sealed partial class OriginalImageUrl
 
 
     public required int ArtworkId { get; init; }
+    public required string Hash { get; init; }
     public required ImageFormat Format { get; init; }
     public required int Index { get; init; }
     public required DateTime UplaodAt { get; init; }
@@ -33,6 +34,7 @@ internal sealed partial class OriginalImageUrl
 
         /// <summary>
         /// https://i.pximg.net/img-original/img/2026/09/07/02/12/24/123456789_0.png
+        /// https://i.pximg.net/img-original/img/2025/03/24/16/55/53/123456789-485cfbf98914fba1ee83201341abaf19_p0.png
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -49,6 +51,7 @@ internal sealed partial class OriginalImageUrl
             var urlRegexOptions = options.Value;
 
             var pid = int.Parse(result.Groups[urlRegexOptions.ArtworkIdKey].Value);
+            var hash = result.Groups[urlRegexOptions.HashKey].Value.Trim();
             var index = int.Parse(result.Groups[urlRegexOptions.IndexKey].Value);
             var ext = result.Groups[urlRegexOptions.ExtensionsKey].Value;
 
@@ -59,11 +62,13 @@ internal sealed partial class OriginalImageUrl
             var mm = int.Parse(result.Groups[urlRegexOptions.MinuteKey].Value);
             var ss = int.Parse(result.Groups[urlRegexOptions.SecondKey].Value);
 
-            var compineUrl = string.Format(options.Value.Format, yyyy, MM, dd, HH, mm, ss, pid, index, ext);
+            var urlHash = string.IsNullOrWhiteSpace(hash) ? string.Empty : $"-{hash}";
+            var compineUrl = string.Format(options.Value.Format, yyyy, MM, dd, HH, mm, ss, pid, urlHash, index, ext);
 
             return new OriginalImageUrl(compineUrl)
             {
                 ArtworkId = pid,
+                Hash = hash,
                 Format = ImageFormat.FromName(ext),
                 Index = index,
                 UplaodAt = new DateTime(yyyy, MM, dd, HH, mm, ss)

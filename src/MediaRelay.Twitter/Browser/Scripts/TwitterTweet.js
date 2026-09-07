@@ -4,7 +4,7 @@
     const waitForTweet = () => {
         return new Promise((resolve) => {
             const check = () => {
-                const tweet = document.querySelector("article[data-testid='tweet'] div[data-testid='tweetPhoto'] img");
+                const tweet = document.querySelector("article[data-testid='tweet'] div[data-testid='tweetPhoto']");
                 if (tweet) {
                     resolve(true);
                 } else {
