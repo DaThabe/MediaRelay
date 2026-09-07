@@ -1,5 +1,4 @@
-﻿using MediaRelay.Extensions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.Storage;
@@ -60,8 +59,7 @@ internal sealed class Storage(
         stream.EnsureAtStart();
 
         // 计算Hash
-        var hashBytes = await hasher.HashAsync(stream, cancellationToken);
-        var hash = Convert.ToHexString(hashBytes).ToLowerInvariant();
+        var hash = await hasher.HashAsHexAsync(stream, cancellationToken);
 
         return (hasher.Algorithm, hash);
     }
@@ -90,7 +88,7 @@ internal sealed class Storage(
         }
 
         source.EnsureAtStart();
-        await using var fs = new FileStream(fullPath, FileMode.CreateNew, FileAccess.Write, FileShare.Write, 4096);
+        await using var fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write, FileShare.Write, 4096, true);
         await source.CopyToAsync(fs, cancellationToken);
 
         logger.LogInformation("文件已储存");

@@ -1,9 +1,9 @@
-﻿using System.Collections.Frozen;
+﻿#pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
+namespace System.Collections.Frozen;
+#pragma warning restore IDE0130 // 命名空间与文件夹结构不匹配
 
-namespace MediaRelay.Console.Extensions;
 
-
-internal static class FrozenDictionaryExtensions
+public static class FrozenDictionaryExtensions
 {
     extension<TKey, TValue>(FrozenDictionary<TKey, TValue>)
         where TKey: notnull

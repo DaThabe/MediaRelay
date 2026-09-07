@@ -6,6 +6,8 @@ public static class StreamExtensions
 {
     extension(Stream stream)
     {
+        /// <inheritdoc/>
+        /// <exception cref="NotSupportedException"/>
         public void EnsureAtStart()
         {
             if (stream.CanSeek)
@@ -14,7 +16,7 @@ public static class StreamExtensions
                 return;
             }
 
-            throw new InvalidOperationException($"流不可定位, 无法移动至起始位");
+            throw new NotSupportedException($"流不支持定位, 无法移动至起始位");
         }
 
 
