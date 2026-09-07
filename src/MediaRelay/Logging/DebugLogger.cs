@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Collections.Frozen;
 using System.Diagnostics;
-using System.Text.Json;
 
 namespace MediaRelay.Logging;
 

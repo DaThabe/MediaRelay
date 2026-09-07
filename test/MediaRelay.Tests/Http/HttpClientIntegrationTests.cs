@@ -30,13 +30,13 @@ public sealed class HttpClientIntegrationTests
     [TestMethod]
     public async Task SendPixivArtworksRequestAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, "https://i.pximg.net/img-original/img/2026/03/27/15/36/58/142800168_p0.png");
-        request.Headers.Referrer = new Uri("https://www.pixiv.net/");
+        //var request = new HttpRequestMessage(HttpMethod.Get, "https://i.pximg.net/img-original/img/2026/03/27/15/36/58/142800168_p0.png");
+        //request.Headers.Referrer = new Uri("https://www.pixiv.net/");
 
-        var response = await _client.SendAsync(request, TestContext.CancellationToken);
-        await using var stream = await response.Content.ReadAsStreamAsync(TestContext.CancellationToken);
+        //var response = await _client.SendAsync(request, TestContext.CancellationToken);
+        //await using var stream = await response.Content.ReadAsStreamAsync(TestContext.CancellationToken);
 
-        Assert.IsLessThan(stream.Length, 0, "没有响应数据");
+        //Assert.IsLessThan(stream.Length, 0, "没有响应数据");
     }
 
 

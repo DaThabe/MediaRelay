@@ -14,7 +14,7 @@ public class AnsiConsoleTests
     [DataRow(ExceptionFormats.ShowLinks)]
     [DataRow(ExceptionFormats.ShortenEverything)]
     [DataRow(ExceptionFormats.NoStackTrace)]
-    public void InnerException(ExceptionFormats formats)
+    public void WriteException_ShouldRenderWithDifferentFormats(ExceptionFormats formats)
     {
         try
         {
