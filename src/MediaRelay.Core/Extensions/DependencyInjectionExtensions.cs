@@ -120,12 +120,12 @@ public static class DependencyInjectionExtensions
     {
         public ILoggingBuilder AddEmojiDebug()
         {
-            builder.Services.AddSingleton<ILoggerProvider>(EmojiLoggerProvider.Debug);
+            builder.Services.TryAddSingleEnumerable<ILoggerProvider>(EmojiLoggerProvider.Debug);
             return builder;
         }
         public ILoggingBuilder AddEmojiConsole()
         {
-            builder.Services.AddSingleton<ILoggerProvider>(EmojiLoggerProvider.Console);
+            builder.Services.TryAddSingleEnumerable<ILoggerProvider>(EmojiLoggerProvider.Console);
             return builder;
         }
     }

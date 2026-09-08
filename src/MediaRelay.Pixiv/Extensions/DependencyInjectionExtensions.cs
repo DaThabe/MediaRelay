@@ -13,7 +13,7 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddPixivSource()
+        public IServiceCollection AddPixiv()
         {
             services.AddOptions<PixivOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration

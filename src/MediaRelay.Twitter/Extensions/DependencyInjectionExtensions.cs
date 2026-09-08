@@ -13,7 +13,7 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddTwitterSource()
+        public IServiceCollection AddTwitter()
         {
             services.AddOptions<TwitterOptions>()
                 .PostConfigure<IConfiguration>((options, configuration) => configuration
@@ -41,8 +41,8 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ImageUrlResource.Factory>();
 
             services.AddSingleton<IUrlParser, TweetSource.UrlParser>();
-            services.AddSingleton<IContentExtractor, TweetContentExtractor>();
             services.AddSingleton<IContentConverter, TweetPublishContentConverter>();
+            services.AddSingleton<IContentExtractor, TweetContentExtractor>();
 
 
             return services;

@@ -6,9 +6,9 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay.Console.Input;
 
 
-internal sealed class InputUrlListenBackgroundService(
+internal sealed class ConsoleInputUrl(
         IUrlRelayService urlRelay,
-        ILogger<InputUrlListenBackgroundService> logger
+        ILogger<ConsoleInputUrl> logger
     ) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

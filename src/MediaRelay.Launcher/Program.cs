@@ -7,19 +7,19 @@ await Host.CreateDefaultBuilder()
     .ConfigureLogging(builder => builder
         .ClearProviders()
         .AddEmojiDebug()
-        .AddMediaRelayConsole()
+        .AddCustomConsole()
     )
     .ConfigureServices(services => services
         // Sources
-        .AddPixivSource()
-        .AddTwitterSource()
+        .AddPixiv()
+        .AddTwitter()
 
         // Destinations
-        .AddImmichDestination()
+        .AddImmich()
 
         // Core
         .AddMediaRelay()
-        .AddConsoleSource()
+        .AddConsole()
     )
     .UseEnvironment(Environments.Development)
     .UseDevelopmentSecrets()

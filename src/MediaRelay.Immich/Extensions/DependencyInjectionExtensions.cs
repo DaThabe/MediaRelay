@@ -14,7 +14,7 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddImmichDestination()
+        public IServiceCollection AddImmich()
         {
             services.AddOptions<ImmichOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration

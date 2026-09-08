@@ -1,6 +1,5 @@
 ﻿using MediaRelay.Console.Input;
 using MediaRelay.Console.Logging;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -11,18 +10,18 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddConsoleSource()
+        public IServiceCollection AddConsole()
         {
-            services.AddHostedService<InputUrlListenBackgroundService>();
+            services.AddHostedService<ConsoleInputUrl>();
             return services;
         }
     }
 
     extension(ILoggingBuilder builder)
     {
-        public ILoggingBuilder AddMediaRelayConsole()
+        public ILoggingBuilder AddCustomConsole()
         {
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LoggerProvider>());
+            builder.Services.TryAddSingleEnumerable<ILoggerProvider, LoggerProvider>();
             return builder;
         }
     }
