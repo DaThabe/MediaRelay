@@ -2,7 +2,7 @@
 
 
 /// <summary>
-/// 推送调度器
+/// 转发调度器
 /// </summary>
 public interface IRelayOrchestrator
 {

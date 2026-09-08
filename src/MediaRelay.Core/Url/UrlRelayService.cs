@@ -1,8 +1,7 @@
 ﻿using MediaRelay.Source;
 using MediaRelay.Source.Url;
-using MediaRelay.Url;
 
-namespace MediaRelay;
+namespace MediaRelay.Url;
 
 
 internal sealed class UrlRelayService(

@@ -18,7 +18,7 @@ internal sealed partial class UrlPersistentQueueFactory(
 
 
 
-    public async ValueTask<IUrlPersistentQueue> GetOrCreateAsync(CancellationToken cancellationToken = default)
+    public async ValueTask<IUrlQueue> GetOrCreateAsync(CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
 
@@ -60,7 +60,7 @@ internal sealed partial class UrlPersistentQueueFactory(
 
 internal sealed partial class UrlPersistentQueueFactory
 {
-    private sealed class InternalQueue(IUrlQueueStore store, ILogger<InternalQueue> logger) : IUrlPersistentQueue
+    private sealed class InternalQueue(IUrlQueueStore store, ILogger<InternalQueue> logger) : IUrlQueue
     {
         public required Channel<Message> Pendings { get; init; }
         public required Channel<Message> Deads { get; init; }
@@ -93,7 +93,7 @@ internal sealed partial class UrlPersistentQueueFactory
 
             return message.Content;
         }
-        public async ValueTask<Uri> PeepWaitAsync(CancellationToken cancellationToken)
+        public async ValueTask<Uri> PeekWaitAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation("等待查看消息");
             if (!await Pendings.Reader.WaitToReadAsync(cancellationToken))

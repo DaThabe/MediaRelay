@@ -3,7 +3,7 @@ using MediaRelay.Browser;
 using MediaRelay.Content;
 using MediaRelay.Http;
 using MediaRelay.Logging;
-using MediaRelay.Persistent;
+using MediaRelay.Messaging;
 using MediaRelay.Persistent.Url;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
@@ -29,6 +29,7 @@ public static class DependencyInjectionExtensions
                 .AddHttpClient()
                 .AddPlaywright()
                 .AddStorage()
+                .AddMessaging()
                 .AddPersistent();
         }
 
@@ -51,6 +52,12 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ISourceRelayService, SourceRelayService>();
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
+            return services;
+        }
+
+        private IServiceCollection AddMessaging()
+        {
+            services.AddSingleton(typeof(IMessageSender<>), typeof(MessageSender<>));
             return services;
         }
 

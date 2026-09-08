@@ -1,6 +1,4 @@
-﻿using MediaRelay.Content;
-
-namespace MediaRelay;
+﻿namespace MediaRelay.Content;
 
 internal sealed class ContentRelayService(
         IContentConverterSelector relayContentConverterSelector,

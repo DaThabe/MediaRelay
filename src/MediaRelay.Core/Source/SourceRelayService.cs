@@ -1,7 +1,6 @@
 ﻿using MediaRelay.Content;
-using MediaRelay.Source;
 
-namespace MediaRelay;
+namespace MediaRelay.Source;
 
 
 internal sealed class SourceRelayService(

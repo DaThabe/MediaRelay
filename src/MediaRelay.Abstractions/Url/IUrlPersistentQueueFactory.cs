@@ -2,5 +2,5 @@
 
 public interface IUrlPersistentQueueFactory
 {
-    ValueTask<IUrlPersistentQueue> GetOrCreateAsync(CancellationToken cancellationToken = default);
+    ValueTask<IUrlQueue> GetOrCreateAsync(CancellationToken cancellationToken = default);
 }

@@ -22,10 +22,10 @@ internal sealed class RelayOrchestrator(
             tasks.Add(task);
         }
 
-        logger.LogInformation("正在推送");
+        logger.LogInformation("正在转发");
 
         await Task.WhenAll(tasks);
 
-        logger.LogInformation("推送完成");
+        logger.LogInformation("转发完成");
     }
 }
