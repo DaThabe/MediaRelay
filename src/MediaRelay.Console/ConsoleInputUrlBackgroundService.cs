@@ -1,14 +1,16 @@
 ﻿using AsyncConsoleReader;
+using MediaRelay.Messaging;
 using MediaRelay.Url;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Console.Input;
+namespace MediaRelay.Console;
 
 
-internal sealed class ConsoleInputUrl(
-        IUrlRelayService urlRelay,
-        ILogger<ConsoleInputUrl> logger
+internal sealed class ConsoleInputUrlBackgroundService(
+        //IUrlRelayService urlRelay,
+        IMessageOrchestrator messageOrchestrator,
+        ILogger<ConsoleInputUrlBackgroundService> logger
     ) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -28,7 +30,9 @@ internal sealed class ConsoleInputUrl(
                     continue;
                 }
 
-                await urlRelay.RelayAsync(url, stoppingToken);
+                var message = new InputUrlMessage(url);
+                await messageOrchestrator.SendAsnc<InputUrlMessage, Uri>(message, stoppingToken);
+                //await urlRelay.RelayAsync(url, stoppingToken);
             }
             catch (Exception ex)
             {

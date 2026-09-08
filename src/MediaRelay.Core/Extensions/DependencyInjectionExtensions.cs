@@ -4,7 +4,6 @@ using MediaRelay.Content;
 using MediaRelay.Http;
 using MediaRelay.Logging;
 using MediaRelay.Messaging;
-using MediaRelay.Persistent.Url;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
 using MediaRelay.Source;
@@ -28,8 +27,7 @@ public static class DependencyInjectionExtensions
                 .AddHttpClient()
                 .AddPlaywright()
                 .AddStorage()
-                .AddMessaging()
-                .AddPersistent();
+                .AddMessaging();
         }
 
         private IServiceCollection AddCore()
@@ -51,21 +49,19 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ISourceRelayService, SourceRelayService>();
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
+            // 消息队列
+            services.AddMessageQueue<UrlMessageQueue, InputUrlMessage, Uri>();
+            services.AddMessageSender<UrlMessageSender, InputUrlMessage, Uri>();
+            services.AddHostedService<UrlQueueConsumer>();
+
             return services;
         }
 
         private IServiceCollection AddMessaging()
         {
-            services.AddSingleton(typeof(IMessageSender<>), typeof(MessageSender<>));
             services.AddSingleton<IMessageOrchestrator, MessageOrchestrator>();
-            return services;
-        }
-
-        private IServiceCollection AddPersistent()
-        {
-            services.AddSingleton<IUrlQueueStore, FileUrlQueueStore>();
-            services.AddSingleton<IUrlPersistentQueueFactory, UrlPersistentQueueFactory>();
-
+            services.AddSingleton<IMessageSenderProvider, MessageSenderProvider>();
+            services.AddSingleton<IMessageReceiverProvider, MessageReceiverProvider>();
             return services;
         }
 
@@ -120,12 +116,12 @@ public static class DependencyInjectionExtensions
     {
         public ILoggingBuilder AddEmojiDebug()
         {
-            builder.Services.TryAddSingleEnumerable<ILoggerProvider>(EmojiLoggerProvider.Debug);
+            builder.Services.TryAddInstanceEnumerable<ILoggerProvider>(EmojiLoggerProvider.Debug);
             return builder;
         }
         public ILoggingBuilder AddEmojiConsole()
         {
-            builder.Services.TryAddSingleEnumerable<ILoggerProvider>(EmojiLoggerProvider.Console);
+            builder.Services.TryAddInstanceEnumerable<ILoggerProvider>(EmojiLoggerProvider.Console);
             return builder;
         }
     }

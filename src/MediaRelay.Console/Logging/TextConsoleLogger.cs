@@ -6,7 +6,7 @@ using System.Text;
 namespace MediaRelay.Console.Logging;
 
 
-internal sealed class Logger(string categoryName) : ILogger
+internal sealed class ConsoleLogger(string categoryName) : ILogger
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;

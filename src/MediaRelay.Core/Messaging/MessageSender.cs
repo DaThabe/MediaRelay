@@ -3,14 +3,15 @@
 namespace MediaRelay.Messaging;
 
 
-internal sealed class MessageSender<T>(
-        IEnumerable<IMessageReceiver<T>> receivers,
-        ILogger<MessageSender<T>> logger
-    ) : IMessageSender<T>
+internal sealed class MessageSender<TMessage, TContent>(
+        IMessageReceiverProvider messageReceiverProvider,
+        ILogger<MessageSender<TMessage, TContent>> logger
+    ) : IMessageSender<TMessage, TContent>
+    where TMessage : IMessage<TContent>
 {
-    private readonly IMessageReceiver<T>[] _receivers = [.. receivers];
+    private readonly IMessageReceiver<TMessage, TContent>[] _receivers = [.. messageReceiverProvider.GetAll<TMessage, TContent>()];
 
-    public async ValueTask SendAsnc(T message, CancellationToken cancellationToken = default)
+    public async ValueTask SendAsync(TMessage message, CancellationToken cancellationToken = default)
     {
         logger.LogInformation("开始发送消息");
 

@@ -15,7 +15,10 @@ public static class DependencyInjectionExtensions
             where TService : class
             where TImplementation : class, TService
         {
-            var descriptor = new ServiceDescriptor(typeof(TService), typeof(TImplementation), lifetime);
+            var descriptor = new ServiceDescriptor(
+                serviceType: typeof(TService),
+                implementationType: typeof(TImplementation),
+                lifetime: lifetime);
             services.TryAddEnumerable(descriptor);
 
             return services;
@@ -26,19 +29,25 @@ public static class DependencyInjectionExtensions
             where TService : class
             where TImplementation : class, TService
         {
-            return services.TryAddEnumerable<TService, TImplementation>(ServiceLifetime.Singleton);
-        }
-
-
-        public IServiceCollection TryAddEnumerable<TService>(TService instance, ServiceLifetime lifetime)
-            where TService : class
-        {
-            var descriptor = new ServiceDescriptor(typeof(TService), instance, lifetime);
+            var descriptor = new ServiceDescriptor(
+                serviceType: typeof(TService),
+                implementationType: typeof(TImplementation),
+                lifetime: ServiceLifetime.Singleton);
             services.TryAddEnumerable(descriptor);
 
             return services;
         }
-        public IServiceCollection TryAddSingleEnumerable<TService>(TService instance) where TService : class =>
-            services.TryAddEnumerable(instance, ServiceLifetime.Singleton);
+
+
+        public IServiceCollection TryAddInstanceEnumerable<TService>(TService instance)
+            where TService : class
+        {
+            var descriptor = new ServiceDescriptor(
+                serviceType: typeof(TService),
+                instance: instance);
+            services.TryAddEnumerable(descriptor: descriptor);
+
+            return services;
+        }
     }
 }

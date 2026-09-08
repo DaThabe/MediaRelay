@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 
 
 await Host.CreateDefaultBuilder()
+    .UseEnvironment(Environments.Development)
     .ConfigureLogging(builder => builder
         .ClearProviders()
         .AddEmojiDebug()
@@ -21,7 +22,6 @@ await Host.CreateDefaultBuilder()
         .AddMediaRelay()
         .AddConsole()
     )
-    .UseEnvironment(Environments.Development)
     .UseDevelopmentSecrets()
     .RunConsoleAsync();
 
