@@ -25,7 +25,7 @@ public static class DependencyInjectionExtensions
             {
                 ApigenImmichClientHacker.Hack();
 
-                var options = sp.GetRequiredService<IOptionsSnapshot<ImmichOptions>>();
+                var options = sp.GetRequiredService<IOptions<ImmichOptions>>();
                 var logger = sp.GetRequiredService<ILogger<ImmichApiClient>>();
 
                 return ImmichApiClient.WithApiKey(options.Value.ApiKey, options.Value.BaseUrl, logger: logger);

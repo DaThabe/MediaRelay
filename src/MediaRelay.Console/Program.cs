@@ -21,6 +21,8 @@ await Host.CreateDefaultBuilder()
         // Core
         .AddMediaRelay()
         .AddMediaRelayConsole()
-        )
+    )
+    .UseEnvironment(Environments.Development)
+    .UseDevelopmentSecrets()
     .RunConsoleAsync();
 

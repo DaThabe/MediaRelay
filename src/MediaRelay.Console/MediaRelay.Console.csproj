@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<UserSecretsId>5311a0ca-fb0e-452f-ba9c-dd10bb5c5b1b</UserSecretsId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -21,9 +22,9 @@
 
 
 	<ItemGroup>
-	  <None Update="appsettings.json">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 </Project>
