@@ -11,7 +11,7 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddMediaRelayConsole()
+        public IServiceCollection AddConsoleSource()
         {
             services.AddHostedService<InputUrlListenBackgroundService>();
             return services;

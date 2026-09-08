@@ -19,7 +19,7 @@ await Host.CreateDefaultBuilder()
 
         // Core
         .AddMediaRelay()
-        .AddMediaRelayConsole()
+        .AddConsoleSource()
     )
     .UseEnvironment(Environments.Development)
     .UseDevelopmentSecrets()

@@ -1,18 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Messaging;
 
 
 internal sealed class MessageSender<T>(
-    IServiceProvider services,
-    ILogger<MessageSender<T>> logger
+        IEnumerable<IMessageReceiver<T>> receivers,
+        ILogger<MessageSender<T>> logger
     ) : IMessageSender<T>
 {
-    private readonly IMessageReceiver<T>[] _receivers = [.. services.GetServices<IMessageReceiver<T>>()];
+    private readonly IMessageReceiver<T>[] _receivers = [.. receivers];
 
     public async ValueTask SendAsnc(T message, CancellationToken cancellationToken = default)
     {
+        logger.LogInformation("开始发送消息");
+
         foreach (var receiver in _receivers)
         {
             using var _ = logger.BeginScope("ReceiverType", receiver.GetType().Name);
@@ -33,5 +34,7 @@ internal sealed class MessageSender<T>(
                 return ValueTask.CompletedTask;
             }
         }
+
+        logger.LogInformation("消息发送完毕");
     }
 }

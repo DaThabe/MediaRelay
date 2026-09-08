@@ -58,6 +58,7 @@ public static class DependencyInjectionExtensions
         private IServiceCollection AddMessaging()
         {
             services.AddSingleton(typeof(IMessageSender<>), typeof(MessageSender<>));
+            services.AddSingleton<IMessageOrchestrator, MessageOrchestrator>();
             return services;
         }
 
