@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Persistent.Url.Messages;
+﻿namespace MediaRelay.Url.Messages;
 
 internal sealed record class DeadMessage : Message
 {

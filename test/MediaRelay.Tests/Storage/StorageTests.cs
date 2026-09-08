@@ -12,7 +12,7 @@ public class StorageTests
     public async Task StoreAsync_ShouldCompleteSuccessfully()
     {
         const string content = nameof(StoreAsync_ShouldCompleteSuccessfully);
-        const string extension = "Test";
+        var mediaType = MediaType.Png;
 
         // Data
         var hasher = new SHA256Hasher();
@@ -21,18 +21,18 @@ public class StorageTests
 
         // Storage
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(dataStream, extension, TestContext.CancellationToken);
+        var info = await storage.StoreAsync(dataStream, mediaType, TestContext.CancellationToken);
 
         // Assert
         dataStream.EnsureAtStart();
-        await AssertFileAndClearAsync(hasher, dataStream, extension, info, TestContext.CancellationToken);
+        await AssertFileAndClearAsync(hasher, dataStream, mediaType, info, TestContext.CancellationToken);
     }
 
     [TestMethod]
     public async Task StoreAsync_WhenStreamIsNotSeekable_ShouldCopyToMemoryStream()
     {
         const string content = nameof(StoreAsync_WhenStreamIsNotSeekable_ShouldCopyToMemoryStream);
-        const string extension = "Test";
+        var mediaType = MediaType.Png;
 
         // Data
         var hasher = new SHA256Hasher();
@@ -42,10 +42,10 @@ public class StorageTests
 
         // Act
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(writeDataStream, extension, TestContext.CancellationToken);
+        var info = await storage.StoreAsync(writeDataStream, mediaType, TestContext.CancellationToken);
 
         // Assert
-        await AssertFileAndClearAsync(hasher, dataStream, extension, info, TestContext.CancellationToken);
+        await AssertFileAndClearAsync(hasher, dataStream, mediaType, info, TestContext.CancellationToken);
     }
 
 
@@ -62,7 +62,7 @@ public class StorageTests
         return new Storage(options, hasher, logger);
     }
 
-    private static async Task AssertFileAndClearAsync(SHA256Hasher hasher, Stream content, string extension, StorageInfo info, CancellationToken cancellationToken = default)
+    private static async Task AssertFileAndClearAsync(SHA256Hasher hasher, Stream content, MediaType mediaType, StorageInfo info, CancellationToken cancellationToken = default)
     {
         // Data
         var filePath = info.Uri.LocalPath;
@@ -72,7 +72,7 @@ public class StorageTests
         // Assert
         Assert.IsTrue(fileExists, $"文件不存在: {filePath}");
         Assert.AreEqual(content.Length, info.Size, "文件大小不匹配");
-        Assert.AreEqual(extension, info.Extensions, "扩展名不匹配");
+        Assert.AreEqual(mediaType, info.MediaType, "媒体类型不匹配");
         Assert.AreEqual(hasher.Algorithm, info.HashAlgorithm, "Hash算法不匹配");
         Assert.AreEqual(hashHex, info.Hash, "Hash值不匹配");
 

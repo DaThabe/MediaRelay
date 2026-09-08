@@ -154,7 +154,7 @@ internal sealed class TweetContentExtractor(
         (
             ResourceId.CreateVideoId(source.Username, source.TweetId),
             new Uri(downloadUrl),
-            "mp4"
+            Storage.MediaType.Mp4
         );
     }
 }

@@ -1,10 +1,11 @@
 ﻿using MediaRelay.Extensions;
 using MediaRelay.Persistent.Url.Messages;
+using MediaRelay.Url.Messages;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
-namespace MediaRelay.Persistent.Url;
+namespace MediaRelay.Url;
 
 
 internal interface IUrlQueueStore

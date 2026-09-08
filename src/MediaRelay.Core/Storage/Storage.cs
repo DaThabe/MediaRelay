@@ -10,7 +10,7 @@ internal sealed class Storage(
 {
     public async ValueTask<StorageInfo> StoreAsync(
         Stream stream,
-        string extension,
+        MediaType format,
         CancellationToken cancellationToken = default)
     {
         bool createdMemoryStream = false;
@@ -34,7 +34,7 @@ internal sealed class Storage(
             logger.LogInformation("文件Hash计算完成");
 
             // 完整路径
-            var fullPath = CombineFullPath(hash, extension);
+            var fullPath = CombineFullPath(hash, format.ToString());
             // 保存流
             var fullUri = await SaveStreamToFileAsync(stream, fullPath, cancellationToken);
 
@@ -44,7 +44,7 @@ internal sealed class Storage(
                 HashAlgorithm = hashAlgorithm,
                 Uri = fullUri,
                 Size = stream.Length,
-                Extensions = extension
+                MediaType = format
             };
         }
         finally

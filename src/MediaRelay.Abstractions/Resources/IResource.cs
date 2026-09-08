@@ -1,4 +1,6 @@
-﻿namespace MediaRelay.Resources;
+﻿using MediaRelay.Storage;
+
+namespace MediaRelay.Resources;
 
 
 /// <summary>
@@ -7,7 +9,7 @@
 public interface IResource
 {
     ResourceId Id { get; }
-    string Extensions { get; }
+    MediaType Type { get; }
 
 
     ValueTask<Stream> GetStreamAsync(CancellationToken cancellationToken = default);

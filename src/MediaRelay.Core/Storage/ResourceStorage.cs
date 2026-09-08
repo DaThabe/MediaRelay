@@ -46,7 +46,7 @@ internal sealed class ResourceStorage(
                 logger.LogInformation("正在储存资源");
 
                 var info = await storage
-                    .StoreAsync(stream, resource.Extensions, cancellationToken);
+                    .StoreAsync(stream, resource.Type, cancellationToken);
 
                 logger.LogInformation("资源储已储存");
                 uris[resource.Id] = info;

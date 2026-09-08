@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Persistent.Url.Messages;
+﻿namespace MediaRelay.Url.Messages;
 
 /// <summary>
 /// 队列元素

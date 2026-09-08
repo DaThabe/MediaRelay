@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Resources;
+using MediaRelay.Storage;
 
 namespace MediaRelay.Pixiv.Image;
 
@@ -9,8 +10,7 @@ internal sealed partial class OriginalImageUrlResource : IResource
 
     public required ResourceId Id { get; init; }
     public required OriginalImageUrl Url { get; init; }
-    string IResource.Extensions => Url.Format.ToString();
-
+    public MediaType Type => Url.MediaType;
 
     private OriginalImageUrlResource(IPixivDownloader downloader) => _downloader = downloader;
 

@@ -15,9 +15,9 @@ public class ResourceStorageTests
         // Data
         var resources = new IResource[]
         {
-            IResource.Mock(ResourceId.Create("1"), "Ext", "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
-            IResource.Mock(ResourceId.Create("2"), "Ext", "HelloWorld2!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
-            IResource.Mock(ResourceId.Create("3"), "Ext", "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken)
+            IResource.Mock(ResourceId.Create("1"), MediaType.Jpg, "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
+            IResource.Mock(ResourceId.Create("2"), MediaType.Png, "HelloWorld2!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
+            IResource.Mock(ResourceId.Create("3"), MediaType.Mp4, "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken)
         };
 
         // Assert
@@ -39,15 +39,15 @@ public class ResourceStorageTests
         // Resource
         var mockExceptionResource = new Mock<IResource>();
         mockExceptionResource.Setup(x => x.Id).Returns(ResourceId.Create("2"));
-        mockExceptionResource.Setup(x => x.Extensions).Returns("Ext");
+        mockExceptionResource.Setup(x => x.Type).Returns(MediaType.Png);
 
         static ValueTask<Stream> GetStreamWithException() => throw new InvalidOperationException("我是故意失败的");
         mockExceptionResource.Setup(x => x.GetStreamAsync(TestContext.CancellationToken))
             .Returns(GetStreamWithException);
 
-        var resource1 = IResource.Mock(ResourceId.Create("1"), "Ext", "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
+        var resource1 = IResource.Mock(ResourceId.Create("1"), MediaType.Jpg, "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
         var resource2 = mockExceptionResource.Object;
-        var resource3 = IResource.Mock(ResourceId.Create("3"), "Ext", "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
+        var resource3 = IResource.Mock(ResourceId.Create("3"), MediaType.Mp4, "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
 
         // Data
         IResource[] allResources = [resource1, resource2, resource3];

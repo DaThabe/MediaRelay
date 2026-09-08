@@ -1,4 +1,4 @@
-﻿using MediaRelay.Image;
+﻿using MediaRelay.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
@@ -10,7 +10,7 @@ internal sealed partial class ImageUrl
     private readonly string _url;
 
     public required string MediaId { get; init; }
-    public required ImageFormat Format { get; init; }
+    public required MediaType MediaType { get; init; }
     public ImageSize Size { get; init; } = ImageSize.Original;
 
 
@@ -59,7 +59,7 @@ internal sealed partial class ImageUrl
             return new ImageUrl(originalUrl)
             {
                 MediaId = mediaId,
-                Format = ImageFormat.FromName(format),
+                MediaType = MediaType.FromExtensions(format),
                 Size = useSize
             };
         }

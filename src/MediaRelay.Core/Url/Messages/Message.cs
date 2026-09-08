@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Url;
 using System.Text.Json.Serialization;
 
-namespace MediaRelay.Persistent.Url.Messages;
+namespace MediaRelay.Url.Messages;
 
 
 [JsonDerivedType(typeof(PendingMessage), typeDiscriminator: "pending")]

@@ -1,4 +1,4 @@
-﻿using MediaRelay.Image;
+﻿using MediaRelay.Storage;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
@@ -12,7 +12,7 @@ internal sealed partial class OriginalImageUrl
 
     public required int ArtworkId { get; init; }
     public required string Hash { get; init; }
-    public required ImageFormat Format { get; init; }
+    public required MediaType MediaType { get; init; }
     public required int Index { get; init; }
     public required DateTime UplaodAt { get; init; }
 
@@ -69,7 +69,7 @@ internal sealed partial class OriginalImageUrl
             {
                 ArtworkId = pid,
                 Hash = hash,
-                Format = ImageFormat.FromName(ext),
+                MediaType = MediaType.FromExtensions(ext),
                 Index = index,
                 UplaodAt = new DateTime(yyyy, MM, dd, HH, mm, ss)
             };

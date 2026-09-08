@@ -26,6 +26,6 @@ internal sealed class VideoDownloader(
         var downloadUrl = await page.EvaluateScriptFileAsync(options.Value.ExtractScriptPath, null, cancellationToken);
 
         var stream = await httpClient.GetStreamAsync(downloadUrl, cancellationToken);
-        return await storage.StoreAsync(stream, "mp4", cancellationToken);
+        return await storage.StoreAsync(stream, MediaType.Mp4, cancellationToken);
     }
 }
