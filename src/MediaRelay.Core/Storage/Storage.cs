@@ -26,22 +26,22 @@ internal sealed class Storage(
             if (stream.Length == 0) throw new ArgumentException("流长度不可为空", nameof(stream));
 
             // Hash信息
-            var (hashAlgorithm, hash) = await GetHashInfoAsync(stream, cancellationToken);
+            var hashInfo = await hasher.HashAsync(stream, cancellationToken);
+            var hashHexString = hashInfo.HexString;
 
-            using var _ = logger.Scope("Hash", hash)
-                .Add("HashAlgorithm", hashAlgorithm)
+            using var _ = logger.Scope("Hash", hashHexString)
+                .Add("HashAlgorithm", hashInfo.Algorithm)
                 .Begin();
             logger.LogInformation("文件Hash计算完成");
 
             // 完整路径
-            var fullPath = CombineFullPath(hash, format.ToString());
+            var fullPath = CombineFullPath(hashHexString, format.Extensions);
             // 保存流
             var fullUri = await SaveStreamToFileAsync(stream, fullPath, cancellationToken);
 
             return new StorageInfo()
             {
-                Hash = hash,
-                HashAlgorithm = hashAlgorithm,
+                HashInfo = hashInfo,
                 Uri = fullUri,
                 Size = stream.Length,
                 MediaType = format
@@ -51,17 +51,6 @@ internal sealed class Storage(
         {
             if (createdMemoryStream) await stream.DisposeAsync();
         }
-    }
-
-    private async Task<(string Algorithm, string Hash)> GetHashInfoAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        // 重置流位置
-        stream.EnsureAtStart();
-
-        // 计算Hash
-        var hash = await hasher.HashAsHexAsync(stream, cancellationToken);
-
-        return (hasher.Algorithm, hash);
     }
 
     private string CombineFullPath(string hash, string extension)

@@ -39,7 +39,7 @@ public readonly record struct MediaType : IEquatable<MediaType>
 
     public bool Equals(MediaType other)
     {
-        if (other == default) return this == Empty;
+        if (other.Category != Category) return false;
         return other.Extensions.Equals(Extensions, StringComparison.OrdinalIgnoreCase);
     }
     public override int GetHashCode()

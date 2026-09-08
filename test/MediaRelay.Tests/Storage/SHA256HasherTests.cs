@@ -15,14 +15,14 @@ public class SHA256HasherTests
         await using var dataStream = new MemoryStream(bytes);
 
         // Expected
-        var expectedHashBytes = SHA256.HashData(dataStream);
+        var hashData = SHA256.HashData(dataStream);
 
         // Actual
         var hasher = new SHA256Hasher();
-        var actualHashBytes = await hasher.HashAsync(dataStream, TestContext.CancellationToken);
+        var hashInfo = await hasher.HashAsync(dataStream, TestContext.CancellationToken);
 
         // Assert
-        CollectionAssert.AreEqual(expectedHashBytes, actualHashBytes);
+        CollectionAssert.AreEqual(hashData, hashInfo.Data);
     }
 
     [TestMethod]

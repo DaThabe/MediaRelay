@@ -123,7 +123,7 @@ internal sealed class ImmichRelay(
 
         return new()
         {
-            DeviceAssetId = $"{info.HashAlgorithm}_{info.Hash}",
+            DeviceAssetId = info.HashInfo.ToString(),
             AssetData = bytes,
             DeviceId = "MediaRelay",
 

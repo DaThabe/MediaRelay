@@ -67,14 +67,13 @@ public class StorageTests
         // Data
         var filePath = info.Uri.LocalPath;
         var fileExists = File.Exists(filePath);
-        var hashHex = await hasher.HashAsHexAsync(content, cancellationToken);
+        var hashInfo = await hasher.HashAsync(content, cancellationToken);
 
         // Assert
         Assert.IsTrue(fileExists, $"文件不存在: {filePath}");
         Assert.AreEqual(content.Length, info.Size, "文件大小不匹配");
         Assert.AreEqual(mediaType, info.MediaType, "媒体类型不匹配");
-        Assert.AreEqual(hasher.Algorithm, info.HashAlgorithm, "Hash算法不匹配");
-        Assert.AreEqual(hashHex, info.Hash, "Hash值不匹配");
+        Assert.AreEqual(hashInfo, info.HashInfo, "Hash信息不匹配");
 
         // Clear
         File.Delete(filePath);
