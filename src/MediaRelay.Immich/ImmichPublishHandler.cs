@@ -109,7 +109,7 @@ internal sealed class ImmichPublishHandler(
         }
 
         using var _ = logger.BeginScope("Tags", $"[{string.Join(',', addedTags)}]");
-        logger.LogWarning("已为媒体添加标签");
+        logger.LogInformation("已为媒体添加标签");
     }
 
 
