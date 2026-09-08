@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Source.Url;
+using MediaRelay.Url;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
@@ -20,7 +20,7 @@ internal sealed partial record class TweetSource : IUrlSource
 // Factory
 internal sealed partial record class TweetSource
 {
-    internal sealed class UrlParser(IOptions<TwitterTweetUrlOptions> options) : IUrlSourceParser
+    internal sealed class UrlParser(IOptions<TwitterTweetUrlOptions> options) : IUrlParser
     {
         private readonly Regex _regex = new
         (

@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Content;
 using MediaRelay.Resources;
-using MediaRelay.Source.Url;
+using MediaRelay.Source;
 
 namespace MediaRelay.Pixiv.Artwork;
 

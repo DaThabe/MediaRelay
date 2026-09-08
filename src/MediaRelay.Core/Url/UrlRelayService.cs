@@ -1,11 +1,10 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Source.Url;
 
 namespace MediaRelay.Url;
 
 
 internal sealed class UrlRelayService(
-        IUrlSourceParserSelector urlSourceParserSelector,
+        IUrlParserSelector urlSourceParserSelector,
         ISourceRelayService sourceRelayService
     ) : IUrlRelayService
 {

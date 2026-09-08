@@ -1,14 +1,15 @@
-﻿using Moq;
+﻿using MediaRelay.Url;
+using Moq;
 
 namespace MediaRelay.Source.Url;
 
 public static class IUrlSourceParserSelectorExtensions
 {
-    extension(IUrlSourceParserSelector)
+    extension(IUrlParserSelector)
     {
-        public static IUrlSourceParserSelector Mock(Uri url, IUrlSourceParser selectedParser)
+        public static IUrlParserSelector Mock(Uri url, IUrlParser selectedParser)
         {
-            var mock = new Mock<IUrlSourceParserSelector>();
+            var mock = new Mock<IUrlParserSelector>();
 
             mock.Setup(x => x.Select(url))
                 .Returns(selectedParser);

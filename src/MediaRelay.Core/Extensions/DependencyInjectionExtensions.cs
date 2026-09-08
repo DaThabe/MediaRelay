@@ -8,7 +8,6 @@ using MediaRelay.Persistent.Url;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
 using MediaRelay.Source;
-using MediaRelay.Source.Url;
 using MediaRelay.Storage;
 using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +40,7 @@ public static class DependencyInjectionExtensions
                  .Bind(options));
 
 
-            services.AddSingleton<IUrlSourceParserSelector, UrlSourceParserSelector>();
+            services.AddSingleton<IUrlParserSelector, UrlParserSelector>();
             services.AddSingleton<IContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
             services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();

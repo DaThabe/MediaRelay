@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Source.Url;
+using MediaRelay.Url;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
@@ -18,7 +18,7 @@ internal sealed partial record class ArtworkSource : IUrlSource
 // Factory
 internal sealed partial record class ArtworkSource
 {
-    internal sealed class UrlParser(IOptions<PixivArtworkUrlOptions> options) : IUrlSourceParser
+    internal sealed class UrlParser(IOptions<PixivArtworkUrlOptions> options) : IUrlParser
     {
         private readonly Regex _regex = new
         (
