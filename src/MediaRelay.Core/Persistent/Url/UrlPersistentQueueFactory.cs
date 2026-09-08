@@ -1,5 +1,6 @@
 ﻿using MediaRelay.Extensions;
 using MediaRelay.Persistent.Url.Messages;
+using MediaRelay.Url;
 using Microsoft.Extensions.Logging;
 using System.Threading.Channels;
 
@@ -90,18 +91,21 @@ internal sealed partial class UrlPersistentQueueFactory
             var messages = await GetAllMessageAsync(cancellationToken);
             await store.SaveAsync(messages, cancellationToken);
 
-            return message.Value;
+            return message.Content;
         }
         public async ValueTask<Uri> PeepWaitAsync(CancellationToken cancellationToken)
         {
             logger.LogInformation("等待查看消息");
-            if (!await Pendings.Reader.WaitToReadAsync(cancellationToken) || !Pendings.Reader.TryPeek(out var message))
+            if (!await Pendings.Reader.WaitToReadAsync(cancellationToken))
                 throw new InvalidOperationException("队列已关闭");
+
+            if (!Pendings.Reader.TryPeek(out var message))
+                throw new InvalidOperationException("队列数据异常");
 
             using var _ = logger.BeginScope("Message", message);
             logger.LogInformation("查看消息");
 
-            return message.Value;
+            return message.Content;
         }
 
 

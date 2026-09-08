@@ -5,7 +5,7 @@ namespace MediaRelay.Twitter.Tweet;
 
 
 internal sealed class TweetPublishContentConverter(
-    IResourceStorage resourceStorage) : IRelayContentConverter
+    IResourceStorage resourceStorage) : IContentConverter
 {
     public bool CanConvert(IContent content) => content is TweetContent;
     public async ValueTask<RelayContent> ConvertAsync(IContent content, CancellationToken cancellationToken = default)

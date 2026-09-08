@@ -5,7 +5,7 @@ namespace MediaRelay.Pixiv.Artwork;
 
 
 internal sealed class ArtworkPublishContentConverter(
-    IResourceStorage resourceStorage) : IRelayContentConverter
+    IResourceStorage resourceStorage) : IContentConverter
 {
     public bool CanConvert(IContent content) => content is ArtworkContent;
     public async ValueTask<RelayContent> ConvertAsync(IContent content, CancellationToken cancellationToken = default)

@@ -3,6 +3,9 @@
 
 public sealed record StorageOptions
 {
-    public static string Name { get; set; } = "Storage";
+    public const string SectionName = nameof(MediaRelayOptions.Storage);
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
+
+
     public string RootPath { get; set; } = "./Storage";
 }

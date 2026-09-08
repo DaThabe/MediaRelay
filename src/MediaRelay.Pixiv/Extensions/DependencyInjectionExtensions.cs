@@ -1,5 +1,4 @@
-﻿using MediaRelay;
-using MediaRelay.Content;
+﻿using MediaRelay.Content;
 using MediaRelay.Pixiv;
 using MediaRelay.Pixiv.Artwork;
 using MediaRelay.Pixiv.Image;
@@ -17,26 +16,23 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddPixivSource()
         {
             services.AddOptions<PixivOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivOptions.Name)
+                .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(PixivOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<PixivArtworkOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivOptions.Name)
-                    .GetSection(PixivArtworkOptions.Name)
+                .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(PixivArtworkOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<PixivHttpOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivOptions.Name)
-                    .GetSection(PixivHttpOptions.Name)
+                .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(PixivHttpOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<PixivOriginalImageUrlOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivOptions.Name)
-                    .GetSection(PixivOriginalImageUrlOptions.Name)
+                .Configure<IConfiguration>((options, configuration) => configuration
+                    .GetSection(PixivOriginalImageUrlOptions.SectionPath)
                     .Bind(options));
 
 
@@ -47,7 +43,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlParser>();
             services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
             services.AddSingleton<IPixivDownloader, PixivDownloader>();
-            services.AddSingleton<IRelayContentConverter, ArtworkPublishContentConverter>();
+            services.AddSingleton<IContentConverter, ArtworkPublishContentConverter>();
 
 
             return services;

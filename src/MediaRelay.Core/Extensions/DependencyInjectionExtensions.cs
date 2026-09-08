@@ -7,8 +7,10 @@ using MediaRelay.Persistent;
 using MediaRelay.Persistent.Url;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
+using MediaRelay.Source;
 using MediaRelay.Source.Url;
 using MediaRelay.Storage;
+using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -32,8 +34,14 @@ public static class DependencyInjectionExtensions
 
         private IServiceCollection AddCore()
         {
+            services.AddOptions<MediaRelayOptions>()
+            .Configure<IConfiguration>((options, configuration) => configuration
+                 .GetSection(MediaRelayOptions.SectionPath)
+                 .Bind(options));
+
+
             services.AddSingleton<IUrlSourceParserSelector, UrlSourceParserSelector>();
-            services.AddSingleton<IRelayContentConverterSelector, ContentHandlerSelector>();
+            services.AddSingleton<IContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
             services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
@@ -48,11 +56,6 @@ public static class DependencyInjectionExtensions
 
         private IServiceCollection AddPersistent()
         {
-            services.AddOptions<PersistentOptions>()
-             .Configure<IConfiguration>((options, configuration) => configuration
-                  .GetSection(PersistentOptions.Name)
-                  .Bind(options));
-
             services.AddSingleton<IUrlQueueStore, FileUrlQueueStore>();
             services.AddSingleton<IUrlPersistentQueueFactory, UrlPersistentQueueFactory>();
 
@@ -63,7 +66,7 @@ public static class DependencyInjectionExtensions
         {
             services.AddOptions<HttpOptions>()
               .Configure<IConfiguration>((options, configuration) => configuration
-                   .GetSection(HttpOptions.Name)
+                   .GetSection(HttpOptions.SectionPath)
                    .Bind(options));
 
             services.AddSingleton<IHttpClient, MediaRelay.Http.HttpClient>();
@@ -75,13 +78,12 @@ public static class DependencyInjectionExtensions
         {
             services.AddOptions<BrowserOptions>()
                .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(BrowserOptions.Name)
+                    .GetSection(BrowserOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<BrowserLaunchOptions>()
                .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(BrowserOptions.Name)
-                    .GetSection(BrowserLaunchOptions.Name)
+                    .GetSection(BrowserLaunchOptions.SectionPath)
                     .Bind(options));
 
 
@@ -95,7 +97,7 @@ public static class DependencyInjectionExtensions
         {
             services.AddOptions<StorageOptions>()
                .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(StorageOptions.Name)
+                    .GetSection(StorageOptions.SectionPath)
                     .Bind(options));
 
             services.AddSingleton<IHasher, SHA256Hasher>();

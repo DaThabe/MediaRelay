@@ -4,13 +4,13 @@ namespace MediaRelay.Content;
 
 
 internal sealed class ContentHandlerSelector(
-        IEnumerable<IRelayContentConverter> converters,
+        IEnumerable<IContentConverter> converters,
         ILogger<ContentHandlerSelector> logger
-    ) : IRelayContentConverterSelector
+    ) : IContentConverterSelector
 {
-    private readonly IRelayContentConverter[] _converters = [.. converters];
+    private readonly IContentConverter[] _converters = [.. converters];
 
-    public IRelayContentConverter Select(IContent content)
+    public IContentConverter Select(IContent content)
     {
         foreach (var converter in _converters)
         {

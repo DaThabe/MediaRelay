@@ -3,11 +3,11 @@
 /// <summary>
 /// 队列元素
 /// </summary>
-internal record class PendingMessage : Message
+internal sealed record class PendingMessage : Message
 {
     public static PendingMessage Create(Uri url)
     {
-        return new PendingMessage() { Value = url };
+        return new PendingMessage() { Content = url };
     }
 
     public override bool TryNext(DateTimeOffset time, out Message? next)
@@ -20,7 +20,7 @@ internal record class PendingMessage : Message
     {
         return new FailedMessage()
         {
-            Value = Value,
+            Content = Content,
             CreatedAt = time,
             MaxRetries = maxRetries,
             RetryInterval = retryInterval

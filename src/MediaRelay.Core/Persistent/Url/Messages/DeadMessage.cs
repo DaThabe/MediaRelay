@@ -1,6 +1,6 @@
 ﻿namespace MediaRelay.Persistent.Url.Messages;
 
-internal record class DeadMessage : Message
+internal sealed record class DeadMessage : Message
 {
     public string? Reason { get; init; }
     public required int RetryCount { get; init; }
@@ -13,7 +13,7 @@ internal record class DeadMessage : Message
     {
         return new()
         {
-            Value = value,
+            Content = value,
             CreatedAt = time,
             RetryCount = count,
             Reason = reason

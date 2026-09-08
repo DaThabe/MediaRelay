@@ -14,7 +14,7 @@ internal interface IUrlQueueStore
 }
 
 
-internal sealed class FileUrlQueueStore(IOptions<PersistentOptions> options, ILogger<FileUrlQueueStore> logger) : IUrlQueueStore
+internal sealed class FileUrlQueueStore(IOptions<MediaRelayOptions> options, ILogger<FileUrlQueueStore> logger) : IUrlQueueStore
 {
     private readonly SemaphoreSlim _lock = new(1, 1);
 

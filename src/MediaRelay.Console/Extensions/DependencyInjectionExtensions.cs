@@ -13,7 +13,7 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddMediaRelayConsole()
         {
-            services.AddHostedService<InputListenBackgroundService>();
+            services.AddHostedService<InputUrlListenBackgroundService>();
             return services;
         }
     }

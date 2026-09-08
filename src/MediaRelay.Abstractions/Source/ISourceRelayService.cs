@@ -1,6 +1,4 @@
-﻿using MediaRelay.Source;
-
-namespace MediaRelay;
+﻿namespace MediaRelay.Source;
 
 
 /// <summary>

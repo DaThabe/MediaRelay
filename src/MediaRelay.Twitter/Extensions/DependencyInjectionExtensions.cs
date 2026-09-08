@@ -1,5 +1,4 @@
-﻿using MediaRelay;
-using MediaRelay.Content;
+﻿using MediaRelay.Content;
 using MediaRelay.Source.Url;
 using MediaRelay.Twitter;
 using MediaRelay.Twitter.Image;
@@ -18,25 +17,22 @@ public static class DependencyInjectionExtensions
         {
             services.AddOptions<TwitterOptions>()
                 .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(TwitterOptions.Name)
+                    .GetSection(TwitterOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterHttpOptions>()
                 .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(TwitterOptions.Name)
-                    .GetSection(TwitterHttpOptions.Name)
+                    .GetSection(TwitterHttpOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterImageUrlOptions>()
                 .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(TwitterOptions.Name)
-                    .GetSection(TwitterImageUrlOptions.Name)
+                    .GetSection(TwitterOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterTweetOptions>()
                 .PostConfigure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(TwitterOptions.Name)
-                    .GetSection(TwitterTweetOptions.Name)
+                    .GetSection(TwitterTweetOptions.SectionPath)
                     .Bind(options));
 
 
@@ -46,7 +42,7 @@ public static class DependencyInjectionExtensions
 
             services.AddSingleton<IUrlSourceParser, TweetSource.UrlParser>();
             services.AddSingleton<IContentExtractor, TweetContentExtractor>();
-            services.AddSingleton<IRelayContentConverter, TweetPublishContentConverter>();
+            services.AddSingleton<IContentConverter, TweetPublishContentConverter>();
 
 
             return services;

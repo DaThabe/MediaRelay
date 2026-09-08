@@ -3,7 +3,7 @@
 namespace MediaRelay;
 
 internal sealed class ContentRelayService(
-        IRelayContentConverterSelector relayContentConverterSelector,
+        IContentConverterSelector relayContentConverterSelector,
         IRelayOrchestrator relayOrchestrator
     ) : IContentRelayService
 {

@@ -3,7 +3,8 @@
 
 public sealed record class HttpOptions
 {
-    public static string Name { get; set; } = "Http";
+    public const string SectionName = nameof(MediaRelayOptions.Http);
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
 
 
     public bool IgnoreSslErrors { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Persistent;
+﻿namespace MediaRelay.Url;
 
 public interface IUrlPersistentQueueFactory
 {

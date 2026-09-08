@@ -5,7 +5,9 @@ namespace MediaRelay.Pixiv;
 
 public sealed record class PixivOptions
 {
-    public static string Name { get; set; } = "Pixiv";
+    public const string SectionName = "Pixiv";
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
+
 
     public PixivHttpOptions Http { get; set; } = new();
     public PixivOriginalImageUrlOptions OriginalImageUrl { get; set; } = new();
@@ -17,12 +19,12 @@ public sealed record class PixivOptions
 /// </summary>
 public sealed record class PixivHttpOptions
 {
-    public static string Name { get; set; } = "Http";
+    public const string SectionName = nameof(PixivOptions.Http);
+    public const string SectionPath = $"{PixivOptions.SectionPath}:{SectionName}";
 
 
     public string BaseUrl { get; set; } = "https://www.pixiv.net/";
     public string Referrer { get; set; } = "https://www.pixiv.net/";
-
     public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);
 
     public int MaxConcurrentDownloads { get; set; } = 3;
@@ -35,7 +37,8 @@ public sealed record class PixivHttpOptions
 /// </summary>
 public sealed class PixivOriginalImageUrlOptions
 {
-    public static string Name { get; set; } = "OriginalImageUrl";
+    public const string SectionName = nameof(PixivOptions.OriginalImageUrl);
+    public const string SectionPath = $"{PixivOptions.SectionPath}:{SectionName}";
 
 
     public string Format { get; set; } = @"https://i.pximg.net/img-original/img/{0}/{1}/{2}/{3}/{4}/{5}/{6}_p{7}_{8}.{9}";
@@ -57,7 +60,8 @@ public sealed class PixivOriginalImageUrlOptions
 /// </summary>
 public sealed record class PixivArtworkOptions
 {
-    public static string Name { get; set; } = "Artwork";
+    public const string SectionName = nameof(PixivOptions.Artwork);
+    public const string SectionPath = $"{PixivOptions.SectionPath}:{SectionName}";
 
 
     public PixivArtworkUrlOptions Url { get; set; } = new();
@@ -65,6 +69,10 @@ public sealed record class PixivArtworkOptions
 }
 public sealed record class PixivArtworkUrlOptions
 {
+    public const string SectionName = nameof(PixivArtworkOptions.Url);
+    public const string SectionPath = $"{PixivArtworkOptions.SectionPath}:{SectionName}";
+
+
     public string Format { get; set; } = "https://www.pixiv.net/artworks/{0}";
     public string Pattern { get; set; } = @"pixiv\.net/artworks/(?<pid>\d+)";
     public string ArtworkIdKey { get; set; } = "pid";

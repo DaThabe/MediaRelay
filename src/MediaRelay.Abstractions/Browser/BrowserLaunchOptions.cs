@@ -3,7 +3,10 @@
 
 public sealed record class BrowserLaunchOptions
 {
-    public static string Name { get; set; } = "Launch";
+    public const string SectionName = nameof(BrowserOptions.Launch);
+    public const string SectionPath = $"{BrowserOptions.SectionPath}:{SectionName}";
+
+
 
     public bool Headless { get; set; }
     public string? ExecutablePath { get; set; }

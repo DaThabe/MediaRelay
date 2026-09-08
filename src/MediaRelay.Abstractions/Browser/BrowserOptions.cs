@@ -3,7 +3,9 @@
 
 public sealed record class BrowserOptions
 {
-    public static string Name { get; set; } = "Browser";
+    public const string SectionName = nameof(MediaRelayOptions.Browser);
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
+
 
     public BrowserLaunchOptions Launch { get; set; } = new();
 }

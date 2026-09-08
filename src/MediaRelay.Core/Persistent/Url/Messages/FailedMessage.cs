@@ -1,6 +1,6 @@
 ﻿namespace MediaRelay.Persistent.Url.Messages;
 
-internal record class FailedMessage : Message
+internal sealed record class FailedMessage : Message
 {
     public static int DefaultMaxRetries = 5;
     public static TimeSpan DefaultRetryInterval = TimeSpan.FromSeconds(5);

@@ -1,6 +1,4 @@
-﻿using MediaRelay.Content;
-
-namespace MediaRelay;
+﻿namespace MediaRelay.Content;
 
 /// <summary>
 /// 内容转发

@@ -6,18 +6,12 @@ namespace MediaRelay.Twitter;
 
 public sealed record class TwitterOptions
 {
-    public static string Name { get; set; } = "Twitter";
+    public const string SectionName = "Twitter";
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
 
 
-    [JsonPropertyName(TwitterHttpOptions.Name)]
     public TwitterHttpOptions Http { get; set; } = new();
-
-
-    [JsonPropertyName(TwitterImageUrlOptions.Name)]
-    public TwitterImageUrlOptions ImageUrlRegex { get; set; } = new();
-
-
-    [JsonPropertyName(TwitterTweetOptions.Name)]
+    public TwitterImageUrlOptions ImageUrl { get; set; } = new();
     public TwitterTweetOptions Tweet { get; set; } = new();
 }
 
@@ -27,7 +21,8 @@ public sealed record class TwitterOptions
 /// </summary>
 public sealed record class TwitterHttpOptions
 {
-    public const string Name = "Http";
+    public const string SectionName = nameof(TwitterOptions.Http);
+    public const string SectionPath = $"{TwitterOptions.SectionName}:{SectionName}";
 
 
     public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);
@@ -40,7 +35,8 @@ public sealed record class TwitterHttpOptions
 /// </summary>
 public sealed class TwitterImageUrlOptions
 {
-    public const string Name  = "ImageUrl";
+    public const string SectionName = nameof(TwitterOptions.ImageUrl);
+    public const string SectionPath = $"{TwitterOptions.SectionPath}:{SectionName}";
 
 
     public string Format { get; set; } = "https://pbs.twimg.com/media/{0}?format={1}&name={2}";
@@ -55,19 +51,20 @@ public sealed class TwitterImageUrlOptions
 /// </summary>
 public sealed record class TwitterTweetOptions
 {
-    public const string Name = "Tweet";
+    public const string SectionName = nameof(TwitterOptions.Tweet);
+    public const string SectionPath = $"{TwitterOptions.SectionPath}:{SectionName}";
 
 
-    [JsonPropertyName(TwitterTweetUrlOptions.Name)]
     public TwitterTweetUrlOptions Url { get; set; } = new();
-
     public string ExtractScriptPath { get; set; } = "Browser/Scripts/TwitterTweet.js";
     public string VideoDownloadUrl { get; set; } = "https://savetwitter.net/";
     public string VideoDownloadUrlScriptPath { get; set; } = "Browser/Scripts/TwitterTweetVideoDownloadUrl.js";
 }
 public sealed record class TwitterTweetUrlOptions
 {
-    public const string Name = "Url";
+    public const string SectionName = nameof(TwitterTweetOptions.Url);
+    public const string SectionPath = $"{TwitterTweetOptions.SectionPath}:{SectionName}";
+
 
     public string Format { get; set; } = "https://x.com/{0}/status/{1}";
     public string Pattern { get; set; } = @"x\.com/(?<uid>\w+)/status/(?<tid>\w+)\?*";

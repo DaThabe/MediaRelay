@@ -3,7 +3,8 @@
 
 public sealed record class ImmichOptions
 {
-    public static string Name { get; set; } = "Immich";
+    public const string SectionName = "Immich";
+    public const string SectionPath = $"{MediaRelayOptions.SectionPath}:{SectionName}";
 
 
     public required string BaseUrl { get; set; }

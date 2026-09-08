@@ -1,7 +1,6 @@
 ﻿using Apigen.Immich.Client;
 using MediaRelay;
 using MediaRelay.Immich;
-using MediaRelay.Publish;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,7 +18,7 @@ public static class DependencyInjectionExtensions
         {
             services.AddOptions<ImmichOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(ImmichOptions.Name)
+                    .GetSection(ImmichOptions.SectionPath)
                     .Bind(options));
 
             services.AddSingleton(sp =>
