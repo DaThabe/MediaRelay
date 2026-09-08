@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace MediaRelay.Storage;
@@ -52,10 +53,10 @@ public class StorageTests
     {
         // Options
         var tempFodler = Path.GetTempPath();
-        var options = Mock.Options(new StorageOptions() { RootPath = tempFodler });
+        var options = IOptions<StorageOptions>.Mock(new () { RootPath = tempFodler });
 
         // Logger
-        var logger = Mock.Logger<Storage>();
+        var logger = ILogger<Storage>.Mock();
 
         // Storage
         return new Storage(options, hasher, logger);

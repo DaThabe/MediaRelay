@@ -1,4 +1,6 @@
 ﻿using MediaRelay.Resources;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace MediaRelay.Storage;
@@ -13,9 +15,9 @@ public class ResourceStorageTests
         // Data
         var resources = new IResource[]
         {
-            Mock.Resource(ResourceId.Create("1"), "Ext", Mock.StringToMemoryStream("HelloWorld1!"), TestContext.CancellationToken),
-            Mock.Resource(ResourceId.Create("2"), "Ext", Mock.StringToMemoryStream("HelloWorld2!"), TestContext.CancellationToken),
-            Mock.Resource(ResourceId.Create("3"), "Ext", Mock.StringToMemoryStream("HelloWorld3!"), TestContext.CancellationToken)
+            IResource.Mock(ResourceId.Create("1"), "Ext", "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
+            IResource.Mock(ResourceId.Create("2"), "Ext", "HelloWorld2!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
+            IResource.Mock(ResourceId.Create("3"), "Ext", "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken)
         };
 
         // Assert
@@ -43,9 +45,9 @@ public class ResourceStorageTests
         mockExceptionResource.Setup(x => x.GetStreamAsync(TestContext.CancellationToken))
             .Returns(GetStreamWithException);
 
-        var resource1 = Mock.Resource(ResourceId.Create("1"), "Ext", Mock.StringToMemoryStream("HelloWorld1!"), TestContext.CancellationToken);
+        var resource1 = IResource.Mock(ResourceId.Create("1"), "Ext", "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
         var resource2 = mockExceptionResource.Object;
-        var resource3 = Mock.Resource(ResourceId.Create("3"), "Ext", Mock.StringToMemoryStream("HelloWorld3!"), TestContext.CancellationToken);
+        var resource3 = IResource.Mock(ResourceId.Create("3"), "Ext", "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
 
         // Data
         IResource[] allResources = [resource1, resource2, resource3];
@@ -90,13 +92,13 @@ public class ResourceStorageTests
     {
         // Storage
         var tempFodler = Path.GetTempPath();
-        var options = Mock.Options(new StorageOptions() { RootPath = tempFodler });
+        var options = IOptions<StorageOptions>.Mock(new() { RootPath = tempFodler });
         var hasher = new SHA256Hasher();
-        var storageLogger = Mock.Logger<Storage>();
+        var storageLogger = ILogger<Storage>.Mock();
         var storage = new Storage(options, hasher, storageLogger);
 
 
-        var resourceStorageLogger = Mock.Logger<ResourceStorage>();
+        var resourceStorageLogger = ILogger<ResourceStorage>.Mock();
         return new ResourceStorage(storage, resourceStorageLogger);
     }
 

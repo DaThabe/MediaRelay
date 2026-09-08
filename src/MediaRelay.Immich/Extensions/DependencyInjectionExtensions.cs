@@ -1,4 +1,5 @@
 ﻿using Apigen.Immich.Client;
+using MediaRelay;
 using MediaRelay.Immich;
 using MediaRelay.Publish;
 using Microsoft.Extensions.Configuration;
@@ -31,8 +32,7 @@ public static class DependencyInjectionExtensions
                 return ImmichApiClient.WithApiKey(options.Value.ApiKey, options.Value.BaseUrl, logger: logger);
             });
 
-            services.AddSingleton<IPublishExecutor, ImmichPublishHandler>();
-
+            services.AddSingleton<IRelayService, ImmichRelay>();
 
             return services;
         }

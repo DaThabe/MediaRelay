@@ -32,7 +32,4 @@ public class AnsiConsoleTests
         static void Level3() => Level4();
         static void Level4() => throw new InvalidOperationException("操作失败", new OperationCanceledException("任务取消"));
     }
-
-
-    
 }

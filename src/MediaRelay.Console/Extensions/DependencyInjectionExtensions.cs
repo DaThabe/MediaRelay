@@ -1,6 +1,7 @@
 ﻿using MediaRelay.Console.Input;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
+using MediaRelay.Console.Logging;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -12,20 +13,17 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddMediaRelayConsole()
         {
-            services.AddSingleton<IUrlPersistentQueue, UrlPersistentQueue>();
             services.AddHostedService<InputListenBackgroundService>();
             return services;
         }
     }
-    extension(IHostBuilder builder)
+
+    extension(ILoggingBuilder builder)
     {
-        public IHostBuilder UseDevelopmentSecrets()
+        public ILoggingBuilder AddMediaRelayConsole()
         {
-            return builder.ConfigureAppConfiguration((context, builder) =>
-            {
-                if (!context.HostingEnvironment.IsDevelopment()) return;
-                builder.AddUserSecrets<Program>(false, true);
-            });
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, LoggerProvider>());
+            return builder;
         }
     }
 }

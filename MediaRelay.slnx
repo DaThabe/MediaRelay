@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Modules/">
-    <Project Path="src/MediaRelay.Consol.Logging/MediaRelay.Console.Logging.csproj" />
+    <Project Path="src/MediaRelay.Console/MediaRelay.Console.csproj" />
+    <Project Path="src/MediaRelay.Core/MediaRelay.Core.csproj" />
   </Folder>
   <Folder Name="/Modules/Destinations/">
     <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
@@ -9,8 +10,10 @@
     <Project Path="src/MediaRelay.Pixiv/MediaRelay.Pixiv.csproj" />
     <Project Path="src/MediaRelay.Twitter/MediaRelay.Twitter.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="test/MediaRelay.Mock/MediaRelay.Mock.csproj" />
+    <Project Path="test/MediaRelay.Tests/MediaRelay.Tests.csproj" />
+  </Folder>
   <Project Path="src/MediaRelay.Abstractions/MediaRelay.Abstractions.csproj" />
-  <Project Path="src/MediaRelay.Console/MediaRelay.Console.csproj" />
-  <Project Path="src/MediaRelay/MediaRelay.csproj" />
-  <Project Path="test/MediaRelay.Tests/MediaRelay.Tests.csproj" />
+  <Project Path="src/MediaRelay.Launcher/MediaRelay.Launcher.csproj" />
 </Solution>

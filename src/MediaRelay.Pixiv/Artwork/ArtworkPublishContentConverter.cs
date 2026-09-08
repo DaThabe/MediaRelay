@@ -1,15 +1,14 @@
 ﻿using MediaRelay.Content;
-using MediaRelay.Publish;
 using MediaRelay.Storage;
 
 namespace MediaRelay.Pixiv.Artwork;
 
 
 internal sealed class ArtworkPublishContentConverter(
-    IResourceStorage resourceStorage) : IPublishContentConverter
+    IResourceStorage resourceStorage) : IRelayContentConverter
 {
     public bool CanConvert(IContent content) => content is ArtworkContent;
-    public async ValueTask<PublishContent> ConvertAsync(IContent content, CancellationToken cancellationToken = default)
+    public async ValueTask<RelayContent> ConvertAsync(IContent content, CancellationToken cancellationToken = default)
     {
         if (content is not ArtworkContent pixivContent)
             throw new NotSupportedException($"不是有效的Pixiv作品内容: {content.Id}");
@@ -18,7 +17,7 @@ internal sealed class ArtworkPublishContentConverter(
         var resourceUris = await resourceStorage
             .StoreAllAsync(pixivContent.MediaResources, cancellationToken);
 
-        return new PublishContent()
+        return new RelayContent()
         {
             ContentId = pixivContent.Id,
             SourceUrl = pixivContent.Source.Url,

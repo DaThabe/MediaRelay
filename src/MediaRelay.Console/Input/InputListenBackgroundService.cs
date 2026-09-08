@@ -1,5 +1,5 @@
 ﻿using AsyncConsoleReader;
-using MediaRelay.Source.Url;
+using MediaRelay.Persistent;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -8,9 +8,8 @@ namespace MediaRelay.Console.Input;
 
 
 internal sealed class InputListenBackgroundService(
-        IMediaRelay mediaRelay,
-        IUrlPersistentQueue urlPersistentQueue,
-        IUrlSourceParserSelector urlSourceParserSelector,
+        IUrlRelayService urlRelay,
+        IUrlPersistentQueueFactory urlPersistentQueueFactory,
         ILogger<InputListenBackgroundService> logger
     ) : BackgroundService
 {
@@ -20,16 +19,19 @@ internal sealed class InputListenBackgroundService(
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _ = ConsumeAsync(stoppingToken);
-        return InputAsync(stoppingToken);
+        _ = InputAsync(stoppingToken);
+
+        return Task.CompletedTask;
     }
 
     private async Task ConsumeAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("请求处理任务已启动");
+        var urlPersistentQueue = await urlPersistentQueueFactory.GetOrCreateAsync(cancellationToken);
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var url = await urlPersistentQueue.ReadWaitAsync(cancellationToken);
+            var url = await urlPersistentQueue.PeepWaitAsync(cancellationToken);
             var requestId = Interlocked.Increment(ref _requestId);
             var beginTime = Stopwatch.GetTimestamp();
 
@@ -39,12 +41,8 @@ internal sealed class InputListenBackgroundService(
 
             try
             {
-                logger.LogInformation("开始处理请求");
-                var source = urlSourceParserSelector
-                           .Select(url)
-                           .Parse(url);
-
-                await mediaRelay.HandleAsync(source, cancellationToken);
+                await urlRelay.RelayAsync(url, cancellationToken);
+                await urlPersistentQueue.ReadWaitAsync(cancellationToken);
 
                 using var __ = logger.BeginScope("ElapsedTime", Stopwatch.GetElapsedTime(beginTime));
                 logger.LogInformation("请求处理完成");
@@ -67,6 +65,7 @@ internal sealed class InputListenBackgroundService(
     private async Task InputAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("网址输入任务已启动");
+        var urlPersistentQueue = await urlPersistentQueueFactory.GetOrCreateAsync(cancellationToken);
 
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -92,34 +91,6 @@ internal sealed class InputListenBackgroundService(
             {
                 logger.LogError(ex, "无法处理输入");
             }
-        }
-    }
-
-    private async Task HandleInputAsync(Uri url, CancellationToken cancellationToken)
-    {
-
-
-
-
-        try
-        {
-
-        }
-        catch (NotSupportedException ex)
-        {
-            logger.LogWarning(ex, "不支持的请求");
-        }
-        catch (TimeoutException ex)
-        {
-            logger.LogWarning(ex, "请求超时");
-        }
-        catch (OperationCanceledException ex)
-        {
-            logger.LogWarning(ex, "请求取消");
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "请求处理失败");
         }
     }
 }

@@ -4,7 +4,8 @@
 /// <summary>
 /// 推送执行器
 /// </summary>
+[Obsolete]
 public interface IPublishExecutor
 {
-    ValueTask ExecuteAsync(PublishContent content, CancellationToken cancellationToken = default);
+    ValueTask ExecuteAsync(RelayContent content, CancellationToken cancellationToken = default);
 }

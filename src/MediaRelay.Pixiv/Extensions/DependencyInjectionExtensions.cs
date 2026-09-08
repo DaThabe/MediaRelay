@@ -1,8 +1,8 @@
-﻿using MediaRelay.Content;
+﻿using MediaRelay;
+using MediaRelay.Content;
 using MediaRelay.Pixiv;
 using MediaRelay.Pixiv.Artwork;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Publish;
 using MediaRelay.Source.Url;
 using Microsoft.Extensions.Configuration;
 
@@ -47,7 +47,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlParser>();
             services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
             services.AddSingleton<IPixivDownloader, PixivDownloader>();
-            services.AddSingleton<IPublishContentConverter, ArtworkPublishContentConverter>();
+            services.AddSingleton<IRelayContentConverter, ArtworkPublishContentConverter>();
 
 
             return services;

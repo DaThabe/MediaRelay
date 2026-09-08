@@ -1,5 +1,6 @@
 ﻿namespace MediaRelay.Publish;
 
+[Obsolete]
 public readonly record struct PublishJobId
 {
     public static PublishId Empty => default;

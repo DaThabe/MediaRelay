@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>MediaRelay</RootNamespace>
+	</PropertyGroup>
+
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
+		<PackageReference Include="Moq" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
+	  <ProjectReference Include="..\..\src\MediaRelay.Console\MediaRelay.Console.csproj" />
+	  <ProjectReference Include="..\..\src\MediaRelay.Core\MediaRelay.Core.csproj" />
+	  <ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
+	  <ProjectReference Include="..\..\src\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
+	  <ProjectReference Include="..\..\src\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
+	</ItemGroup>
+
+</Project>

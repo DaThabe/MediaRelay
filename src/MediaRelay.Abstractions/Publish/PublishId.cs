@@ -3,6 +3,7 @@
 /// <summary>
 /// 转发任务的唯一标识
 /// </summary>
+[Obsolete]
 public readonly record struct PublishId
 {
     public static PublishId Empty => default;
