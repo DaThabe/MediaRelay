@@ -37,7 +37,6 @@ public static class DependencyInjectionExtensions
                  .GetSection(MediaRelayOptions.SectionPath)
                  .Bind(options));
 
-            services.AddSingleton<IUrlParserSelector, UrlParserSelector>();
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<IContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
