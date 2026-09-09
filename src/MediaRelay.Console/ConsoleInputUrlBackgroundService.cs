@@ -29,9 +29,7 @@ internal sealed class ConsoleInputUrlBackgroundService(
                     continue;
                 }
 
-                var message = new UrlMessage(url);
-                await messageOrchestrator.SendAsnc<UrlMessage, Uri>(message, stoppingToken);
-                //await urlRelay.RelayAsync(url, stoppingToken);
+                await messageOrchestrator.SendAsnc<UrlMessage, Uri>(url, stoppingToken);
             }
             catch (Exception ex)
             {

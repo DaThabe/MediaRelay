@@ -1,11 +1,12 @@
 ﻿using MediaRelay.Messaging;
-using System.Text.Json.Serialization;
 
 namespace MediaRelay.Url;
 
 
-[method: JsonConstructor]
-public record class UrlMessage(Guid Id, Uri Content) : IMessage<Uri>
+public sealed record class UrlMessage : IMessage<Uri>
 {
-    public UrlMessage(Uri url) : this(Guid.CreateVersion7(), url) { }
+    public MessageId Id => MessageId.FromValue(Content.ToString());
+    public required Uri Content { get; init; }
+
+    public static implicit operator UrlMessage(Uri uri) => new() { Content = uri };
 }
