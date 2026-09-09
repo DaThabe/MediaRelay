@@ -6,11 +6,13 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay.Immich;
 
 
-internal sealed class ImmichRelay(
+internal sealed class ImmichRelayHandler(
     ImmichApiClient apiClient,
-    ILogger<ImmichRelay> logger
-    ) : IRelayService
+    ILogger<ImmichRelayHandler> logger
+    ) : IRelayHandler
 {
+    public bool CanRelay(RelayContent content) => true;
+
     public async ValueTask RelayAsync(RelayContent content, CancellationToken cancellationToken = default)
     {
         List<Guid> mediaIds = [];

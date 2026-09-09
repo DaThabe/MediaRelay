@@ -2,9 +2,9 @@
 
 
 /// <summary>
-/// 转发
+/// 转发内容
 /// </summary>
-public interface IRelayService
+public interface IRelay
 {
     ValueTask RelayAsync(RelayContent content, CancellationToken cancellationToken = default);
 }

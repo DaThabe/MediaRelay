@@ -1,6 +1,4 @@
-﻿using MediaRelay.Messaging;
-
-namespace MediaRelay.Url;
+﻿namespace MediaRelay.Url;
 
 /// <summary>
 /// 从 Url 转发

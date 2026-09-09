@@ -4,11 +4,10 @@
 		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="AsyncConsoleReader" />
 		<PackageReference Include="Spectre.Console" />
-		<PackageReference Include="Spectre.Console.Json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
+		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

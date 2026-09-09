@@ -31,7 +31,7 @@ public static class DependencyInjectionExtensions
                 return ImmichApiClient.WithApiKey(options.Value.ApiKey, options.Value.BaseUrl, logger: logger);
             });
 
-            services.AddSingleton<IRelayService, ImmichRelay>();
+            services.AddSingleton<IRelayHandler, ImmichRelayHandler>();
 
             return services;
         }

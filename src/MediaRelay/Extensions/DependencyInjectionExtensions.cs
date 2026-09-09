@@ -19,46 +19,84 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjectionExtensions
 {
+    // MediaRelay
     extension(IServiceCollection services)
     {
         public IServiceCollection AddMediaRelay()
         {
-            return services.AddCore()
-                .AddHttpClient()
-                .AddPlaywright()
-                .AddStorage()
-                .AddMessaging();
-        }
+            // Config
+            services.AddOptions<MediaRelayOptions>()
+                .Configure<IConfiguration>((options, configuration) => configuration
+                     .GetSection(MediaRelayOptions.SectionPath)
+                     .Bind(options));
 
+            return services
+                .AddCore()
+                .AddInfrastructure();
+        }
+    }
+
+    // Core
+    extension(IServiceCollection services)
+    {
         private IServiceCollection AddCore()
         {
-            services.AddOptions<MediaRelayOptions>()
-            .Configure<IConfiguration>((options, configuration) => configuration
-                 .GetSection(MediaRelayOptions.SectionPath)
-                 .Bind(options));
+            services
+                .AddUrlRelay()
+                .AddSourceRelay()
+                .AddContentRelay()
+                .AddRelay();
 
-            // Url
+            return services;
+        }
+        private IServiceCollection AddUrlRelay()
+        {
             services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
             services.AddMessageSender<UrlMessageSender, UrlMessage, Uri>();
             services.AddHostedService<UrlQueueConsumer>();
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
 
-            // Source
+            return services;
+        }
+        private IServiceCollection AddSourceRelay()
+        {
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<ISourceRelayService, SourceRelayService>();
 
-            // Content
+            return services;
+        }
+        private IServiceCollection AddContentRelay()
+        {
+            // resource
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
+
+            // content
             services.AddSingleton<IContentExtractorFactory, ContentExtractorFactory>();
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
-            // Relay
-            services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();
+            return services;
+        }
+        private IServiceCollection AddRelay()
+        {
             services.AddSingleton<IRelayContentFactory, RelayContentFactory>();
+            services.AddSingleton<IRelay, Relay>();
 
             return services;
         }
+    }
+    // Infrastructure
+    extension(IServiceCollection services)
+    {
+        private IServiceCollection AddInfrastructure()
+        {
+            services
+                .AddHttpClient()
+                .AddBrowser()
+                .AddStorage()
+                .AddMessaging();
 
+            return services;
+        }
         private IServiceCollection AddMessaging()
         {
             services.AddSingleton<IMessageOrchestrator, MessageOrchestrator>();
@@ -66,7 +104,6 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IMessageReceiverProvider, MessageReceiverProvider>();
             return services;
         }
-
         private IServiceCollection AddHttpClient()
         {
             services.AddOptions<HttpOptions>()
@@ -78,8 +115,7 @@ public static class DependencyInjectionExtensions
 
             return services;
         }
-
-        private IServiceCollection AddPlaywright()
+        private IServiceCollection AddBrowser()
         {
             services.AddOptions<BrowserOptions>()
                .Configure<IConfiguration>((options, configuration) => configuration
@@ -97,7 +133,6 @@ public static class DependencyInjectionExtensions
 
             return services;
         }
-
         private IServiceCollection AddStorage()
         {
             services.AddOptions<StorageOptions>()
@@ -114,6 +149,7 @@ public static class DependencyInjectionExtensions
         }
     }
 
+    // Logger
     extension(ILoggingBuilder builder)
     {
         public ILoggingBuilder AddEmojiDebug()

@@ -17,7 +17,7 @@
 
 	<ItemGroup>
 		<None Update="Browser\Scripts\TwitterTweetVideoDownloadUrl.js">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Browser\Scripts\TwitterTweet.js">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

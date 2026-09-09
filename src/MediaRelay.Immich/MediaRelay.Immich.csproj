@@ -5,15 +5,15 @@
 		<NoWarn>$(NoWarn);SYSLIB1034;SYSLIB1030</NoWarn>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
-	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Options" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
 		<PackageReference Include="Apigen.Immich.Client" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
