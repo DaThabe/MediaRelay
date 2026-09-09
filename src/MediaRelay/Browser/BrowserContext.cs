@@ -1,24 +1,31 @@
 ﻿using MediaRelay.Http;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Browser;
 
 
-internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext context) : IBrowserContext
+internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext context, ILogger logger) : IBrowserContext
 {
     public async Task<IPage> NewPageAsync()
     {
         var page = await context.NewPageAsync();
-        return new Page(page);
-    }
-    public ValueTask DisposeAsync()
-    {
-        return context.DisposeAsync();
-    }
+        logger.LogDebug("新建页面");
 
-    public Task AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions)
+        return new Page(page, logger);
+    }
+    public async Task AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions)
     {
         var cookies = cookieOptions.Select(Parse);
-        return context.AddCookiesAsync(cookies);
+        await context.AddCookiesAsync(cookies);
+
+        var cookieString = string.Join(',', cookies.Select(x => $"{x.Domain}/{x.Name}"));
+        using var _ = logger.BeginScope("Cookies", $"[ {cookieString} ]");
+        logger.LogDebug("Cookie已添加");
+    }
+    public async ValueTask DisposeAsync()
+    {
+        await context.DisposeAsync();
+        logger.LogDebug("浏览器上下文已释放");
     }
 
 

@@ -59,7 +59,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
             {
                 if (_pendings.Count > 0)
                 {
-                    var envelope = _pendings[^1];
+                    var envelope = _pendings[0];
                     envelope.MarkProcessing();
 
                     LogDequeued(envelope);

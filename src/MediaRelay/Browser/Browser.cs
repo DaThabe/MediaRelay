@@ -1,19 +1,24 @@
-﻿namespace MediaRelay.Browser;
+﻿using Microsoft.Extensions.Logging;
+
+namespace MediaRelay.Browser;
 
 
-internal sealed class Browser(Microsoft.Playwright.IBrowser browser) : IBrowser
+internal sealed class Browser(Microsoft.Playwright.IBrowser browser, ILogger logger) : IBrowser
 {
     public string Version => browser.Version;
 
     public async Task<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
     {
         var context = await browser.NewContextAsync(Parse(options));
-        return new BrowserContext(context);
+        logger.LogDebug("已创建浏览器上下文");
+
+        return new BrowserContext(context, logger);
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return browser.DisposeAsync();
+        await browser.DisposeAsync();
+        logger.LogDebug("浏览器已释放");
     }
 
 

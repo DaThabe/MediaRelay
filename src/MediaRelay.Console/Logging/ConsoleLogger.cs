@@ -10,6 +10,7 @@ internal sealed class ConsoleLogger(string categoryName, IAnsiConsole ansiConsol
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
+    private bool _useScopeData = false;
 
 
     public bool IsEnabled(LogLevel logLevel) => true;
@@ -36,13 +37,15 @@ internal sealed class ConsoleLogger(string categoryName, IAnsiConsole ansiConsol
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
+        var scopeDatas = _useScopeData ? _currentScope?.ToFrozenDictionary() : null;
+
         var messageMarkupString = MessagaeStyle.ToMarkupString(
             timestamp: DateTime.Now,
             level: logLevel,
             categoryName: categoryName,
             message: formatter(state, exception),
             exception: exception,
-            scopeDatas: _currentScope?.ToFrozenDictionary());
+            scopeDatas: scopeDatas);
 
         ansiConsole.MarkupLine(messageMarkupString);
     }
@@ -128,10 +131,25 @@ file sealed class MessagaeStyle
         var title = $"[{name}]".EscapeMarkup();
         return $"[{style.ToMarkup()}]{title}[/]";
     }
-    private static string? GetCategoryNameMarkup(string categoryName)
+    private static string? GetCategoryNameMarkup(ReadOnlySpan<char> categoryName)
     {
-        if (string.IsNullOrWhiteSpace(categoryName)) return null;
-        return $"[{_categoryNameStyle.ToMarkup()}]{categoryName.EscapeMarkup()}[/]";
+        if (categoryName.IsWhiteSpace()) return null;
+        var index = categoryName.LastIndexOf('.');
+
+        string message;
+        if (index == -1)
+        {
+            message = categoryName.ToString();
+        }
+        else
+        {
+            var @namespace = categoryName[..index];
+            var className = categoryName[(index+1)..];
+
+            message = $"{className} ← {@namespace}";
+        }
+
+        return $"[{_categoryNameStyle.ToMarkup()}]{message.EscapeMarkup()}[/]";
     }
     private static string? GetMessageMarkup(string message)
     {
