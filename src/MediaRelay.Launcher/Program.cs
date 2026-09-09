@@ -4,8 +4,7 @@ using Microsoft.Extensions.Logging;
 
 Console.Title = "MediaRelay v0.0.1";
 
-await Host.CreateDefaultBuilder()
-    .UseEnvironment(Environments.Development)
+await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(builder => builder
         .ClearProviders()
         .AddEmojiDebug()

@@ -40,14 +40,10 @@ internal sealed class ConsoleLogger(string categoryName) : ILogger
             level: logLevel,
             categoryName: categoryName,
             message: formatter(state, exception),
-            scopeDatas: _currentScope?.ToFrozenDictionary() ?? FrozenDictionary<string, object>.Empty);
+            exception: exception,
+            scopeDatas: _currentScope?.ToFrozenDictionary());
 
         AnsiConsole.MarkupLine(messageMarkupString);
-        if (exception is not null)
-        {
-            AnsiConsole.MarkupLine($"[red]{exception.ToString().EscapeMarkup()}[/]");
-            //AnsiConsole.WriteException(exception, ExceptionFormats.NoStackTrace);
-        }
     }
 }
 
@@ -66,6 +62,7 @@ file sealed class MessagaeStyle
 
     private static readonly Style _categoryNameStyle = new(Color.Gray30, null, null);
     private static readonly Style _messageStyle = new(Color.White, null, Decoration.Bold);
+    private static readonly Style _exceptionStyle = new(Color.Red, null, Decoration.Bold);
 
     private static readonly Style _scopeDataKeyStyle = new(Color.Gray30, null, Decoration.Bold);
     private static readonly Style _scopeDataValueStyle = new(Color.Gray30, null, Decoration.Bold);
@@ -74,42 +71,94 @@ file sealed class MessagaeStyle
     private static readonly Style _scopeDataEqualSignStyle = new(Color.Gray30, null, null);
 
 
-    public static string ToMarkupString(DateTime timestamp, LogLevel level, string categoryName, string message, IReadOnlyDictionary<string, object> scopeDatas)
+    public static string ToMarkupString(
+        DateTime timestamp,
+        LogLevel level,
+        string categoryName,
+        string message,
+        Exception? exception = null,
+        IReadOnlyDictionary<string, object>? scopeDatas = null)
     {
         StringBuilder sb = new();
 
-        // Time
-        var timestampMarkup = $"[{_timestampStyle.ToMarkup()}]{$"[{timestamp:HH:mm:ss}]".EscapeMarkup()}[/]";
-        // Level
-        var (levelName, levelStyle) = GetLevelStyle(level);
-        var levelMarkup = $"[{levelStyle.ToMarkup()}]{$"[{levelName}]".EscapeMarkup()}[/]";
-        // Category
-        var categoryNameMarkup = $"[{_categoryNameStyle.ToMarkup()}]{categoryName.EscapeMarkup()}[/]";
-        // Message
-        var messageMarkup = $"[{_messageStyle.ToMarkup()}]{message.EscapeMarkup()}[/] {GetScopeDataMarkup(scopeDatas)}";
+        var timestampMarkup = GetTimestampMarkup(timestamp);
+        var levelMarkup = GetLevelMarkup(level);
+        var categoryNameMarkup = GetCategoryNameMarkup(categoryName);
+        var messageMarkup = GetMessageMarkup(message);
+        var exceptionMarkup = GetExceptionMarkup(exception);
+        var scopeDataMarkup = GetScopeDataMarkup(scopeDatas);
 
         // Format
         sb.AppendLine($"{timestampMarkup} {levelMarkup} {categoryNameMarkup}");
-        sb.Append($"    {messageMarkup}");
+
+        if (exceptionMarkup is null && scopeDataMarkup is null)
+            sb.Append($"    {messageMarkup}");
+        else if (exceptionMarkup is not null)
+            sb.Append($"    {messageMarkup} {exceptionMarkup}");
+        else
+            sb.Append($"    {messageMarkup} {exceptionMarkup} {scopeDataMarkup}");
 
         return sb.ToString();
     }
 
-
-    private static (string Name, Style Style) GetLevelStyle(LogLevel level) => level switch
+    private static string GetTimestampMarkup(DateTime timestamp)
     {
-        LogLevel.Trace => ("TRC", _levelTraceStyle),
-        LogLevel.Debug => ("DBG", _levelDebugStyle),
-        LogLevel.Information => ("INF", _levelInformationStyle),
-        LogLevel.Warning => ("WRN", _levelWarningStyle),
-        LogLevel.Error => ("ERR", _levelErrorStyle),
-        LogLevel.Critical => ("CRT", _levelCriticalStyle),
-        _ => ("NON", _levelNoneStyle)
-    };
-
-    private static string GetScopeDataMarkup(IReadOnlyDictionary<string, object> datas)
+        return $"[{_timestampStyle.ToMarkup()}]{$"[{timestamp:HH:mm:ss}]".EscapeMarkup()}[/]";
+    }
+    private static string GetLevelMarkup(LogLevel level)
     {
-        if (datas.Count == 0) return string.Empty;
+        var (name, style) = level switch
+        {
+            LogLevel.Trace => ("TRC", _levelTraceStyle),
+            LogLevel.Debug => ("DBG", _levelDebugStyle),
+            LogLevel.Information => ("INF", _levelInformationStyle),
+            LogLevel.Warning => ("WRN", _levelWarningStyle),
+            LogLevel.Error => ("ERR", _levelErrorStyle),
+            LogLevel.Critical => ("CRT", _levelCriticalStyle),
+            _ => ("NON", _levelNoneStyle)
+        };
+
+        var title = $"[{name}]".EscapeMarkup();
+        return $"[{style.ToMarkup()}]{title}[/]";
+    }
+    private static string? GetCategoryNameMarkup(string categoryName)
+    {
+        if (string.IsNullOrWhiteSpace(categoryName)) return null;
+        return $"[{_categoryNameStyle.ToMarkup()}]{categoryName.EscapeMarkup()}[/]";
+    }
+    private static string? GetMessageMarkup(string message)
+    {
+        if (string.IsNullOrWhiteSpace(message)) return null;
+        return $"[{_messageStyle.ToMarkup()}]{message.EscapeMarkup()}[/]";
+    }
+    private static string? GetExceptionMarkup(Exception? exception)
+    {
+        if (exception is null) return null;
+        string message;
+
+        if (exception.InnerException is not null)
+        {
+            List<string> messages = [];
+            Exception? current = exception;
+
+            while (current is not null)
+            {
+                messages.Add(current.Message);
+                current = current.InnerException;
+            }
+
+            message = string.Join("→", messages);
+        }
+        else
+        {
+            message = exception.Message;
+        }
+
+        return $"[{_exceptionStyle.ToMarkup()}]{message.EscapeMarkup()}[/]";
+    }
+    private static string? GetScopeDataMarkup(IReadOnlyDictionary<string, object>? datas)
+    {
+        if (datas is null || datas.Count == 0) return null;
 
         var items = new List<string>();
 

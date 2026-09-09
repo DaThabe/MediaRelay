@@ -10,7 +10,7 @@ namespace MediaRelay.Messaging.Queue;
 public enum MessageEnvelopeStatus
 {
     /// <summary>
-    /// 排队种
+    /// 排队中
     /// </summary>
     Pending,
 
@@ -25,7 +25,7 @@ public enum MessageEnvelopeStatus
     Completed,
 
     /// <summary>
-    /// 失败
+    /// 已拒绝
     /// </summary>
-    Failed,
+    Rejected,
 }

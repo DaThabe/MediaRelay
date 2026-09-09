@@ -11,11 +11,11 @@ public static class DependencyInjectionExtensions
     {
         public IHostBuilder UseDevelopmentSecrets()
         {
-            return builder.ConfigureAppConfiguration((context, builder) =>
-            {
-                if (!context.HostingEnvironment.IsDevelopment()) return;
-                builder.AddUserSecrets<Program>(false, true);
-            });
+#if DEBUG
+            builder.ConfigureAppConfiguration(x => x.AddUserSecrets<Program>(false, true));
+#endif
+            return builder;
+
         }
     }
 }

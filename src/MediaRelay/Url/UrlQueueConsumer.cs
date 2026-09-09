@@ -15,20 +15,27 @@ public sealed class UrlQueueConsumer(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var message = await uriQueue.DequeueAsync(stoppingToken);
-            logger.LogInformation("接收到消息");
-
             try
             {
-                await urlRelayService.RelayAsync(message.Content, stoppingToken);
-                await uriQueue.AcknowledgeAsync(message, stoppingToken);
+                var message = await uriQueue.DequeueAsync(stoppingToken);
+                logger.LogInformation("接收到消息");
 
-                logger.LogInformation("消息处理完成");
+                try
+                {
+                    await urlRelayService.RelayAsync(message.Content, stoppingToken);
+                    await uriQueue.AcknowledgeAsync(message, stoppingToken);
+
+                    logger.LogInformation("消息处理完成");
+                }
+                catch (Exception ex)
+                {
+                    await uriQueue.RejectAsync(message, cancellationToken: stoppingToken);
+                    logger.LogError(ex, "消息处理失败");
+                }
             }
             catch (Exception ex)
             {
-                await uriQueue.RejectAsync(message, cancellationToken: stoppingToken);
-                logger.LogError(ex, "消息处理失败, 已经返回队列");
+                logger.LogError(ex, "队列异常");
             }
         }
     }

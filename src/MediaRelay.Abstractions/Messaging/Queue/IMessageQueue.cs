@@ -27,7 +27,7 @@ public interface IMessageQueue<TMessage, TContent> : IMessageSender<TMessage, TC
     /// <summary>
     /// 拒绝
     /// </summary>
-    ValueTask RejectAsync(TMessage message, bool requeue = true, CancellationToken cancellationToken = default);
+    ValueTask RejectAsync(TMessage message, CancellationToken cancellationToken = default);
 }
 
 

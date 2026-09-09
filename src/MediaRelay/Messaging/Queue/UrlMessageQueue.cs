@@ -1,33 +1,29 @@
-﻿using MediaRelay.Messaging.Queue;
+﻿using MediaRelay.Url;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
-namespace MediaRelay.Url;
+namespace MediaRelay.Messaging.Queue;
 
 
 internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options, ILogger<UrlMessageQueue> logger) :
-    PersistenceMessageQueue<UrlMessage, Uri>(logger)
+    PersistenceMessageQueue<MessageEnvelope, UrlMessage, Uri>(logger)
 {
-    protected override IMessageEnvelope<UrlMessage, Uri> CreateEnvelope(UrlMessage message)
+    protected override MessageEnvelope CreateEnvelope(UrlMessage message)
     {
-        return new MessageEnvelope() { Message = message };
+        return MessageEnvelope.Create(message, MessageRetryOptions.FromCount(5));
     }
-
-    protected override async ValueTask<IEnumerable<IMessageEnvelope<UrlMessage, Uri>>> LoadAsync(CancellationToken cancellationToken = default)
+    protected override async ValueTask<IEnumerable<MessageEnvelope>> LoadAsync(CancellationToken cancellationToken = default)
     {
         var filePath = options.Value.UrlMessageQueueFile;
         if (!File.Exists(filePath)) return [];
         var json = await File.ReadAllTextAsync(filePath, cancellationToken);
 
-        return JsonSerializer.Deserialize(json, MessageJsonSerializerContext.Default.MessageEnvelopeArray) ?? [];
+        return JsonSerializer.Deserialize(json, QueueJsonSerializerContext.Default.MessageEnvelopeArray) ?? [];
     }
-
-    protected override async ValueTask SaveAsync(IEnumerable<IMessageEnvelope<UrlMessage, Uri>> data, CancellationToken cancellationToken = default)
+    protected override async ValueTask SaveAsync(IEnumerable<MessageEnvelope> envelopes, CancellationToken cancellationToken = default)
     {
-        var dto = data.Select(x => new MessageEnvelope() { Message = x.Message, CreateAt = x.CreateAt, Status = x.Status }).ToArray();
-        var json = JsonSerializer.Serialize(dto, MessageJsonSerializerContext.Default.MessageEnvelopeArray);
+        var json = JsonSerializer.Serialize([.. envelopes], QueueJsonSerializerContext.Default.MessageEnvelopeArray);
 
         var filePath = options.Value.UrlMessageQueueFile;
         var folder = Path.GetDirectoryName(filePath);
@@ -35,20 +31,4 @@ internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options, ILogg
 
         await File.WriteAllTextAsync(filePath, json, cancellationToken);
     }
-}
-
-[JsonSourceGenerationOptions(
-    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase
-)]
-[JsonSerializable(typeof(MessageEnvelope))]
-[JsonSerializable(typeof(MessageEnvelope[]))]
-[JsonSerializable(typeof(JsonStringEnumConverter<MessageEnvelopeStatus>))]
-internal partial class MessageJsonSerializerContext : JsonSerializerContext;
-
-
-internal sealed class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
-{
-    public required UrlMessage Message { get; init; }
-    public MessageEnvelopeStatus Status { get; init; } = MessageEnvelopeStatus.Pending;
-    public DateTimeOffset CreateAt { get; init; } = DateTimeOffset.Now;
 }

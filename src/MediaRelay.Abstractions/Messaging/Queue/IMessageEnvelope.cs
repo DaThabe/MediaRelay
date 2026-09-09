@@ -7,4 +7,13 @@ public interface IMessageEnvelope<TMessage, out TContent>
     TMessage Message { get; }
     MessageEnvelopeStatus Status { get; }
     DateTimeOffset CreateAt { get; }
+
+
+    void MarkProcessing();
+    void MarkCompleted();
+    void MarkRejected();
+
+
+    void Retry();
+    void Recover();
 }
