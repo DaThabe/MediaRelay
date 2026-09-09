@@ -1,4 +1,5 @@
-﻿using MediaRelay.Content;
+﻿using MediaRelay;
+using MediaRelay.Content;
 using MediaRelay.Pixiv;
 using MediaRelay.Pixiv.Artwork;
 using MediaRelay.Pixiv.Image;
@@ -43,7 +44,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlParser>();
             services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
             services.AddSingleton<IPixivDownloader, PixivDownloader>();
-            services.AddSingleton<IContentConverter, ArtworkPublishContentConverter>();
+            services.AddSingleton<IRelayContentCreator, ArtworkPublishContentConverter>();
 
 
             return services;

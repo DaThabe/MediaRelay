@@ -5,10 +5,10 @@ namespace MediaRelay.Pixiv.Artwork;
 
 
 internal sealed class ArtworkPublishContentConverter(
-    IResourceStorage resourceStorage) : IContentConverter
+    IResourceStorage resourceStorage) : IRelayContentCreator
 {
-    public bool CanConvert(IContent content) => content is ArtworkContent;
-    public async ValueTask<RelayContent> ConvertAsync(IContent content, CancellationToken cancellationToken = default)
+    public bool CanCreate(IContent content) => content is ArtworkContent;
+    public async ValueTask<RelayContent> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
         if (content is not ArtworkContent pixivContent)
             throw new NotSupportedException($"不是有效的Pixiv作品内容: {content.Id}");

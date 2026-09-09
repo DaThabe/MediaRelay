@@ -1,16 +1,16 @@
 ﻿namespace MediaRelay.Content;
 
 internal sealed class ContentRelayService(
-        IContentConverterSelector relayContentConverterSelector,
+        IRelayContentFactory relayContentFactory,
         IRelayOrchestrator relayOrchestrator
     ) : IContentRelayService
 {
     public async ValueTask RelayAsync(IContent content, CancellationToken cancellationToken = default)
     {
-        var relayContent = await relayContentConverterSelector
-           .Select(content)
-           .ConvertAsync(content, cancellationToken);
+        var relayContent = await relayContentFactory
+            .CreateAsync(content, cancellationToken);
 
-        await relayOrchestrator.RelayAsync(relayContent, cancellationToken);
+        await relayOrchestrator
+            .RelayAsync(relayContent, cancellationToken);
     }
 }

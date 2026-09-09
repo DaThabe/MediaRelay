@@ -37,21 +37,24 @@ public static class DependencyInjectionExtensions
                  .GetSection(MediaRelayOptions.SectionPath)
                  .Bind(options));
 
-            services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
-            services.AddSingleton<IContentConverterSelector, ContentHandlerSelector>();
-            services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
-            services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();
-            services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
-
-            // 转发
-            services.AddSingleton<IUrlRelayService, UrlRelayService>();
-            services.AddSingleton<ISourceRelayService, SourceRelayService>();
-            services.AddSingleton<IContentRelayService, ContentRelayService>();
-
-            // 消息队列
+            // Url
             services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
             services.AddMessageSender<UrlMessageSender, UrlMessage, Uri>();
             services.AddHostedService<UrlQueueConsumer>();
+            services.AddSingleton<IUrlRelayService, UrlRelayService>();
+
+            // Source
+            services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
+            services.AddSingleton<ISourceRelayService, SourceRelayService>();
+
+            // Content
+            services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
+            services.AddSingleton<IContentExtractorFactory, ContentExtractorFactory>();
+            services.AddSingleton<IContentRelayService, ContentRelayService>();
+
+            // Relay
+            services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();
+            services.AddSingleton<IRelayContentFactory, RelayContentFactory>();
 
             return services;
         }

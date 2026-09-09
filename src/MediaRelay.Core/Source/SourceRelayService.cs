@@ -4,7 +4,7 @@ namespace MediaRelay.Source;
 
 
 internal sealed class SourceRelayService(
-        IContentExtractorSelector contentExtractorSelector,
+        IContentExtractorFactory contentExtractorFactory,
         IContentRelayService contentRelayService
     ) : ISourceRelayService
 {
@@ -12,12 +12,10 @@ internal sealed class SourceRelayService(
         ISource source,
         CancellationToken cancellationToken = default)
     {
-        // Extract
-        var content = await contentExtractorSelector
-            .Select(source)
-            .ExtractAsync(source, cancellationToken);
+        var content = await contentExtractorFactory
+            .CreateAsync(source, cancellationToken);
 
-        // Publish
-        await contentRelayService.RelayAsync(content, cancellationToken);
+        await contentRelayService
+            .RelayAsync(content, cancellationToken);
     }
 }

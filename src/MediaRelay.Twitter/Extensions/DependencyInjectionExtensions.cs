@@ -1,4 +1,5 @@
-﻿using MediaRelay.Content;
+﻿using MediaRelay;
+using MediaRelay.Content;
 using MediaRelay.Source;
 using MediaRelay.Twitter;
 using MediaRelay.Twitter.Image;
@@ -41,7 +42,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ImageUrlResource.Factory>();
 
             services.AddSingleton<IUrlSourceParser, TweetSource.UrlParser>();
-            services.AddSingleton<IContentConverter, TweetPublishContentConverter>();
+            services.AddSingleton<IRelayContentCreator, TweetPublishContentConverter>();
             services.AddSingleton<IContentExtractor, TweetContentExtractor>();
 
 

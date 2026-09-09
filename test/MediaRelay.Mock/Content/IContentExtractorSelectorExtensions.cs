@@ -3,16 +3,16 @@ using Moq;
 
 namespace MediaRelay.Content;
 
-public static class IContentExtractorSelectorExtensions
+public static class IContentExtractorFactoryExtensions
 {
-    extension(IContentExtractorSelector)
+    extension(IContentExtractorFactory)
     {
-        public static IContentExtractorSelector Mock(ISource source, IContentExtractor selectedExtractor)
+        public static IContentExtractorFactory Mock(ISource source, IContent createResult, CancellationToken createAsyncCts= default)
         {
-            var mock = new Mock<IContentExtractorSelector>();
+            var mock = new Mock<IContentExtractorFactory>();
 
-            mock.Setup(x => x.Select(source))
-                .Returns(selectedExtractor);
+            mock.Setup(x => x.CreateAsync(source, createAsyncCts))
+                .Returns(new ValueTask<IContent>(createResult));
 
             return mock.Object;
         }
