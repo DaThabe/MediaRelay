@@ -2,6 +2,7 @@
 using MediaRelay.Console.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Spectre.Console;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,17 @@ public static class DependencyInjectionExtensions
             return host.ConfigureServices((_, services) =>
             {
                 services.AddConsole();
-                services.TryAddInstanceEnumerable<ILoggerProvider>(ConsoleLoggerProvider.Instance);
+                services.AddCustomConsoleLoggerProvider();
             });
+        }
+    }
+
+    extension(ILoggingBuilder builder)
+    {
+        public ILoggingBuilder AddCustomConsole()
+        {
+            builder.Services.AddCustomConsoleLoggerProvider();
+            return builder;
         }
     }
 
@@ -28,14 +38,13 @@ public static class DependencyInjectionExtensions
             services.AddHostedService<ConsoleInputUrlBackgroundService>();
             return services;
         }
-    }
 
-    extension(ILoggingBuilder builder)
-    {
-        public ILoggingBuilder AddCustomConsole()
+        private IServiceCollection AddCustomConsoleLoggerProvider()
         {
-            builder.Services.TryAddInstanceEnumerable<ILoggerProvider>(ConsoleLoggerProvider.Instance);
-            return builder;
+            services.AddSingleton(_ => AnsiConsole.Create(new AnsiConsoleSettings()));
+            services.TryAddSingleEnumerable<ILoggerProvider, ConsoleLoggerProvider>();
+
+            return services;
         }
     }
 }

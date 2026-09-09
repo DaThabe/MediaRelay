@@ -6,7 +6,7 @@ using System.Text;
 namespace MediaRelay.Console.Logging;
 
 
-internal sealed class ConsoleLogger(string categoryName) : ILogger
+internal sealed class ConsoleLogger(IAnsiConsole ansiConsole, string categoryName) : ILogger
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
@@ -43,7 +43,7 @@ internal sealed class ConsoleLogger(string categoryName) : ILogger
             exception: exception,
             scopeDatas: _currentScope?.ToFrozenDictionary());
 
-        AnsiConsole.MarkupLine(messageMarkupString);
+        ansiConsole.MarkupLine(messageMarkupString);
     }
 }
 
@@ -85,18 +85,24 @@ file sealed class MessagaeStyle
         var levelMarkup = GetLevelMarkup(level);
         var categoryNameMarkup = GetCategoryNameMarkup(categoryName);
         var messageMarkup = GetMessageMarkup(message);
-        var exceptionMarkup = GetExceptionMarkup(exception);
         var scopeDataMarkup = GetScopeDataMarkup(scopeDatas);
+        var exceptionMarkup = GetExceptionMarkup(exception);
 
-        // Format
+        // Title
         sb.AppendLine($"{timestampMarkup} {levelMarkup} {categoryNameMarkup}");
 
-        if (exceptionMarkup is null && scopeDataMarkup is null)
+        // Message
+        if (scopeDataMarkup is null)
             sb.Append($"    {messageMarkup}");
-        else if (exceptionMarkup is not null)
-            sb.Append($"    {messageMarkup} {exceptionMarkup}");
         else
-            sb.Append($"    {messageMarkup} {exceptionMarkup} {scopeDataMarkup}");
+            sb.Append($"    {messageMarkup} {scopeDataMarkup}");
+
+        // Exception
+        if (exceptionMarkup is not null)
+        {
+            sb.AppendLine();
+            sb.Append($"    {exceptionMarkup}");
+        }
 
         return sb.ToString();
     }
@@ -134,27 +140,18 @@ file sealed class MessagaeStyle
     private static string? GetExceptionMarkup(Exception? exception)
     {
         if (exception is null) return null;
-        string message;
 
-        if (exception.InnerException is not null)
+        StringBuilder sb = new();
+        sb.AppendLine($"{exception.GetType().Name}: {exception.Message}");
+
+        var next = exception.InnerException;
+        while (next is not null)
         {
-            List<string> messages = [];
-            Exception? current = exception;
-
-            while (current is not null)
-            {
-                messages.Add(current.Message);
-                current = current.InnerException;
-            }
-
-            message = string.Join("→", messages);
-        }
-        else
-        {
-            message = exception.Message;
+            sb.AppendLine($"       →{next.GetType().Name}: {next.Message}");
+            next = next.InnerException;
         }
 
-        return $"[{_exceptionStyle.ToMarkup()}]{message.EscapeMarkup()}[/]";
+        return $"[{_exceptionStyle.ToMarkup()}]{sb.ToString().EscapeMarkup()}[/]";
     }
     private static string? GetScopeDataMarkup(IReadOnlyDictionary<string, object>? datas)
     {

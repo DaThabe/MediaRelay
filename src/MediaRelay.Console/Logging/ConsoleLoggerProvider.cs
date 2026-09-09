@@ -1,14 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
+using Spectre.Console;
 
 namespace MediaRelay.Console.Logging;
 
 
-internal sealed class ConsoleLoggerProvider : ILoggerProvider
+internal sealed class ConsoleLoggerProvider(IAnsiConsole ansiConsole) : ILoggerProvider
 {
-    public ILogger CreateLogger(string categoryName) => new ConsoleLogger(categoryName);
+    public ILogger CreateLogger(string categoryName) => new ConsoleLogger(ansiConsole, categoryName);
     public void Dispose() { }
-
-
-    private ConsoleLoggerProvider() { }
-    public static ConsoleLoggerProvider Instance { get; } = new();
 }
