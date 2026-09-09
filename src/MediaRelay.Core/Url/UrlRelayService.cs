@@ -4,7 +4,8 @@ namespace MediaRelay.Url;
 
 
 internal sealed class UrlRelayService(
-        IUrlParserSelector urlSourceParserSelector,
+        IUrlSourceFactory urlSourceFactory,
+        //IUrlParserSelector urlSourceParserSelector,
         ISourceRelayService sourceRelayService
     ) : IUrlRelayService
 {
@@ -13,9 +14,10 @@ internal sealed class UrlRelayService(
         if (url.Scheme != Uri.UriSchemeHttp && url.Scheme != Uri.UriSchemeHttps)
             throw new ArgumentException($"不是有效的网址: {url}");
 
-        var source = urlSourceParserSelector
-                       .Select(url)
-                       .Parse(url);
+        //var source = urlSourceParserSelector
+        //               .Select(url)
+        //               .Create(url);
+        var source = urlSourceFactory.Create(url);
 
         await sourceRelayService.RelayAsync(source, cancellationToken);
     }

@@ -37,8 +37,8 @@ public static class DependencyInjectionExtensions
                  .GetSection(MediaRelayOptions.SectionPath)
                  .Bind(options));
 
-
             services.AddSingleton<IUrlParserSelector, UrlParserSelector>();
+            services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<IContentConverterSelector, ContentHandlerSelector>();
             services.AddSingleton<IContentExtractorSelector, ContentExtractorSelector>();
             services.AddSingleton<IRelayOrchestrator, RelayOrchestrator>();
@@ -50,8 +50,8 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
             // 消息队列
-            services.AddMessageQueue<UrlMessageQueue, InputUrlMessage, Uri>();
-            services.AddMessageSender<UrlMessageSender, InputUrlMessage, Uri>();
+            services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
+            services.AddMessageSender<UrlMessageSender, UrlMessage, Uri>();
             services.AddHostedService<UrlQueueConsumer>();
 
             return services;

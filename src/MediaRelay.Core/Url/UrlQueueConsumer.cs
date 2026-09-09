@@ -6,7 +6,7 @@ namespace MediaRelay.Url;
 
 
 public sealed class UrlQueueConsumer(
-        IMessageQueue<InputUrlMessage, Uri> uriQueue,
+        IMessageQueue<UrlMessage, Uri> uriQueue,
         IUrlRelayService urlRelayService,
         ILogger<UrlQueueConsumer> logger
     ) : BackgroundService

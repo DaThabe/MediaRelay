@@ -2,7 +2,7 @@
 using MediaRelay.Pixiv;
 using MediaRelay.Pixiv.Artwork;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Url;
+using MediaRelay.Source;
 using Microsoft.Extensions.Configuration;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -40,7 +40,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<OriginalImageUrlResource.Factory>();
 
 
-            services.AddSingleton<IUrlParser, ArtworkSource.UrlParser>();
+            services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlParser>();
             services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
             services.AddSingleton<IPixivDownloader, PixivDownloader>();
             services.AddSingleton<IContentConverter, ArtworkPublishContentConverter>();

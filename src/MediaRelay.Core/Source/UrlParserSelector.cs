@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Url;
+namespace MediaRelay.Source;
 
-
+[Obsolete]
 internal sealed class UrlParserSelector(
-        IEnumerable<IUrlParser> parsers,
+        IEnumerable<IUrlSourceParser> parsers,
         ILogger<UrlParserSelector> logger
     ) : IUrlParserSelector
 {
-    private readonly IUrlParser[] _parsers = [.. parsers];
+    private readonly IUrlSourceParser[] _parsers = [.. parsers];
 
-    public IUrlParser Select(Uri url)
+    public IUrlSourceParser Select(Uri url)
     {
         foreach (var parser in _parsers)
         {

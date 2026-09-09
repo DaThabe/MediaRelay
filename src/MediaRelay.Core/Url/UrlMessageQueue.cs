@@ -6,14 +6,14 @@ using System.Text.Json.Serialization;
 namespace MediaRelay.Url;
 
 
-internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options) : PersistenceMessageQueue<InputUrlMessage, Uri>
+internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options) : PersistenceMessageQueue<UrlMessage, Uri>
 {
-    protected override IMessageEnvelope<InputUrlMessage, Uri> CreateEnvelope(InputUrlMessage message)
+    protected override IMessageEnvelope<UrlMessage, Uri> CreateEnvelope(UrlMessage message)
     {
         return new MessageEnvelope() { Message = message };
     }
 
-    protected override async ValueTask<IEnumerable<IMessageEnvelope<InputUrlMessage, Uri>>> LoadAsync(CancellationToken cancellationToken = default)
+    protected override async ValueTask<IEnumerable<IMessageEnvelope<UrlMessage, Uri>>> LoadAsync(CancellationToken cancellationToken = default)
     {
         var filePath = options.Value.UrlMessageQueueFile;
         if (!File.Exists(filePath)) return [];
@@ -22,7 +22,7 @@ internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options) : Per
         return JsonSerializer.Deserialize(json, MessageJsonSerializerContext.Default.MessageEnvelopeArray) ?? [];
     }
 
-    protected override async ValueTask SaveAsync(IEnumerable<IMessageEnvelope<InputUrlMessage, Uri>> data, CancellationToken cancellationToken = default)
+    protected override async ValueTask SaveAsync(IEnumerable<IMessageEnvelope<UrlMessage, Uri>> data, CancellationToken cancellationToken = default)
     {
         var dto = data.Select(x => new MessageEnvelope() { Message = x.Message, CreateAt = x.CreateAt, Status = x.Status }).ToArray();
         var json = JsonSerializer.Serialize(dto, MessageJsonSerializerContext.Default.MessageEnvelopeArray);
@@ -44,9 +44,9 @@ internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options) : Per
 internal partial class MessageJsonSerializerContext : JsonSerializerContext;
 
 
-internal sealed class MessageEnvelope : IMessageEnvelope<InputUrlMessage, Uri>
+internal sealed class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 {
-    public required InputUrlMessage Message { get; init; }
+    public required UrlMessage Message { get; init; }
     public MessageStatus Status { get; init; } = MessageStatus.Pending;
     public DateTimeOffset CreateAt { get; init; } = DateTimeOffset.Now;
 }

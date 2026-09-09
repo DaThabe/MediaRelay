@@ -2,9 +2,9 @@
 
 namespace MediaRelay.Url;
 
-internal sealed class UrlMessageSender(IMessageQueue<InputUrlMessage, Uri> queue) : IMessageSender<InputUrlMessage, Uri>
+internal sealed class UrlMessageSender(IMessageQueue<UrlMessage, Uri> queue) : IMessageSender<UrlMessage, Uri>
 {
-    public ValueTask SendAsync(InputUrlMessage message, CancellationToken cancellationToken = default)
+    public ValueTask SendAsync(UrlMessage message, CancellationToken cancellationToken = default)
     {
         return queue.SendAsync(message, cancellationToken);
     }

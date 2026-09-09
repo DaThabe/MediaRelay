@@ -14,8 +14,8 @@ public class UrlRelayServiceTest
         var url = Uri.MockHttps;
 
         var urlSource = IUrlSource.Mock(SourceId.Test, url);
-        var urlSourceParser = IUrlParser.Mock(url, true, urlSource);
-        var urlSourceParserSelector = IUrlParserSelector.Mock(url, urlSourceParser);
+        var urlSourceParser = IUrlSourceParser.Mock(url, true, urlSource);
+        var urlSourceParserSelector = IUrlSourceFactory.Mock(url, urlSource, urlSourceParser);
 
         var sourceRelayService = ISourceRelayService.Mock(urlSource, TestContext.CancellationToken);
 
