@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-Console.Title = "MediaRelay v0.0.1";
+Console.Title = "MediaRelay v20260910.0102";
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(builder => builder
