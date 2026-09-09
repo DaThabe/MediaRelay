@@ -4,6 +4,7 @@ using MediaRelay.Content;
 using MediaRelay.Http;
 using MediaRelay.Logging;
 using MediaRelay.Messaging;
+using MediaRelay.Messaging.Queue;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
 using MediaRelay.Source;
@@ -51,10 +52,9 @@ public static class DependencyInjectionExtensions
         }
         private IServiceCollection AddUrlRelay()
         {
-            services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
-            services.AddMessageSender<UrlMessageSender, UrlMessage, Uri>();
-            services.AddHostedService<UrlQueueConsumer>();
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
+            services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
+            services.AddHostedService<UrlQueueConsumer>();
 
             return services;
         }
@@ -100,8 +100,6 @@ public static class DependencyInjectionExtensions
         private IServiceCollection AddMessaging()
         {
             services.AddSingleton<IMessageOrchestrator, MessageOrchestrator>();
-            services.AddSingleton<IMessageSenderProvider, MessageSenderProvider>();
-            services.AddSingleton<IMessageReceiverProvider, MessageReceiverProvider>();
             return services;
         }
         private IServiceCollection AddHttpClient()

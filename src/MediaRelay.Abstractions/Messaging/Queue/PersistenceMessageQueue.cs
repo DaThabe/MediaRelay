@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Messaging;
+namespace MediaRelay.Messaging.Queue;
 
 
 public abstract class PersistenceMessageQueue<TMessage, TContent> : IMessageQueue<TMessage, TContent>, IAsyncDisposable
@@ -146,8 +146,8 @@ public abstract class PersistenceMessageQueue<TMessage, TContent> : IMessageQueu
 
             foreach (var message in messages.OrderBy(x => x.CreateAt).ToArray())
             {
-                if (message.Status is MessageStatus.Failed) faileds.Add(message);
-                else if (message.Status is MessageStatus.Pending) pendings.Add(message);
+                if (message.Status is MessageEnvelopeStatus.Failed) faileds.Add(message);
+                else if (message.Status is MessageEnvelopeStatus.Pending) pendings.Add(message);
                 else deads.Add(message);
             }
 

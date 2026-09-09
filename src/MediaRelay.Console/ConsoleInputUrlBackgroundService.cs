@@ -8,7 +8,6 @@ namespace MediaRelay.Console;
 
 
 internal sealed class ConsoleInputUrlBackgroundService(
-        //IUrlRelayService urlRelay,
         IMessageOrchestrator messageOrchestrator,
         ILogger<ConsoleInputUrlBackgroundService> logger
     ) : BackgroundService

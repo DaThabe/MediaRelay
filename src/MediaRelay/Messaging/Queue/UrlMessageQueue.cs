@@ -1,4 +1,4 @@
-﻿using MediaRelay.Messaging;
+﻿using MediaRelay.Messaging.Queue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -42,13 +42,13 @@ internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options, ILogg
 )]
 [JsonSerializable(typeof(MessageEnvelope))]
 [JsonSerializable(typeof(MessageEnvelope[]))]
-[JsonSerializable(typeof(JsonStringEnumConverter<MessageStatus>))]
+[JsonSerializable(typeof(JsonStringEnumConverter<MessageEnvelopeStatus>))]
 internal partial class MessageJsonSerializerContext : JsonSerializerContext;
 
 
 internal sealed class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 {
     public required UrlMessage Message { get; init; }
-    public MessageStatus Status { get; init; } = MessageStatus.Pending;
+    public MessageEnvelopeStatus Status { get; init; } = MessageEnvelopeStatus.Pending;
     public DateTimeOffset CreateAt { get; init; } = DateTimeOffset.Now;
 }

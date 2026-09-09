@@ -43,7 +43,11 @@ internal sealed class ConsoleLogger(string categoryName) : ILogger
             scopeDatas: _currentScope?.ToFrozenDictionary() ?? FrozenDictionary<string, object>.Empty);
 
         AnsiConsole.MarkupLine(messageMarkupString);
-        if (exception is not null) AnsiConsole.WriteException(exception, ExceptionFormats.NoStackTrace);
+        if (exception is not null)
+        {
+            AnsiConsole.MarkupLine($"[red]{exception.ToString().EscapeMarkup()}[/]");
+            //AnsiConsole.WriteException(exception, ExceptionFormats.NoStackTrace);
+        }
     }
 }
 

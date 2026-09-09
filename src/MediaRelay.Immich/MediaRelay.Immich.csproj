@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<NoWarn>$(NoWarn);SYSLIB1034;SYSLIB1030</NoWarn>
+		<NoWarn>$(NoWarn);SYSLIB1034;SYSLIB1030;IL3050;</NoWarn>
 	</PropertyGroup>
 
 

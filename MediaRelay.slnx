@@ -4,7 +4,6 @@
     <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
     <Project Path="src/MediaRelay.Pixiv/MediaRelay.Pixiv.csproj" />
     <Project Path="src/MediaRelay.Twitter/MediaRelay.Twitter.csproj" />
-    <Project Path="src/MediaRelay/MediaRelay.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="test/MediaRelay.Mock/MediaRelay.Mock.csproj" />
@@ -12,4 +11,5 @@
   </Folder>
   <Project Path="src/MediaRelay.Abstractions/MediaRelay.Abstractions.csproj" />
   <Project Path="src/MediaRelay.Launcher/MediaRelay.Launcher.csproj" />
+  <Project Path="src/MediaRelay/MediaRelay.csproj" />
 </Solution>
