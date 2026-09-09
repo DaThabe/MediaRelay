@@ -17,6 +17,7 @@ await Host.CreateDefaultBuilder(args)
         .AddTwitter()
         .AddImmich()
         .AddConsole()
+        .AddClipboard()
     )
     .UseDevelopmentSecrets()
     .RunConsoleAsync();

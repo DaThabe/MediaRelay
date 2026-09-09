@@ -14,7 +14,7 @@ internal sealed class ConsoleInputUrlBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        logger.LogInformation("网址输入监听任务已启动");
+        logger.LogInformation("监听任务已启动");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -25,9 +25,11 @@ internal sealed class ConsoleInputUrlBackgroundService(
                 var input = AsyncConsole.ReadLine(stoppingToken)?.Trim();
                 if (string.IsNullOrEmpty(input)) continue;
 
+                using var _ = logger.BeginScope("Input", input);
+
                 if (!Uri.TryCreate(input, UriKind.Absolute, out var url))
                 {
-                    logger.LogWarning("请输入网址");
+                    logger.LogWarning("输入不是有效网址");
                     continue;
                 }
 
@@ -35,12 +37,12 @@ internal sealed class ConsoleInputUrlBackgroundService(
             }
             catch(OperationCanceledException)
             {
-                logger.LogInformation("网址输入监听任务已取消");
+                logger.LogInformation("监听任务已取消");
                 return;
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "无法处理输入");
+                logger.LogError(ex, "监听任务异常");
             }
         }
     }

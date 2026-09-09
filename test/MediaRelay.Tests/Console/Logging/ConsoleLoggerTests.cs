@@ -14,7 +14,7 @@ public sealed class ConsoleLoggerTests
     public void LogError_Exception(int deep)
     {
         var console = new TestConsole();
-        var logger = new ConsoleLogger(console, "MediaRelay.Console.Logging");
+        var logger = new ConsoleLogger("MediaRelay.Console.Logging", console);
 
         using var _ = logger.BeginScope("Deep", deep);
 

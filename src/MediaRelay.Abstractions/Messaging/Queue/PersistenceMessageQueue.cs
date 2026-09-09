@@ -158,20 +158,20 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
             var messages = await LoadAsync(cancellationToken);
 
             // 分类
-            var faileds = new List<TEnvelope>();
+            var processings = new List<TEnvelope>();
+            var rejecteds = new List<TEnvelope>();
             var pendings = new List<TEnvelope>();
-            var deads = new List<TEnvelope>();
 
             foreach (var message in messages.OrderBy(x => x.CreateAt).ToArray())
             {
-                if (message.Status is MessageEnvelopeStatus.Rejected) faileds.Add(message);
+                if (message.Status is MessageEnvelopeStatus.Rejected) rejecteds.Add(message);
                 else if (message.Status is MessageEnvelopeStatus.Pending) pendings.Add(message);
-                else deads.Add(message);
+                else if (message.Status is MessageEnvelopeStatus.Processing) processings.Add(message);
             }
 
             // 初始化
-            _pendings = [.. faileds, .. pendings];
-            _deads = deads;
+            _pendings = [.. processings, .. pendings];
+            _deads = rejecteds;
 
             _loadTcs.TrySetResult();
         }

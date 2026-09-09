@@ -39,7 +39,7 @@ internal sealed class ImmichRelayHandler(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "媒体上传失败");
+                logger.LogError(ex, "资源处理失败");
             }
         }
 

@@ -8,4 +8,5 @@ public sealed record class BrowserOptions
 
 
     public BrowserLaunchOptions Launch { get; set; } = new();
+    public BrowserNewContextOptions NewContext { get; set; } = new();
 }

@@ -5,8 +5,14 @@ namespace MediaRelay.Messaging.Queue;
 
 internal sealed record class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 {
+    private MessageEnvelopeStatus _status = MessageEnvelopeStatus.Pending;
+
+#pragma warning disable RCS1085 // Use auto-implemented property  Json反序列化无法设置 private set;
+    public MessageEnvelopeStatus Status { get => _status; init => _status = value; }
+#pragma warning restore RCS1085 // Use auto-implemented property
+
+
     public required UrlMessage Message { get; init; }
-    public MessageEnvelopeStatus Status { get; private set; } = MessageEnvelopeStatus.Pending;
     public DateTimeOffset CreateAt { get; init; } = DateTimeOffset.Now;
     public DateTimeOffset UpdatedAt { get; private set; } = DateTimeOffset.Now;
     public MessageRetryOptions? RetryOptions { get; init; }
@@ -48,7 +54,7 @@ internal sealed record class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 
         if (Status is MessageEnvelopeStatus.Processing or MessageEnvelopeStatus.Pending)
         {
-            Status = MessageEnvelopeStatus.Rejected;
+            OnUpdate(MessageEnvelopeStatus.Rejected);
             return;
         }
 
@@ -76,7 +82,7 @@ internal sealed record class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 
     private void OnUpdate(MessageEnvelopeStatus status)
     {
-        Status = status;
+        _status = status;
         UpdatedAt = DateTimeOffset.Now;
     }
 }

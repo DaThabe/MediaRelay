@@ -10,6 +10,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
 		<ProjectReference Include="..\MediaRelay.Console\MediaRelay.Console.csproj" />
 		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
@@ -19,7 +20,7 @@
 
 	<ItemGroup>
 		<None Update="appsettings.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 

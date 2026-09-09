@@ -26,5 +26,6 @@
     <PackageVersion Include="Playwright.Clearcote" Version="1.5.0" />
     <PackageVersion Include="Apigen.Immich.Client" Version="2.6.15" />
     <PackageVersion Include="Spectre.Console.Testing" Version="0.57.2" />
+    <PackageVersion Include="TextCopy" Version="6.2.1" />
   </ItemGroup>
 </Project>

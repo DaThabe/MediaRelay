@@ -10,7 +10,7 @@ internal sealed class ConsoleLogger(string categoryName, IAnsiConsole ansiConsol
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
-    private bool _useScopeData = false;
+    private bool _useScopeData = true;
 
 
     public bool IsEnabled(LogLevel logLevel) => true;

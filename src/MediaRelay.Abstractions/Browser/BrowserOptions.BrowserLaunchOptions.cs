@@ -16,26 +16,3 @@ public sealed record class BrowserLaunchOptions
     public string? UserAgent { get; set; }
     public string? DownloadsPath { get; set; } = $"./Browser/downloads";
 }
-
-public sealed record class BrowserNewContextOptions
-{
-    public ViewportSize? ViewportSize { get; set; }
-}
-
-public record struct ViewportSize(int Width, int Height);
-
-
-public sealed record class PageGotoOptions
-{
-    public WaitUntilState? WaitUntil { get; set; }
-    public TimeSpan? Timeout { get; set; }
-    public string? Referer { get; set; }
-}
-
-public enum WaitUntilState
-{
-    Load,
-    DOMContentLoaded,
-    NetworkIdle,
-    Commit
-}
