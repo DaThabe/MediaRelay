@@ -4,13 +4,14 @@ using Microsoft.Extensions.Logging;
 
 Console.Title = "MediaRelay v20260910.0102";
 
+
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(builder => builder
         .ClearProviders()
         .AddEmojiDebug()
         .AddCustomConsole()
     )
-    .ConfigureServices(services => services    
+    .ConfigureServices(services => services
         .AddMediaRelay()
         // Modules
         .AddPixiv()
@@ -19,6 +20,4 @@ await Host.CreateDefaultBuilder(args)
         .AddConsole()
         .AddClipboard()
     )
-    .UseDevelopmentSecrets()
     .RunConsoleAsync();
-
