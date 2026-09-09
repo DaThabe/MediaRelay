@@ -454,3 +454,5 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 /ImageHub.Cli/appsettings.development.json
 /src/MediaRelay.Console/appsettings.json
+/src/MediaRelay.Launcher/Properties/PublishProfiles/FolderProfile-Production.pubxml
+/src/MediaRelay.Launcher/appsettings.Development.json
