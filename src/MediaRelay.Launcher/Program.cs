@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+Console.Title = "MediaRelay v0.0.1";
 
 await Host.CreateDefaultBuilder()
     .UseEnvironment(Environments.Development)
@@ -10,16 +11,12 @@ await Host.CreateDefaultBuilder()
         .AddEmojiDebug()
         .AddCustomConsole()
     )
-    .ConfigureServices(services => services
-        // Sources
+    .ConfigureServices(services => services    
+        .AddMediaRelay()
+        // Modules
         .AddPixiv()
         .AddTwitter()
-
-        // Destinations
         .AddImmich()
-
-        // Core
-        .AddMediaRelay()
         .AddConsole()
     )
     .UseDevelopmentSecrets()

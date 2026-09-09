@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace MediaRelay.Messaging;
 
+
 public interface IMessageSender<TMessage, TContent>
     where TMessage : IMessage<TContent>
 {

@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Messaging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -6,7 +7,8 @@ using System.Text.Json.Serialization;
 namespace MediaRelay.Url;
 
 
-internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options) : PersistenceMessageQueue<UrlMessage, Uri>
+internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options, ILogger<UrlMessageQueue> logger) :
+    PersistenceMessageQueue<UrlMessage, Uri>(logger)
 {
     protected override IMessageEnvelope<UrlMessage, Uri> CreateEnvelope(UrlMessage message)
     {

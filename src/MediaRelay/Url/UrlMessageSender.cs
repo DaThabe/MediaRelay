@@ -6,6 +6,6 @@ internal sealed class UrlMessageSender(IMessageQueue<UrlMessage, Uri> queue) : I
 {
     public ValueTask SendAsync(UrlMessage message, CancellationToken cancellationToken = default)
     {
-        return queue.SendAsync(message, cancellationToken);
+        return queue.EnqueueAsync(message, cancellationToken);
     }
 }

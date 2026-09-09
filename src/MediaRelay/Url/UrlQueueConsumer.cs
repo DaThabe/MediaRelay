@@ -15,7 +15,7 @@ public sealed class UrlQueueConsumer(
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            var message = await uriQueue.PeekAsync(stoppingToken);
+            var message = await uriQueue.DequeueAsync(stoppingToken);
             logger.LogInformation("接收到消息");
 
             try
