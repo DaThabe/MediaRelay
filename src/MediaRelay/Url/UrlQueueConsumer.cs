@@ -13,6 +13,8 @@ public sealed class UrlQueueConsumer(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("网址处理任务已启动");
+
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -32,6 +34,11 @@ public sealed class UrlQueueConsumer(
                     await uriQueue.RejectAsync(message, cancellationToken: stoppingToken);
                     logger.LogError(ex, "消息处理失败");
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogInformation("网址处理任务已取消");
+                return;
             }
             catch (Exception ex)
             {

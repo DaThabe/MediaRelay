@@ -30,6 +30,9 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
 
+        // 从死信队列删除
+        _deads.RemoveAll(x => x.Message.Id == message.Id);
+
         if (_pendings.Find(x => x.Message.Id == message.Id) is not null)
         {
             LogEnqueueExists(message);
@@ -121,7 +124,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         catch (Exception ex)
         {
             envelope.MarkRejected();
-            if (_deads.Find(x => x.Message.Id == message.Id) is not null) _deads.Add(envelope);
+            if (_deads.Find(x => x.Message.Id == message.Id) is null) _deads.Add(envelope);
 
             await SaveAsync([.. _pendings, .. _deads], cancellationToken);
             _logger?.LogInformation(ex, "消息已拒绝");

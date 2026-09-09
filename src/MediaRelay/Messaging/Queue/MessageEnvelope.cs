@@ -44,11 +44,12 @@ internal sealed record class MessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
     }
     public void MarkRejected()
     {
-        if (Status == MessageEnvelopeStatus.Processing) return;
+        if (Status == MessageEnvelopeStatus.Rejected) return;
 
-        if (Status == MessageEnvelopeStatus.Processing)
+        if (Status is MessageEnvelopeStatus.Processing or MessageEnvelopeStatus.Pending)
         {
             Status = MessageEnvelopeStatus.Rejected;
+            return;
         }
 
         throw new InvalidOperationException($"当前状态不能拒绝: [{Status}]");

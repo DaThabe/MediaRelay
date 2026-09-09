@@ -6,10 +6,11 @@ using System.Text;
 namespace MediaRelay.Console.Logging;
 
 
-internal sealed class ConsoleLogger(IAnsiConsole ansiConsole, string categoryName) : ILogger
+internal sealed class ConsoleLogger(string categoryName, IAnsiConsole ansiConsole) : ILogger
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
+
 
     public bool IsEnabled(LogLevel logLevel) => true;
 

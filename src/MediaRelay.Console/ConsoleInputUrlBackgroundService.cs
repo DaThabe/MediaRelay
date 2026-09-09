@@ -14,6 +14,8 @@ internal sealed class ConsoleInputUrlBackgroundService(
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        logger.LogInformation("网址输入监听任务已启动");
+
         while (!stoppingToken.IsCancellationRequested)
         {
             System.Console.CursorVisible = true;
@@ -30,6 +32,11 @@ internal sealed class ConsoleInputUrlBackgroundService(
                 }
 
                 await messageOrchestrator.SendAsnc<UrlMessage, Uri>(url, stoppingToken);
+            }
+            catch(OperationCanceledException)
+            {
+                logger.LogInformation("网址输入监听任务已取消");
+                return;
             }
             catch (Exception ex)
             {
