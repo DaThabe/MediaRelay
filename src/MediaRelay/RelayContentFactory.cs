@@ -11,7 +11,7 @@ internal sealed class RelayContentFactory(
 {
     private readonly IRelayContentCreator[] _createtors = [.. relayContentCreators];
 
-    public async ValueTask<RelayContent> CreateAsync(IContent content, CancellationToken cancellationToken = default)
+    public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
         foreach (var creator in _createtors)
         {

@@ -8,7 +8,7 @@ internal sealed class TweetPublishContentConverter(
     IResourceStorage resourceStorage) : IRelayContentCreator
 {
     public bool CanCreate(IContent content) => content is TweetContent;
-    public async ValueTask<RelayContent> CreateAsync(IContent content, CancellationToken cancellationToken = default)
+    public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
         if (content is not TweetContent tweet)
             throw new NotSupportedException($"不支持的推文内容: {content}");
@@ -17,13 +17,14 @@ internal sealed class TweetPublishContentConverter(
         var resourceUris = await resourceStorage
             .StoreAllAsync(tweet.MediaResources, cancellationToken);
 
-        return new RelayContent()
+        return new()
         {
+            SourceId = tweet.Source.Id,
             ContentId = tweet.Id,
-            SourceUrl = tweet.Source.Url,
 
             Author = tweet.AuthorName,
             AuthorUrl = tweet.AuthorUrl,
+            SourceUrl = tweet.Source.Url,
 
             Title = tweet.Content,
             UploadAt = tweet.UploadAt,

@@ -10,7 +10,7 @@ internal sealed class Relay(
 {
     private readonly IRelayHandler[] _relayHandlers = [.. relayHandlers];
 
-    public async ValueTask RelayAsync(RelayContent content, CancellationToken cancellationToken = default)
+    public async ValueTask RelayAsync(RelayPayload content, CancellationToken cancellationToken = default)
     {
         if (_relayHandlers.Length == 0) return;
 

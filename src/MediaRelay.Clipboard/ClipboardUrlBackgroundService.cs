@@ -40,6 +40,8 @@ internal sealed class ClipboardUrlBackgroundService(
                     lastUri = url;
                     await messageOrchestrator.SendAsnc<UrlMessage, Uri>(url, stoppingToken);
                 }
+
+                await DelayAsync(stoppingToken);
             }
             catch (OperationCanceledException)
             {
@@ -49,11 +51,21 @@ internal sealed class ClipboardUrlBackgroundService(
             catch (Exception ex)
             {
                 logger.LogError(ex, "监听任务异常");
+                await DelayAsync(stoppingToken);
             }
-            finally
-            {
-                await Task.Delay(options.Value.PollingInterval, stoppingToken);
-            }
+        }
+    }
+
+
+    private async Task DelayAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            await Task.Delay(options.Value.PollingInterval, cancellationToken);
+        }
+        catch(OperationCanceledException)
+        {
+            logger.LogInformation("等待任务已取消");
         }
     }
 }

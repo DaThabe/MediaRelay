@@ -11,28 +11,28 @@ internal sealed class ImmichRelayHandler(
     ILogger<ImmichRelayHandler> logger
     ) : IRelayHandler
 {
-    public bool CanRelay(RelayContent content) => true;
+    public bool CanRelay(RelayPayload payload) => true;
 
-    public async ValueTask RelayAsync(RelayContent content, CancellationToken cancellationToken = default)
+    public async ValueTask RelayAsync(RelayPayload payload, CancellationToken cancellationToken = default)
     {
         List<Guid> mediaIds = [];
 
-        foreach (var resource in content.Resources.ToArray())
+        foreach (var resource in payload.Resources.ToArray())
         {
             using var _ = logger.BeginScope("Resource", resource);
 
             try
             {
                 // 媒体上传
-                var meidaId = await UploadMediaAsync(content, resource, cancellationToken);
+                var meidaId = await UploadMediaAsync(payload, resource, cancellationToken);
 
                 // 修改描述
-                var description = GetDescriptionString(content);
+                var description = GetDescriptionString(payload);
                 var mediaUpdateResult = await apiClient.Assets
                     .UpdateAsync(meidaId.ToString(), new() { Description = description }, cancellationToken);
 
                 // 标签
-                await TagAssetsAsync(meidaId, content.Tags, cancellationToken);
+                await TagAssetsAsync(meidaId, payload.Tags, cancellationToken);
 
                 // 加入集合
                 mediaIds.Add(meidaId);
@@ -56,7 +56,7 @@ internal sealed class ImmichRelayHandler(
 
 
     // 上传媒体
-    private async Task<Guid> UploadMediaAsync(RelayContent content, StorageInfo storageInfo, CancellationToken cancellationToken)
+    private async Task<Guid> UploadMediaAsync(RelayPayload content, StorageInfo storageInfo, CancellationToken cancellationToken)
     {
         logger.LogInformation("开始上传媒体");
 
@@ -111,13 +111,13 @@ internal sealed class ImmichRelayHandler(
 
 
     // 获取描述文本
-    private static string GetDescriptionString(RelayContent content)
+    private static string GetDescriptionString(RelayPayload content)
     {
         return $"{content.Title}{Environment.NewLine}{content.Description}{Environment.NewLine}{content.SourceUrl}";
     }
 
     // 获取媒体创建Dto
-    private static async Task<AssetMediaCreateDto> GetMediaCreateDtoAsync(RelayContent publishContent, StorageInfo info, CancellationToken cancellationToken)
+    private static async Task<AssetMediaCreateDto> GetMediaCreateDtoAsync(RelayPayload publishContent, StorageInfo info, CancellationToken cancellationToken)
     {
         var fileFullPath = info.Uri.AbsolutePath;
         var bytes = await File.ReadAllBytesAsync(fileFullPath, cancellationToken);
@@ -130,7 +130,7 @@ internal sealed class ImmichRelayHandler(
             DeviceId = "MediaRelay",
 
             Filename = Path.GetFileName(fileFullPath),
-            FileCreatedAt = publishContent.UploadAt.UtcDateTime,
+            FileCreatedAt = publishContent.UploadAt?.UtcDateTime ?? fileInfo.CreationTimeUtc,
             FileModifiedAt = fileInfo.LastWriteTime
         };
     }

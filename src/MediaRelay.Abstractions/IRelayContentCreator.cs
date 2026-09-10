@@ -9,5 +9,5 @@ namespace MediaRelay;
 public interface IRelayContentCreator
 {
     bool CanCreate(IContent content);
-    ValueTask<RelayContent> CreateAsync(IContent content, CancellationToken cancellationToken = default);
+    ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default);
 }

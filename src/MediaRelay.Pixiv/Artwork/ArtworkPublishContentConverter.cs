@@ -8,28 +8,29 @@ internal sealed class ArtworkPublishContentConverter(
     IResourceStorage resourceStorage) : IRelayContentCreator
 {
     public bool CanCreate(IContent content) => content is ArtworkContent;
-    public async ValueTask<RelayContent> CreateAsync(IContent content, CancellationToken cancellationToken = default)
+    public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
-        if (content is not ArtworkContent pixivContent)
+        if (content is not ArtworkContent artwork)
             throw new NotSupportedException($"不是有效的Pixiv作品内容: {content.Id}");
 
         // 储存所有资源
         var resourceUris = await resourceStorage
-            .StoreAllAsync(pixivContent.MediaResources, cancellationToken);
+            .StoreAllAsync(artwork.MediaResources, cancellationToken);
 
-        return new RelayContent()
+        return new()
         {
-            ContentId = pixivContent.Id,
-            SourceUrl = pixivContent.Source.Url,
+            SourceId = artwork.Source.Id,
+            ContentId = artwork.Id,
 
-            Author = pixivContent.AuthorName,
-            AuthorUrl = pixivContent.AuthorUrl,
+            Author = artwork.AuthorName,
+            SourceUrl = artwork.Source.Url,
+            AuthorUrl = artwork.AuthorUrl,
 
-            Title = pixivContent.Title,
-            Description = pixivContent.Description,
-            UploadAt = pixivContent.UploadAt,
+            Title = artwork.Title,
+            Description = artwork.Description,
+            UploadAt = artwork.UploadAt,
 
-            Tags = pixivContent.Tags,
+            Tags = artwork.Tags,
             Resources = resourceUris.Values.ToHashSet()
         };
     }

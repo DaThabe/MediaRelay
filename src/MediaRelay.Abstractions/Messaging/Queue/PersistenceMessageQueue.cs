@@ -35,18 +35,20 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
         if (_pendings.Find(x => x.Message.Id == message.Id) is not null)
         {
-            LogEnqueueExists(message);
+            _logger?.LogWarning("消息已存在");
             return;
         }
 
+        // 加入死信队列
         var envelope = CreateEnvelope(message);
         _pendings.Add(envelope);
 
-        // Save
         await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-        LogEnqueued(envelope);
-
         _newMessageEvent.Set();
+
+        // Log
+        using var __ = _logger?.BeginScope("Envelope", envelope);
+        _logger?.LogDebug("消息已入队");
     }
     public async ValueTask<TMessage> DequeueAsync(CancellationToken cancellationToken = default)
     {
@@ -62,7 +64,10 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
                     var envelope = _pendings[0];
                     envelope.MarkProcessing();
 
-                    LogDequeued(envelope);
+                    using var _ = _logger?.BeginScope("Envelope", envelope);
+                    _logger?.LogDebug("消息已出队");
+
+
                     return envelope.Message;
                 }
             }
@@ -85,7 +90,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         var envelope = _pendings.FirstOrDefault(x => x.Message.Id == message.Id);
         if (envelope is null)
         {
-            LogEnqueueNotExists(message);
+            _logger?.LogWarning("消息不存在");
             return;
         }
 
@@ -94,7 +99,9 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
         // Save
         await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-        LogAcknowledge(envelope);
+        
+        using var __ = _logger?.BeginScope("Envelope", envelope);
+        _logger?.LogDebug("消息已确认");
     }
     public async ValueTask RejectAsync(TMessage message, CancellationToken cancellationToken = default)
     {
@@ -175,6 +182,11 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
             _loadTcs.TrySetResult();
         }
+        catch(OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            _loadTcs.TrySetCanceled(cancellationToken);
+            _logger?.LogInformation("数据初始化已取消");
+        }
         catch (Exception ex)
         {
             _loadTcs.TrySetException(ex);
@@ -182,48 +194,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
     }
 
 
-    private void LogEnqueueExists(TMessage _)
-    {
-        if (_logger is null) return;
-        _logger.LogWarning("消息已存在");
-    }
-    private void LogEnqueueNotExists(TMessage _)
-    {
-        if (_logger is null) return;
-        _logger.LogWarning("消息不存在");
-    }
-    private void LogEnqueued(IMessageEnvelope<TMessage, TContent> envelope)
-    {
-        if (_logger is null) return;
-
-        using var _ = _logger.BeginScope("Envelope", envelope);
-        _logger.LogDebug("已入队");
-    }
-    private void LogDequeued(IMessageEnvelope<TMessage, TContent> envelope)
-    {
-        if (_logger is null) return;
-
-        using var _ = _logger.BeginScope("Envelope", envelope);
-        _logger.LogDebug("已出队");
-    }
-    private void LogAcknowledge(IMessageEnvelope<TMessage, TContent> envelope)
-    {
-        if (_logger is null) return;
-
-        using var _ = _logger.BeginScope("Envelope", envelope);
-        _logger.LogDebug("已确认");
-    }
-    private void LogReject(IMessageEnvelope<TMessage, TContent> envelope)
-    {
-        if (_logger is null) return;
-
-        using var _ = _logger.BeginScope("Envelope", envelope);
-        _logger.LogDebug("已拒绝");
-    }
-
-
-
-    protected sealed class AsyncManualResetEvent
+    private sealed class AsyncManualResetEvent
     {
         private TaskCompletionSource _tcs = new();
 

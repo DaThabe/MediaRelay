@@ -6,6 +6,6 @@
 /// </summary>
 public interface IRelayHandler
 {
-    bool CanRelay(RelayContent content);
-    ValueTask RelayAsync(RelayContent content, CancellationToken cancellationToken = default);
+    bool CanRelay(RelayPayload payload);
+    ValueTask RelayAsync(RelayPayload payload, CancellationToken cancellationToken = default);
 }
