@@ -4,7 +4,6 @@ using MediaRelay.Source;
 using MediaRelay.Twitter;
 using MediaRelay.Twitter.Image;
 using MediaRelay.Twitter.Tweet;
-using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -38,15 +37,11 @@ public static class DependencyInjectionExtensions
                     .Bind(options));
 
 
-
             services.AddSingleton<ImageUrl.Parser>();
             services.AddSingleton<ImageUrlResource.Factory>();
 
-            services.AddSingleton<TweetSource.UrlParser>();
-            services.AddSingleton<IUrlSourceParser>(sp => sp.GetRequiredService<TweetSource.UrlParser>());
-            services.AddUrlValidator(sp => sp.GetRequiredService<TweetSource.UrlParser>().CanParse);
 
-
+            services.AddSingleton<IUrlSourceParser, TweetSource.UrlParser>();
             services.AddSingleton<IRelayContentCreator, TweetPublishContentConverter>();
             services.AddSingleton<IContentExtractor, TweetContentExtractor>();
 

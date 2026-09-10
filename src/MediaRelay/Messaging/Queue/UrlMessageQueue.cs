@@ -1,4 +1,5 @@
-﻿using MediaRelay.Url;
+﻿using MediaRelay.Source;
+using MediaRelay.Url;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -8,16 +9,16 @@ namespace MediaRelay.Messaging.Queue;
 
 internal sealed class UrlMessageQueue(
         IOptions<MediaRelayOptions> options,
-        IEnumerable<UrlValidator> urlValidators,
+        IEnumerable<IUrlSourceParser> urlSourceParsers,
         ILogger<UrlMessageQueue> logger
     ) : PersistenceMessageQueue<MessageEnvelope, UrlMessage, Uri>(logger), IMessageSender<UrlMessage, Uri>
 {
     protected override bool CanEnqueue(UrlMessage message)
     {
-        var result = urlValidators.Any(x => x.Invoke(message.Content));
-        if (result) return true;
+        if (urlSourceParsers.Any(x => x.CanParse(message.Content)))
+            return true;
 
-        logger.LogInformation("该消无法处理");
+        logger.LogInformation("该消息无法处理");
         return false;
     }
 

@@ -10,3 +10,7 @@ public interface IRelayContentFactory
 {
     ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default);
 }
+
+public delegate ValueTask<RelayPayload> RelayContentFactory(
+    IContent content,
+    CancellationToken cancellationToken = default);
