@@ -12,13 +12,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\src\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Console\MediaRelay.Console.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Url\MediaRelay.Url.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay\MediaRelay.csproj" />
+		<ProjectReference Include="..\..\src\MediaRelay.Url.Abstractions\MediaRelay.Url.Abstractions.csproj" />
 	</ItemGroup>
 
 </Project>

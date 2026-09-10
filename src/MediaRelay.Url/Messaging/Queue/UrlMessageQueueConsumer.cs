@@ -25,13 +25,13 @@ public sealed class UrlMessageQueueConsumer(
                 try
                 {
                     await urlRelayService.RelayAsync(message.Content, stoppingToken);
-                    await uriQueue.AcknowledgeAsync(message, stoppingToken);
+                    await uriQueue.AcknowledgeAsync(message.Id, stoppingToken);
 
                     logger.LogInformation("消息处理完成");
                 }
                 catch (Exception ex)
                 {
-                    await uriQueue.RejectAsync(message, cancellationToken: stoppingToken);
+                    await uriQueue.RejectAsync(message.Id, cancellationToken: stoppingToken);
                     logger.LogError(ex, "消息处理失败");
                 }
             }

@@ -19,12 +19,4 @@ public static class SystemExtensions
 
         public MemoryStream ToMemoryStreamUTF8() => str.ToMemoryStream(Encoding.UTF8);
     }
-
-
-    extension(Uri)
-    {
-        public static Uri AboutBlank => new("about:blank");
-        public static Uri MockHttp => new("http://mock.mediarelay.com/");
-        public static Uri MockHttps => new("http://mock.mediarelay.com/");
-    }
 }

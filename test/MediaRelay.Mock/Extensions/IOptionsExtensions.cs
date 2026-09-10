@@ -18,4 +18,15 @@ public static class IOptionsExtensions
             return mock.Object;
         }
     }
+
+    extension<T>(IOptions<T>) where T :class, new()
+    {
+        public static IOptions<T> Mock(Action<T> budilder)
+        {
+            var options = new T();
+            budilder.Invoke(options);
+
+            return Mock(options);
+        }
+    }
 }

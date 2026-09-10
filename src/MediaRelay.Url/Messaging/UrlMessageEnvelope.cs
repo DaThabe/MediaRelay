@@ -15,13 +15,13 @@ internal sealed record class UrlMessageEnvelope : IMessageEnvelope<UrlMessage, U
     public required UrlMessage Message { get; init; }
     public DateTimeOffset CreateAt { get; init; } = DateTimeOffset.Now;
     public DateTimeOffset UpdatedAt { get; private set; } = DateTimeOffset.Now;
-    public UrlMessageRetryOptions? RetryOptions { get; init; }
+    public UrlMessageRetryCounter? RetryCounter { get; init; }
 
 
     public static UrlMessageEnvelope Create(UrlMessage message) =>
         new() { Message = message };
-    public static UrlMessageEnvelope Create(UrlMessage message, UrlMessageRetryOptions retryOptions) =>
-        new() { Message = message, RetryOptions = retryOptions };
+    public static UrlMessageEnvelope Create(UrlMessage message, UrlMessageRetryCounter retryOptions) =>
+        new() { Message = message, RetryCounter = retryOptions };
 
 
     public void MarkCompleted()
@@ -65,18 +65,19 @@ internal sealed record class UrlMessageEnvelope : IMessageEnvelope<UrlMessage, U
     public void Recover()
     {
         OnUpdate(MessageEnvelopeStatus.Pending);
-        RetryOptions?.Recover();
+        RetryCounter?.Recover();
     }
-    public void Retry()
+    public bool TryRetry()
     {
-        if (RetryOptions is null)
+        if (RetryCounter is null) return false;
+
+        if (RetryCounter.TryIncrement())
         {
-            throw new InvalidOperationException("该消息不能重试");
+            OnUpdate(MessageEnvelopeStatus.Processing);
+            return true;
         }
 
-
-        RetryOptions.Increment();
-        OnUpdate(MessageEnvelopeStatus.Processing);
+        return false;
     }
 
 

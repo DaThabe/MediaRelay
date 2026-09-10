@@ -14,6 +14,6 @@ public interface IMessageEnvelope<TMessage, out TContent>
     void MarkRejected();
 
 
-    void Retry();
+    bool TryRetry();
     void Recover();
 }

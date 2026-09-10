@@ -1,7 +1,9 @@
-﻿using MediaRelay.Messaging.Queue;
+﻿using MediaRelay;
+using MediaRelay.Messaging.Queue;
 using MediaRelay.Url;
 using MediaRelay.Url.Messaging.Queue;
 using MediaRelay.Url.Resource;
+using Microsoft.Extensions.Configuration;
 
 
 
@@ -16,11 +18,22 @@ public static class DependencyInjectionExtensions
     {
         public IServiceCollection AddUrl()
         {
+            services.AddOptions<UrlOptions>()
+                .Configure<IConfiguration>((options, configuration) => configuration
+                     .GetSection(UrlOptions.SectionPath)
+                     .Bind(options));
+
+            services.AddOptions<UrlMessageQueueOptions>()
+                .Configure<IConfiguration>((options, configuration) => configuration
+                     .GetSection(UrlMessageQueueOptions.SectionPath)
+                     .Bind(options));
+
+
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
 
-            services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
+            services.AddMessageQueueWithSender<UrlMessageQueue, UrlMessage, Uri>();
             services.AddHostedService<UrlMessageQueueConsumer>();
 
             return services;

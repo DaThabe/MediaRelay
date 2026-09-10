@@ -4,7 +4,8 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay.Messaging.Queue;
 
 
-public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : IMessageQueue<TMessage, TContent>, IAsyncDisposable
+public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
+    IMessageQueue<TMessage, TContent>, IMessageSender<TMessage, TContent>, IAsyncDisposable
     where TMessage : IMessage<TContent>
     where TEnvelope : IMessageEnvelope<TMessage, TContent>
 {
@@ -18,6 +19,9 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
     private List<TEnvelope> _deads = [];
 
 
+    public int Count => _pendings.Count;
+
+
     protected PersistenceMessageQueue(ILogger? logger = null)
     {
         _logger = logger;
@@ -29,6 +33,8 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
     public async ValueTask EnqueueAsync(TMessage message, CancellationToken cancellationToken = default)
     {
+        if (!CanEnqueue(message)) throw new InvalidOperationException("该消息禁止入队");
+
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
 
@@ -84,12 +90,12 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         throw new OperationCanceledException(cancellationToken);
     }
 
-    public async ValueTask AcknowledgeAsync(TMessage message, CancellationToken cancellationToken = default)
+    public async ValueTask AcknowledgeAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
 
-        var envelope = _pendings.FirstOrDefault(x => x.Message.Id == message.Id);
+        var envelope = _pendings.FirstOrDefault(x => x.Message.Id == messageId);
         if (envelope is null)
         {
             _logger?.LogWarning("消息不存在");
@@ -105,13 +111,13 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         using var __ = _logger?.BeginScope("Envelope", envelope);
         _logger?.LogDebug("消息已确认");
     }
-    public async ValueTask RejectAsync(TMessage message, CancellationToken cancellationToken = default)
+    public async ValueTask RejectAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
 
         // 查询信封
-        var envelope = _pendings.Find(x => x.Message.Id == message.Id);
+        var envelope = _pendings.Find(x => x.Message.Id == messageId);
         if (envelope is null)
         {
             _logger?.LogWarning("消息已不存在");
@@ -121,23 +127,19 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
         _pendings.Remove(envelope);
 
 
-        try
+        if (envelope.TryRetry())
         {
-            envelope.Retry();
-
             _pendings.Add(envelope);
-            await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-
             _logger?.LogInformation("消息已重试");
         }
-        catch (Exception ex)
+        else
         {
             envelope.MarkRejected();
-            if (_deads.Find(x => x.Message.Id == message.Id) is null) _deads.Add(envelope);
-
-            await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-            _logger?.LogInformation(ex, "消息已拒绝");
+            if (_deads.Find(x => x.Message.Id == messageId) is null) _deads.Add(envelope);
+            _logger?.LogInformation("消息已拒绝");
         }
+
+        await SaveAsync([.. _pendings, .. _deads], cancellationToken);
     }
 
 
@@ -151,9 +153,11 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
 
     bool IMessageSender<TMessage, TContent>.CanSend(TMessage message) => CanEnqueue(message);
+    ValueTask IMessageSender<TMessage, TContent>.SendAsync(TMessage message, CancellationToken cancellationToken) =>
+        EnqueueAsync(message, cancellationToken);
+
+
     protected virtual bool CanEnqueue(TMessage message) => true;
-
-
     protected abstract ValueTask<IEnumerable<TEnvelope>> LoadAsync(CancellationToken cancellationToken = default);
     protected abstract ValueTask SaveAsync(IEnumerable<TEnvelope> envelopes, CancellationToken cancellationToken = default);
     protected abstract TEnvelope CreateEnvelope(TMessage message);

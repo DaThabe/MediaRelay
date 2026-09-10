@@ -1,26 +1,26 @@
 ﻿namespace MediaRelay.Url.Messaging;
 
-internal sealed record class UrlMessageRetryOptions
+internal sealed record class UrlMessageRetryCounter
 {
     public int CurrentCount { get; private set; }
     public required int MaxCount { get; init; }
 
 
-    public static UrlMessageRetryOptions FromCount(int maxCount, int initCount = 0)
+    public static UrlMessageRetryCounter FromCount(int maxCount, int initCount = 0)
     {
-        return new UrlMessageRetryOptions() { MaxCount = maxCount, CurrentCount = initCount };
+        return new UrlMessageRetryCounter() { MaxCount = maxCount, CurrentCount = initCount };
     }
 
 
-    public void Increment()
+    public bool TryIncrement()
     {
         if (CurrentCount < MaxCount)
         {
             CurrentCount++;
-            return;
+            return true;
         }
 
-        throw new InvalidOperationException("已到最大重试次数");
+        return false;
     }
 
     public void Recover()

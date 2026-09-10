@@ -1,4 +1,5 @@
-﻿using MediaRelay.Resources;
+﻿using MediaRelay.Extensions;
+using MediaRelay.Resources;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -92,13 +93,13 @@ public class ResourceStorageTests
     {
         // Storage
         var tempFodler = Path.GetTempPath();
-        var options = IOptions<StorageOptions>.Mock(new() { RootPath = tempFodler });
+        var options = IOptions<StorageOptions>.Mock(x =>x.RootPath = tempFodler);
         var hasher = new SHA256Hasher();
-        var storageLogger = ILogger<Storage>.Mock();
+        var storageLogger = ILogger<Storage>.Create();
         var storage = new Storage(options, hasher, storageLogger);
 
 
-        var resourceStorageLogger = ILogger<ResourceStorage>.Mock();
+        var resourceStorageLogger = ILogger<ResourceStorage>.Create();
         return new ResourceStorage(storage, resourceStorageLogger);
     }
 
@@ -114,5 +115,5 @@ public class ResourceStorageTests
     }
 
 
-    public TestContext TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null;
 }

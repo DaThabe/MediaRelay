@@ -9,7 +9,7 @@ public static class ILoggerExtensions
 {
     extension<T>(ILogger<T>)
     {
-        public static ILogger<T> Mock() => _factory.CreateLogger<T>();
+        public static ILogger<T> Create() => _factory.CreateLogger<T>();
     }
 
     private static readonly ILoggerFactory _factory = LoggerFactory.Create(x => x.AddEmojiConsole());

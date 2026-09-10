@@ -1,7 +1,6 @@
-﻿using MediaRelay.Url;
-using Moq;
+﻿using Moq;
 
-namespace MediaRelay.Source;
+namespace MediaRelay.Url;
 
 public static class IUrlSourceParserSelectorExtensions
 {

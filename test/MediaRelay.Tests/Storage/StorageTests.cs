@@ -53,10 +53,10 @@ public class StorageTests
     {
         // Options
         var tempFodler = Path.GetTempPath();
-        var options = IOptions<StorageOptions>.Mock(new () { RootPath = tempFodler });
+        var options = IOptions<StorageOptions>.Mock(x => x.RootPath = tempFodler);
 
         // Logger
-        var logger = ILogger<Storage>.Mock();
+        var logger = ILogger<Storage>.Create();
 
         // Storage
         return new Storage(options, hasher, logger);

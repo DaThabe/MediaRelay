@@ -24,12 +24,13 @@ internal sealed class UrlMessageQueue(
 
     protected override UrlMessageEnvelope CreateEnvelope(UrlMessage message)
     {
-        return UrlMessageEnvelope.Create(message, UrlMessageRetryOptions.FromCount(5));
+        return UrlMessageEnvelope.Create(message, UrlMessageRetryCounter.FromCount(options.Value.MessageQueue.MessageRetryCount));
     }
     protected override async ValueTask<IEnumerable<UrlMessageEnvelope>> LoadAsync(CancellationToken cancellationToken = default)
     {
-        var filePath = options.Value.QueueFile;
+        var filePath = options.Value.MessageQueue.File;
         if (!File.Exists(filePath)) return [];
+
         var json = await File.ReadAllTextAsync(filePath, cancellationToken);
 
         return JsonSerializer.Deserialize(json, UrlQueueJsonSerializerContext.Default.UrlMessageEnvelopeArray) ?? [];
@@ -38,7 +39,7 @@ internal sealed class UrlMessageQueue(
     {
         var json = JsonSerializer.Serialize([.. envelopes], UrlQueueJsonSerializerContext.Default.UrlMessageEnvelopeArray);
 
-        var filePath = options.Value.QueueFile;
+        var filePath = options.Value.MessageQueue.File;
         var folder = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrWhiteSpace(folder)) Directory.CreateDirectory(folder);
 

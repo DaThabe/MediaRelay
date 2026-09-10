@@ -10,9 +10,9 @@ public class UrlRelayServiceTest
     [TestMethod]
     public async Task RelayAsync_ShouldCompleteSuccessfully()
     {
-        var url = Uri.MockHttps;
+        var url = Uri.TestHttpsUrl;
 
-        var urlSource = IUrlSource.Mock(SourceId.Test, url);
+        var urlSource = IUrlSource.Mock(SourceId.TestId, url);
         var urlSourceFactory = IUrlSourceFactory.Mock(url, urlSource);
 
         var sourceRelayService = ISourceRelayService.Mock(urlSource, TestContext.CancellationToken);
@@ -21,5 +21,5 @@ public class UrlRelayServiceTest
         await urlRelayService.RelayAsync(url, TestContext.CancellationToken);
     }
 
-    public TestContext TestContext { get; set; }
+    public TestContext TestContext { get; set; } = null!;
 }
