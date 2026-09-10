@@ -17,22 +17,22 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddTwitter()
         {
             services.AddOptions<TwitterOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
+                .Configure<IConfiguration>((options, configuration) => configuration
                     .GetSection(TwitterOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterHttpOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
+                .Configure<IConfiguration>((options, configuration) => configuration
                     .GetSection(TwitterHttpOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterImageUrlOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
+                .Configure<IConfiguration>((options, configuration) => configuration
                     .GetSection(TwitterOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterTweetOptions>()
-                .PostConfigure<IConfiguration>((options, configuration) => configuration
+                .Configure<IConfiguration>((options, configuration) => configuration
                     .GetSection(TwitterTweetOptions.SectionPath)
                     .Bind(options));
 

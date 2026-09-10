@@ -1,5 +1,6 @@
 ﻿using MediaRelay.Clipboard;
 using Microsoft.Extensions.Configuration;
+using TextCopy;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
 namespace Microsoft.Extensions.DependencyInjection;
@@ -13,10 +14,11 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddClipboard()
         {
             services.AddOptions<ClipboardOptions>()
-               .PostConfigure<IConfiguration>((options, configuration) => configuration
+               .Configure<IConfiguration>((options, configuration) => configuration
                    .GetSection(ClipboardOptions.SectionPath)
                    .Bind(options));
 
+            services.InjectClipboard();
             services.AddHostedService<ClipboardUrlBackgroundService>();
 
             return services;

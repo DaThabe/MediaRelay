@@ -10,6 +10,7 @@ namespace MediaRelay.Clipboard;
 
 internal sealed class ClipboardUrlBackgroundService(
         IMessageOrchestrator messageOrchestrator,
+        IClipboard clipboard,
         IOptions<ClipboardOptions> options,
         ILogger<ClipboardUrlBackgroundService> logger
     ) : BackgroundService
@@ -24,7 +25,7 @@ internal sealed class ClipboardUrlBackgroundService(
         {
             try
             {
-                var text = await ClipboardService.GetTextAsync(stoppingToken);
+                var text = await clipboard.GetTextAsync(stoppingToken);
                 var trimmed = text?.Trim();
 
                 if (string.IsNullOrWhiteSpace(trimmed)) continue;
