@@ -9,6 +9,11 @@ public interface IMessageSender<TMessage, TContent>
     where TMessage : IMessage<TContent>
 {
     /// <summary>
+    /// 是否可以发送
+    /// </summary>
+    bool CanSend(TMessage message);
+
+    /// <summary>
     /// 发送
     /// </summary>
     ValueTask SendAsync(TMessage message, CancellationToken cancellationToken = default);

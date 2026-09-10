@@ -10,6 +10,7 @@ internal sealed class MessageOrchestrator(IServiceProvider serviceProvider) : IM
     {
         var sendTasks = serviceProvider
             .GetServices<IMessageSender<TMessage, TContent>>()
+            .Where(x => x.CanSend(message))
             .Select(x => x.SendAsync(message, cancellationToken).AsTask());
 
         await Task.WhenAll(sendTasks);

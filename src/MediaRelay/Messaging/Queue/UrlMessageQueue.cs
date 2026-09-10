@@ -6,9 +6,21 @@ using System.Text.Json;
 namespace MediaRelay.Messaging.Queue;
 
 
-internal sealed class UrlMessageQueue(IOptions<MediaRelayOptions> options, ILogger<UrlMessageQueue> logger) :
-    PersistenceMessageQueue<MessageEnvelope, UrlMessage, Uri>(logger)
+internal sealed class UrlMessageQueue(
+        IOptions<MediaRelayOptions> options,
+        IEnumerable<UrlValidator> urlValidators,
+        ILogger<UrlMessageQueue> logger
+    ) : PersistenceMessageQueue<MessageEnvelope, UrlMessage, Uri>(logger), IMessageSender<UrlMessage, Uri>
 {
+    protected override bool CanEnqueue(UrlMessage message)
+    {
+        var result = urlValidators.Any(x => x.Invoke(message.Content));
+        if (result) return true;
+
+        logger.LogInformation("该消无法处理");
+        return false;
+    }
+
     protected override MessageEnvelope CreateEnvelope(UrlMessage message)
     {
         return MessageEnvelope.Create(message, MessageRetryOptions.FromCount(5));

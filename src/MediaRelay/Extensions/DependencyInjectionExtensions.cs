@@ -52,7 +52,7 @@ public static class DependencyInjectionExtensions
         }
         private IServiceCollection AddUrlRelay()
         {
-            services.AddSingleton<IUrlRelayService, UrlRelayService>();
+            services.AddSingleton<IUrlRelay, UrlRelayService>();
             services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
             services.AddHostedService<UrlQueueConsumer>();
 

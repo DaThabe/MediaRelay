@@ -6,11 +6,11 @@ namespace MediaRelay;
 
 public static class IUrlRelayServiceExtensions
 {
-    extension(IUrlRelayService)
+    extension(IUrlRelay)
     {
-        public static IUrlRelayService Mock(Uri url, CancellationToken relayAsyncCts = default)
+        public static IUrlRelay Mock(Uri url, CancellationToken relayAsyncCts = default)
         {
-            var mock = new Mock<IUrlRelayService>();
+            var mock = new Mock<IUrlRelay>();
 
             mock.Setup(x => x.RelayAsync(url, relayAsyncCts))
                 .Returns(ValueTask.CompletedTask);

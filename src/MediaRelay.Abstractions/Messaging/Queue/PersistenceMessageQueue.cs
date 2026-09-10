@@ -25,6 +25,8 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
     }
 
 
+
+
     public async ValueTask EnqueueAsync(TMessage message, CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
@@ -99,7 +101,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
         // Save
         await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-        
+
         using var __ = _logger?.BeginScope("Envelope", envelope);
         _logger?.LogDebug("消息已确认");
     }
@@ -148,6 +150,10 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
     }
 
 
+    bool IMessageSender<TMessage, TContent>.CanSend(TMessage message) => CanEnqueue(message);
+    protected virtual bool CanEnqueue(TMessage message) => true;
+
+
     protected abstract ValueTask<IEnumerable<TEnvelope>> LoadAsync(CancellationToken cancellationToken = default);
     protected abstract ValueTask SaveAsync(IEnumerable<TEnvelope> envelopes, CancellationToken cancellationToken = default);
     protected abstract TEnvelope CreateEnvelope(TMessage message);
@@ -182,7 +188,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
 
             _loadTcs.TrySetResult();
         }
-        catch(OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
             _loadTcs.TrySetCanceled(cancellationToken);
             _logger?.LogInformation("数据初始化已取消");
@@ -192,6 +198,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> : I
             _loadTcs.TrySetException(ex);
         }
     }
+
 
 
     private sealed class AsyncManualResetEvent
