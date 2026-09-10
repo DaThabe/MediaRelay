@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Source.Url;
+using MediaRelay.Url;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 

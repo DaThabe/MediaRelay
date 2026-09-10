@@ -1,24 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
-		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
 		<ProjectReference Include="..\MediaRelay.Url.Abstractions\MediaRelay.Url.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Polly.Core" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
-		<PackageReference Include="Microsoft.Extensions.Options" />
+		<PackageReference Include="Playwright.Clearcote" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="MediaRelay.Tests" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="Browser\Scripts\PixivArtwork.js">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 
 </Project>

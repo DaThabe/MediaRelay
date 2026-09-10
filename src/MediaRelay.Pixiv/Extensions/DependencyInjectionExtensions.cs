@@ -3,7 +3,7 @@ using MediaRelay.Content;
 using MediaRelay.Pixiv;
 using MediaRelay.Pixiv.Artwork;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Source.Url;
+using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配

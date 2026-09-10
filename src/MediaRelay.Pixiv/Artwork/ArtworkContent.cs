@@ -1,11 +1,11 @@
 ﻿using MediaRelay.Content;
 using MediaRelay.Resources;
-using MediaRelay.Source.Url;
+using MediaRelay.Url;
 
 namespace MediaRelay.Pixiv.Artwork;
 
 
-internal sealed partial record class ArtworkContent : IWebContent
+internal sealed partial record class ArtworkContent : IUrlContent
 {
     public required ContentId Id { get; init; }
     public required IUrlSource Source { get; init; }

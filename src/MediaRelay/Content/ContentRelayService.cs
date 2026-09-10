@@ -1,7 +1,7 @@
 ﻿namespace MediaRelay.Content;
 
 internal sealed class ContentRelayService(
-        IRelayContentFactory relayContentFactory,
+        IRelayPayloadFactory relayContentFactory,
         IRelayService relayOrchestrator
     ) : IContentRelayService
 {

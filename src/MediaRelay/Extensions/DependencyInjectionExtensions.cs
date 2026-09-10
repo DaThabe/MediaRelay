@@ -4,14 +4,9 @@ using MediaRelay.Content;
 using MediaRelay.Http;
 using MediaRelay.Logging;
 using MediaRelay.Messaging;
-using MediaRelay.Messaging.Queue;
 using MediaRelay.Playwright;
-using MediaRelay.Resources;
-using MediaRelay.Resources.Url;
 using MediaRelay.Source;
-using MediaRelay.Source.Url;
 using MediaRelay.Storage;
-using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -44,44 +39,16 @@ public static class DependencyInjectionExtensions
     {
         private IServiceCollection AddCore()
         {
-            services
-                .AddUrlRelay()
-                .AddSourceRelay()
-                .AddContentRelay()
-                .AddRelay();
-
-            return services;
-        }
-        private IServiceCollection AddUrlRelay()
-        {
-            services.AddSingleton<IUrlRelayService, UrlRelayService>();
-            services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
-            services.AddHostedService<UrlQueueConsumer>();
-
-            return services;
-        }
-        private IServiceCollection AddSourceRelay()
-        {
-            services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
+            // source
             services.AddSingleton<ISourceRelayService, SourceRelayService>();
-
-            return services;
-        }
-        private IServiceCollection AddContentRelay()
-        {
-            // resource
-            services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
 
             // content
             services.AddSingleton<IContentExtractorFactory, ContentExtractorFactory>();
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
-            return services;
-        }
-        private IServiceCollection AddRelay()
-        {
-            services.AddSingleton<IRelayContentFactory, RelayContentFactory>();
-            services.AddSingleton<IRelayService, Relay>();
+            // relay
+            services.AddSingleton<IRelayPayloadFactory, RelayPayloadFactory>();
+            services.AddSingleton<IRelayService, RelayService>();
 
             return services;
         }

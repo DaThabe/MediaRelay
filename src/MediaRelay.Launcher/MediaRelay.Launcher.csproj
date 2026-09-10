@@ -15,6 +15,7 @@
 		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
 		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
+		<ProjectReference Include="..\MediaRelay.Url\MediaRelay.Url.csproj" />
 		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
 	</ItemGroup>
 

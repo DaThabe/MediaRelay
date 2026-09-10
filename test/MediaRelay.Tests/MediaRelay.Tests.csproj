@@ -9,12 +9,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\src\MediaRelay.Console\MediaRelay.Console.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Launcher\MediaRelay.Launcher.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
-		<ProjectReference Include="..\..\src\MediaRelay\MediaRelay.csproj" />
 		<ProjectReference Include="..\MediaRelay.Mock\MediaRelay.Mock.csproj" />
 	</ItemGroup>
 

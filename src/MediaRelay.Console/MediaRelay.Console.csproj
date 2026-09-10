@@ -8,6 +8,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
+		<ProjectReference Include="..\MediaRelay.Url.Abstractions\MediaRelay.Url.Abstractions.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

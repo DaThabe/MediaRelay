@@ -4,8 +4,6 @@ using MediaRelay.Immich;
 using MediaRelay.Pixiv;
 using MediaRelay.Storage;
 using MediaRelay.Twitter;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace MediaRelay;
 

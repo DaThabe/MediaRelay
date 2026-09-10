@@ -13,6 +13,7 @@ await Host.CreateDefaultBuilder(args)
     )
     .ConfigureServices(services => services
         .AddMediaRelay()
+        .AddUrl()
         // Modules
         .AddPixiv()
         .AddTwitter()

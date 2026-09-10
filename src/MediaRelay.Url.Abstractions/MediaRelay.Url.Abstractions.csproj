@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<RootNamespace>MediaRelay.Url</RootNamespace>
+		<RootNamespace>MediaRelay</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -10,6 +10,12 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Content\" />
+	  <Folder Include="Resources\" />
+	  <Folder Include="Source\" />
 	</ItemGroup>
 
 </Project>

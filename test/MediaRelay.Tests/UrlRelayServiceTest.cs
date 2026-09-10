@@ -1,5 +1,4 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Source.Url;
 using MediaRelay.Url;
 
 namespace MediaRelay;
@@ -14,12 +13,11 @@ public class UrlRelayServiceTest
         var url = Uri.MockHttps;
 
         var urlSource = IUrlSource.Mock(SourceId.Test, url);
-        var urlSourceParser = IUrlSourceParser.Mock(url, true, urlSource);
-        var urlSourceParserSelector = IUrlSourceFactory.Mock(url, urlSource, urlSourceParser);
+        var urlSourceFactory = IUrlSourceFactory.Mock(url, urlSource);
 
         var sourceRelayService = ISourceRelayService.Mock(urlSource, TestContext.CancellationToken);
 
-        var urlRelayService = new UrlRelayService(urlSourceParserSelector, sourceRelayService);
+        var urlRelayService = new UrlRelayService(urlSourceFactory, sourceRelayService);
         await urlRelayService.RelayAsync(url, TestContext.CancellationToken);
     }
 

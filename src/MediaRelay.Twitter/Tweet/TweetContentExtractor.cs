@@ -1,78 +1,13 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Content;
 using MediaRelay.Resources;
-using MediaRelay.Resources.Url;
 using MediaRelay.Source;
 using MediaRelay.Twitter.Image;
+using MediaRelay.Url;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 namespace MediaRelay.Twitter.Tweet;
-
-
-//internal sealed class TweetContentExtractor(
-//        IBrowserService browserService,
-//        IOptions<HttpOptions> httpOptions,
-//        IOptions<TwitterHttpOptions> twitterHttpOptions,
-//        IOptions<TwitterTweetOptions> tweetOptions,
-//        IVideoDownloader videoDownloader,
-//        ImageUrl.Parser parser,
-//        ImageUrlResource.Factory factory,
-//        ILogger<TweetContentExtractor> logger
-//    ) : BrowserContentScriptExtractor(browserService, logger)
-//{
-//    public override bool CanExtract(ISource source)
-//    {
-//        return source is TweetSource;
-//    }
-
-//    protected override void OnNavigating(PageGotoOptions options)
-//    {
-//        options.Timeout = httpOptions.Value.Timeout;
-//        options.WaitUntil = WaitUntilState.DOMContentLoaded;
-//    }
-//    protected override void OnContextCreating(BrowserNewContextOptions options)
-//    {
-//        //options.BypassCSP = true;
-//    }
-//    protected override async ValueTask OnContextCreated(IBrowserContext context)
-//    {
-//        await context.AddCookiesAsync(httpOptions.Value.Cookies);
-//        await context.AddCookiesAsync(twitterHttpOptions.Value.Cookies);
-//    }
-
-//    protected override async ValueTask<string> LoadScriptAsync(CancellationToken cancellationToken)
-//    {
-//        return await File.ReadAllTextAsync(tweetOptions.Value.ExtractScriptPath, cancellationToken);
-//    }
-
-//    protected override IContent ParseScriptResult(IUrlSource webPageSource, string scriptResult)
-//    {
-//        if (webPageSource is not TweetSource source)
-//            throw new NotSupportedException($"不支持的推文来源: {webPageSource}");
-
-//        var snapshot = JsonSerializer.Deserialize(scriptResult, SnapshotSerializerContext.Default.Snapshot)
-//            ?? throw new ArgumentNullException($"未解析到推文内容: {source}");
-
-//        // 如果1张图像都没有试一试视频
-//        if (snapshot.Resources.Count == 0)
-//        {
-//            throw new ArgumentException($"推文解析内容中不包含媒体资源: {source}");
-//        }
-
-//        return TweetContent.BuilderFromSource(source)
-//            .SetContent(snapshot.Content)
-//            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
-//            .SetUploadTime(snapshot.UploadAt)
-//            .AddTags(snapshot.Tags)
-//            .AddResources(snapshot.Resources.Select(url =>
-//            {
-//                var imageUrl = parser.Parse(url, ImageSize.Original);
-//                return factory.Create(imageUrl);
-//            }))
-//            .Build();
-//    }
-//}
 
 
 internal sealed class TweetContentExtractor(
@@ -146,7 +81,7 @@ internal sealed class TweetContentExtractor(
     private async Task<IResource> GetVideoExtractResourceAsync(IBrowserContext context, TweetSource source, CancellationToken cancellationToken)
     {
         await using var videoDownlaodPage = await context.NewPageAsync();
-        await videoDownlaodPage.GotoAsync(options.Value.Tweet.VideoDownloadUrl, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
+        await videoDownlaodPage.GotoAsync(options.Value.Tweet.VideoDownloadUrl, new() { WaitUntil = WaitUntilState.DOMContentLoaded }, cancellationToken);
 
         var downloadUrl = await videoDownlaodPage
             .EvaluateScriptFileAsync(options.Value.Tweet.VideoDownloadUrlScriptPath, source.Url.ToString(), cancellationToken);
