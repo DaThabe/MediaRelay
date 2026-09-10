@@ -1,4 +1,4 @@
-﻿{
+{
   "profiles": {
     "MediaRelay (Development)": {
       "commandName": "Project",
@@ -11,6 +11,9 @@
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Production"
       }
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
     }
   }
 }

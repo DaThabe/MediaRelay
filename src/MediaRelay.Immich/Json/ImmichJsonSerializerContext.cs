@@ -141,7 +141,7 @@ namespace MediaRelay.Immich.Json;
 [JsonSerializable(typeof(MemoriesUpdate))]
 [JsonSerializable(typeof(MemoryCreateDto))]
 [JsonSerializable(typeof(MemoryResponseDto))]
-[JsonSerializable(typeof(MemorySearchOrder))]
+[JsonSerializable(typeof(JsonStringEnumConverter<MemorySearchOrder>))]
 [JsonSerializable(typeof(MemoryStatisticsResponseDto))]
 [JsonSerializable(typeof(JsonStringEnumConverter<MemoryType>))]
 [JsonSerializable(typeof(MemoryUpdateDto))]

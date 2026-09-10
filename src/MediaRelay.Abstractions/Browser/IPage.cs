@@ -1,9 +1,11 @@
-﻿namespace MediaRelay.Browser;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace MediaRelay.Browser;
 
 public interface IPage : IAsyncDisposable
 {
     Task GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default);
-    Task<T> EvaluateAsync<T>(string expression, object? arg = default);
+    Task<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(string expression, object? arg = default);
 }
 
 
