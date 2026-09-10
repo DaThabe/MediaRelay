@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Content;
 using MediaRelay.Resources;
-using MediaRelay.Source;
+using MediaRelay.Source.Url;
 
 namespace MediaRelay.Twitter.Tweet;
 

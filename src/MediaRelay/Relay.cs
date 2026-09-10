@@ -6,7 +6,7 @@ namespace MediaRelay;
 internal sealed class Relay(
     IEnumerable<IRelayHandler> relayHandlers,
     ILogger<Relay> logger
-    ) : IRelay
+    ) : IRelayService
 {
     private readonly IRelayHandler[] _relayHandlers = [.. relayHandlers];
 

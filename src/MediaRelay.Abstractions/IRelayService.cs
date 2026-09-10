@@ -4,7 +4,7 @@
 /// <summary>
 /// 转发内容
 /// </summary>
-public interface IRelay
+public interface IRelayService
 {
     ValueTask RelayAsync(RelayPayload payload, CancellationToken cancellationToken = default);
 }

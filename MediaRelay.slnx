@@ -12,5 +12,6 @@
   </Folder>
   <Project Path="src/MediaRelay.Abstractions/MediaRelay.Abstractions.csproj" />
   <Project Path="src/MediaRelay.Launcher/MediaRelay.Launcher.csproj" />
+  <Project Path="src/MediaRelay.Url.Abstractions/MediaRelay.Url.Abstractions.csproj" />
   <Project Path="src/MediaRelay/MediaRelay.csproj" />
 </Solution>

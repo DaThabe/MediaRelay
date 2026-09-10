@@ -7,7 +7,9 @@ using MediaRelay.Messaging;
 using MediaRelay.Messaging.Queue;
 using MediaRelay.Playwright;
 using MediaRelay.Resources;
+using MediaRelay.Resources.Url;
 using MediaRelay.Source;
+using MediaRelay.Source.Url;
 using MediaRelay.Storage;
 using MediaRelay.Url;
 using Microsoft.Extensions.Configuration;
@@ -52,7 +54,7 @@ public static class DependencyInjectionExtensions
         }
         private IServiceCollection AddUrlRelay()
         {
-            services.AddSingleton<IUrlRelay, UrlRelayService>();
+            services.AddSingleton<IUrlRelayService, UrlRelayService>();
             services.AddMessageQueue<UrlMessageQueue, UrlMessage, Uri>();
             services.AddHostedService<UrlQueueConsumer>();
 
@@ -79,7 +81,7 @@ public static class DependencyInjectionExtensions
         private IServiceCollection AddRelay()
         {
             services.AddSingleton<IRelayContentFactory, RelayContentFactory>();
-            services.AddSingleton<IRelay, Relay>();
+            services.AddSingleton<IRelayService, Relay>();
 
             return services;
         }

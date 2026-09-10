@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Source;
+using MediaRelay.Source.Url;
 
 namespace MediaRelay.Url;
 
@@ -6,7 +7,7 @@ namespace MediaRelay.Url;
 internal sealed class UrlRelayService(
         IUrlSourceFactory urlSourceFactory,
         ISourceRelayService sourceRelayService
-    ) : IUrlRelay
+    ) : IUrlRelayService
 {
     public async ValueTask RelayAsync(Uri url, CancellationToken cancellationToken = default)
     {

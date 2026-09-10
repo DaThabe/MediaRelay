@@ -2,7 +2,7 @@
 
 internal sealed class ContentRelayService(
         IRelayContentFactory relayContentFactory,
-        IRelay relayOrchestrator
+        IRelayService relayOrchestrator
     ) : IContentRelayService
 {
     public async ValueTask RelayAsync(IContent content, CancellationToken cancellationToken = default)

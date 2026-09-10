@@ -1,6 +1,6 @@
 ﻿using MediaRelay;
 using MediaRelay.Content;
-using MediaRelay.Source;
+using MediaRelay.Source.Url;
 using MediaRelay.Twitter;
 using MediaRelay.Twitter.Image;
 using MediaRelay.Twitter.Tweet;

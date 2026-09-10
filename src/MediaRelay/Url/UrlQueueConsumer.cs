@@ -7,7 +7,7 @@ namespace MediaRelay.Url;
 
 public sealed class UrlQueueConsumer(
         IMessageQueue<UrlMessage, Uri> uriQueue,
-        IUrlRelay urlRelayService,
+        IUrlRelayService urlRelayService,
         ILogger<UrlQueueConsumer> logger
     ) : BackgroundService
 {
