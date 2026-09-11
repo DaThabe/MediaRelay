@@ -37,7 +37,7 @@ public sealed class HeyBoxOriginalImageUrlOptions
     public const string SectionPath = $"{HeyBoxOptions.SectionPath}:{SectionName}";
 
 
-    public string Format { get; set; } = @"https://imgheybox1.max-c.com/bbs/{0}/{1}/{2}/{3}.{4}";
+    public string Format { get; set; } = @"https://imgheybox1.max-c.com/bbs/{0:D4}/{1:D2}/{2:D2}/{3}.{4}";
     public string Pattern { get; set; } = @"imgheybox1\.max-c\.com/bbs/(?<yyyy>\d{4})/(?<MM>\d{2})/(?<dd>\d{2})/(?<hash>[a-zA-Z0-9]+)\.(?<ext>\w+)";
     
     public string YearKey { get; set; } = "yyyy";

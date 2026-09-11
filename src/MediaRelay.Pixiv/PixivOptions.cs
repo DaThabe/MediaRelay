@@ -41,7 +41,7 @@ public sealed class PixivOriginalImageUrlOptions
     public const string SectionPath = $"{PixivOptions.SectionPath}:{SectionName}";
 
 
-    public string Format { get; set; } = @"https://i.pximg.net/img-original/img/{0}/{1}/{2}/{3}/{4}/{5}/{6}_p{7}_{8}.{9}";
+    public string Format { get; set; } = @"https://i.pximg.net/img-original/img/{0:D4}/{1:D2}/{2:D2}/{3:D2}/{4:D2}/{5:D2}/{6}_p{7}_{8}.{9}";
     public string Pattern { get; set; } = @"i\.pximg\.net/img-original/img/(?<yyyy>\d{4})/(?<MM>\d{2})/(?<dd>\d{2})/(?<HH>\d{2})/(?<mm>\d{2})/(?<ss>\d{2})/(?<pid>\d+)(-(?<hash>[a-zA-Z0-9]+)){0,1}_p(?<idx>\d+)\.(?<ext>\w+)";
     public string ArtworkIdKey { get; set; } = "pid";
     public string HashKey { get; set; } = "hash";

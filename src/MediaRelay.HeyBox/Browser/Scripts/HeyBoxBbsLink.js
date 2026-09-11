@@ -35,6 +35,31 @@
     };
     await handleExpandButton();
 
+    // 时间解析
+    function parseUploadAt(raw, now = new Date()) {
+        if (!raw) return null;
+
+        const text = raw.trim();
+
+        // 尝试匹配：可选年份 + 月 + 日 + 可选时间
+        // 2026-09-11 / 09-11 / 2026-09-11 12:30 / 09-11 12:30
+        const match = text.match(
+            /^(?:(\d{4})[-/])?(\d{1,2})[-/](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?$/
+        );
+
+        if (!match) return null;
+
+        const year = match[1] ? parseInt(match[1], 10) : now.getFullYear();
+        const month = parseInt(match[2], 10);
+        const day = parseInt(match[3], 10);
+        const hour = match[4] ? parseInt(match[4], 10) : 0;
+        const minute = match[5] ? parseInt(match[5], 10) : 0;
+
+        // 本地时间转 ISO
+        const date = new Date(year, month - 1, day, hour, minute, 0);
+        return date.toISOString();
+    }
+
 
 
     // 图像
@@ -51,8 +76,8 @@
     const describe = figcaption?.querySelector("div.image-text__content")
         ?.innerText?.trim() || "";
     // 上传时间
-    const uploadAt = figcaption?.querySelector("div.link-data__time")
-        ?.innerText?.trim() || "";
+    const uploadAt = parseUploadAt(figcaption?.querySelector("div.link-data__time")
+        ?.innerText?.trim() || "");
     // 标签
     const tags = Array.from(figcaption?.querySelectorAll("div.link-section-tags button") || [])
         .map(a => a.innerText.trim())
