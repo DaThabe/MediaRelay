@@ -7,9 +7,9 @@ internal static class SourceIdExtensions
 {
     extension(SourceId)
     {
-        public static SourceId FromHeyBoxLinkId(long artworkId)
+        public static SourceId FromHeyBoxBbsLinkId(long linkId)
         {
-            return SourceId.Create($"Pixiv_Artwork:{artworkId}");
+            return SourceId.Create($"Pixiv_Artwork:{linkId}");
         }
     }
 }

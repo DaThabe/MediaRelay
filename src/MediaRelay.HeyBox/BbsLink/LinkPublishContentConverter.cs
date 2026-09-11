@@ -4,14 +4,14 @@ using MediaRelay.Storage;
 namespace MediaRelay.HeyBox.BbsLink;
 
 
-internal sealed class ArtworkPublishContentConverter(
+internal sealed class LinkPublishContentConverter(
     IResourceStorage resourceStorage) : IRelayContentCreator
 {
     public bool CanCreate(IContent content) => content is LinkContent;
     public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
         if (content is not LinkContent artwork)
-            throw new NotSupportedException($"不是有效的Pixiv作品内容: {content.Id}");
+            throw new NotSupportedException($"不是有效的 小黑和论坛帖子 内容: {content.Id}");
 
         // 储存所有资源
         var resourceUris = await resourceStorage

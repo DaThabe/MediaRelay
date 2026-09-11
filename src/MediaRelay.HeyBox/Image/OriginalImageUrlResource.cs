@@ -1,4 +1,4 @@
-﻿using MediaRelay.HeyBox;
+﻿using MediaRelay.Http;
 using MediaRelay.Resources;
 using MediaRelay.Storage;
 
@@ -7,30 +7,31 @@ namespace MediaRelay.HeyBox.Image;
 
 internal sealed partial class OriginalImageUrlResource : IResource
 {
-    private readonly IPixivDownloader _downloader;
+    private readonly IHttpClient _httpClient;
 
     public required ResourceId Id { get; init; }
     public required OriginalImageUrl Url { get; init; }
     public MediaType Type => Url.MediaType;
 
-    private OriginalImageUrlResource(IPixivDownloader downloader) => _downloader = downloader;
+    private OriginalImageUrlResource(IHttpClient downloader) => _httpClient = downloader;
 
 
     public ValueTask<Stream> GetStreamAsync(CancellationToken cancellationToken = default)
     {
-        return _downloader.DownloadAsync(Url.ToString(), cancellationToken);
+        var task = _httpClient.GetStreamAsync(Url.ToString(), cancellationToken);
+        return new ValueTask<Stream>(task);
     }
 }
 
 internal sealed partial class OriginalImageUrlResource
 {
-    public class Factory(IPixivDownloader downloader)
+    public class Factory(IHttpClient httpClient)
     {
         public OriginalImageUrlResource Create(OriginalImageUrl url)
         {
-            return new(downloader)
+            return new(httpClient)
             {
-                Id = ResourceId.FromPixivArtworkId(url.ArtworkId),
+                Id = ResourceId.FromMediaHash(url.Hash),
                 Url = url
             };
         }

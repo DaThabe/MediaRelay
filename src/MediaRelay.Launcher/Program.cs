@@ -17,6 +17,7 @@ await Host.CreateDefaultBuilder(args)
         // Modules
         .AddPixiv()
         .AddTwitter()
+        .AddHeyBox()
         .AddImmich()
         .AddConsole()
         .AddClipboard()

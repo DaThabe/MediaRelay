@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Browser\Scripts\PixivArtwork.js">
+		<None Update="Browser\Scripts\HeyBoxBbsLink.js">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

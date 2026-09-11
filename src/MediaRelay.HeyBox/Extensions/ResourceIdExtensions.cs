@@ -7,9 +7,9 @@ internal static class ResourceIdExtensions
 {
     extension(ResourceId)
     {
-        public static ResourceId FromPixivArtworkId(long artworkId)
+        public static ResourceId FromMediaHash(string mediaHash)
         {
-            return ResourceId.Create($"Pixiv_Original_Image:{artworkId}");
+            return ResourceId.Create($"HeyBox_Image:{mediaHash}");
         }
     }
 }

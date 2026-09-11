@@ -4,7 +4,6 @@ using MediaRelay.HeyBox;
 using MediaRelay.HeyBox.BbsLink;
 using MediaRelay.HeyBox.Image;
 using Microsoft.Extensions.Configuration;
-using MediaRelay.HeyBox;
 using MediaRelay.Source;
 
 #pragma warning disable IDE0130 // 命名空间与文件夹结构不匹配
@@ -15,26 +14,26 @@ public static class DependencyInjectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public IServiceCollection AddXiaoHeiHe()
+        public IServiceCollection AddHeyBox()
         {
-            services.AddOptions<XiaoHeiHeOptions>()
+            services.AddOptions<HeyBoxOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(XiaoHeiHeOptions.SectionPath)
+                    .GetSection(HeyBoxOptions.SectionPath)
                     .Bind(options));
 
-            services.AddOptions<PixivArtworkOptions>()
+            services.AddOptions<HeyBoxBbsLinkOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivArtworkOptions.SectionPath)
+                    .GetSection(HeyBoxBbsLinkOptions.SectionPath)
                     .Bind(options));
 
-            services.AddOptions<PixivHttpOptions>()
+            services.AddOptions<HeyBoxHttpOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivHttpOptions.SectionPath)
+                    .GetSection(HeyBoxHttpOptions.SectionPath)
                     .Bind(options));
 
-            services.AddOptions<PixivOriginalImageUrlOptions>()
+            services.AddOptions<HeyBoxOriginalImageUrlOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(PixivOriginalImageUrlOptions.SectionPath)
+                    .GetSection(HeyBoxOriginalImageUrlOptions.SectionPath)
                     .Bind(options));
 
 
@@ -43,9 +42,8 @@ public static class DependencyInjectionExtensions
 
 
             services.AddSingleton<IUrlSourceParser, LinkSource.UrlParser>();
-            services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
-            services.AddSingleton<IPixivDownloader, PixivDownloader>();
-            services.AddSingleton<IRelayContentCreator, ArtworkPublishContentConverter>();
+            services.AddSingleton<IContentExtractor, LinkContentExtractor>();
+            services.AddSingleton<IRelayContentCreator, LinkPublishContentConverter>();
 
 
             return services;

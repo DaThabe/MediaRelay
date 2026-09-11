@@ -35,7 +35,7 @@ internal sealed partial record class LinkSource
 
             return new LinkSource()
             {
-                Id = SourceId.FromHeyBoxLinkId(id),
+                Id = SourceId.FromHeyBoxBbsLinkId(id),
                 Url = new Uri(string.Format(options.Value.Format, id)),
                 LinkId = id
             };
