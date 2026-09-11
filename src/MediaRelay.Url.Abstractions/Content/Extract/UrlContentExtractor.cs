@@ -1,0 +1,105 @@
+﻿using MediaRelay.Browser;
+using MediaRelay.Source;
+using MediaRelay.Url;
+using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
+
+namespace MediaRelay.Content.Extract;
+
+
+public abstract class UrlContentExtractor<TSource, TExtractorSnapshot, TContentBuilder, TContent>(IBrowserService browserService) : IContentExtractor
+    where TSource : IUrlSource
+    where TExtractorSnapshot : IExtractorSnapshot
+    where TContentBuilder : IUrlContentBuilder<TContentBuilder, TContent>
+    where TContent : IUrlContent
+{
+    public virtual bool CanExtract(ISource source) => source is TSource;
+    public virtual async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
+    {
+        if (source is not TSource targetSource)
+            throw new NotSupportedException($"不支持的推文来源: {source}");
+
+        // Browser
+        await using var browser = await GetBrowserAsync();
+        await using var context = await NewBrowserContextAsync(browser);
+        await using var page = await NewBrowserPageAsync(context);
+        var gotoOptions = new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded };
+        await GotoBrowserPageAsync(page, targetSource.Url.ToString(), gotoOptions, cancellationToken);
+
+        // Extract
+        var scriptFilePath = GetScriptFilePath();
+        var scriptResultJsonTypeInfo = GetScriptResultJsonTypeInfo();
+        var scriptResultString = await page.EvaluateScriptFileAsync<string>(scriptFilePath, null, cancellationToken);
+        var snapshot = JsonSerializer.Deserialize(scriptResultString, scriptResultJsonTypeInfo);
+
+        // Builder
+        ArgumentNullException.ThrowIfNull(snapshot);
+        var builder = CreateContentBuilder(targetSource)
+            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
+            .SetTitle(snapshot.Title)
+            .SetContent(snapshot.Content)
+            .AddTags(snapshot.Tags);
+
+        // Context
+        var extractContext = new ExtractContext()
+        {
+            Source = targetSource,
+            Browser = browser,
+            BrowserContext = context,
+            Page = page,
+            ScriptFilePath = scriptFilePath,
+            ScriptResultJsonTypeInfo = scriptResultJsonTypeInfo,
+            ExtractorSnapshot = snapshot,
+            Builder = builder
+        };
+        return await ExtractAsync(extractContext, cancellationToken);
+    }
+
+    // Browser
+    protected virtual ValueTask<IBrowser> GetBrowserAsync() =>
+         browserService.GetSharedAsync();
+    // Context
+    protected virtual ValueTask<IBrowserContext> NewBrowserContextAsync(IBrowser browser) =>
+        browser.NewContextAsync();
+    // Page
+    protected virtual ValueTask<IPage> NewBrowserPageAsync(IBrowserContext browserContext) =>
+        browserContext.NewPageAsync();
+    // Goto
+    protected virtual ValueTask GotoBrowserPageAsync(IPage page, string targetUrl, PageGotoOptions? options, CancellationToken cancellationToken) =>
+        page.GotoAsync(targetUrl, options, cancellationToken);
+
+
+    // 脚本文件路径
+    protected abstract string GetScriptFilePath();
+    // 脚本结果Json类型信息
+    protected abstract JsonTypeInfo<TExtractorSnapshot> GetScriptResultJsonTypeInfo();
+    protected abstract TContentBuilder CreateContentBuilder(TSource source);
+    // 提取任务
+    protected abstract ValueTask<TContent> ExtractAsync(IExtractContext context, CancellationToken cancellationToken);
+
+
+    protected interface IExtractContext
+    {
+        TSource Source { get; }
+        IBrowser Browser { get; }
+        IBrowserContext BrowserContext { get; }
+        IPage Page { get; }
+        string ScriptFilePath { get; }
+        JsonTypeInfo<TExtractorSnapshot> ScriptResultJsonTypeInfo { get; }
+        TContentBuilder Builder { get; }
+        TExtractorSnapshot ExtractorSnapshot { get; }
+    }
+    private sealed class ExtractContext : IExtractContext
+    {
+        public required TSource Source { get; init; }
+        public required IBrowser Browser { get; init; }
+        public required IBrowserContext BrowserContext { get; init; }
+        public required IPage Page { get; init; }
+
+        public required string ScriptFilePath { get; init; }
+        public required TExtractorSnapshot ExtractorSnapshot { get; init; }
+        public required JsonTypeInfo<TExtractorSnapshot> ScriptResultJsonTypeInfo { get; init; }
+
+        public required TContentBuilder Builder { get; init; }
+    }
+}

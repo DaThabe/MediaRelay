@@ -64,7 +64,7 @@ internal sealed class ArtworkContentExtractor(
             cancellationToken);
 
         var extractResult = await page
-            .EvaluateScriptFileAsync(options.Value.Artwork.ExtractScriptPath, cancellationToken: cancellationToken);
+            .EvaluateScriptFileAsync<string>(options.Value.Artwork.ExtractScriptPath, cancellationToken: cancellationToken);
 
         return JsonSerializer
             .Deserialize(extractResult, ArtworkContentSnapshotJsonSerializerContext.Default.ArtworkContentSnapshot)

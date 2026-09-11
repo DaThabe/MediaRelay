@@ -4,6 +4,6 @@ namespace MediaRelay.Browser;
 
 public interface IBrowserContext : IAsyncDisposable
 {
-    Task<IPage> NewPageAsync();
-    Task AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions);
+    ValueTask<IPage> NewPageAsync();
+    ValueTask AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions);
 }

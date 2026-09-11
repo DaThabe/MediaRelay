@@ -6,14 +6,14 @@ namespace MediaRelay.Browser;
 
 internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext context, ILogger logger) : IBrowserContext
 {
-    public async Task<IPage> NewPageAsync()
+    public async ValueTask<IPage> NewPageAsync()
     {
         var page = await context.NewPageAsync();
         logger.LogDebug("新建页面");
 
         return new Page(page, logger);
     }
-    public async Task AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions)
+    public async ValueTask AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions)
     {
         var cookies = cookieOptions.Select(Parse);
         await context.AddCookiesAsync(cookies);

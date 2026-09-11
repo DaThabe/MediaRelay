@@ -7,7 +7,7 @@ internal sealed class Browser(Microsoft.Playwright.IBrowser browser, ILogger log
 {
     public string Version => browser.Version;
 
-    public async Task<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
+    public async ValueTask<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
     {
         var context = await browser.NewContextAsync(Parse(options));
         logger.LogDebug("已创建浏览器上下文");

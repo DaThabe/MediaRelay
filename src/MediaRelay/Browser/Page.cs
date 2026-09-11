@@ -1,17 +1,35 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace MediaRelay.Browser;
 
 
 internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IPage
 {
-    public Task<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(string expression, object? arg = default)
+    public async ValueTask<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(
+        string expression, object? arg = default, CancellationToken cancellationToken = default)
     {
-        return page.EvaluateAsync<T>(expression, arg);
+        await using var registration = cancellationToken.Register(async () =>
+        {
+            await page.CloseAsync();
+            logger.LogInformation("页面已取消");
+        });
+
+        return await page.EvaluateAsync<T>(expression, arg);
+    }
+    public async ValueTask<JsonElement?> EvaluateAsync(string expression, object? arg = null, CancellationToken cancellationToken = default)
+    {
+        await using var registration = cancellationToken.Register(async () =>
+        {
+            await page.CloseAsync();
+            logger.LogInformation("页面已取消");
+        });
+
+        return await page.EvaluateAsync(expression, arg);
     }
 
-    public async Task GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
+    public async ValueTask GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
     {
         await using var registration = cancellationToken.Register(async () =>
         {

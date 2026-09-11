@@ -3,5 +3,5 @@
 public interface IBrowser : IAsyncDisposable
 {
     string Version { get; }
-    Task<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null);
+    ValueTask<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null);
 }
