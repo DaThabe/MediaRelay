@@ -16,7 +16,7 @@ public static class IContentExtensions
                 .Returns(contentId);
             mock.Setup(x => x.Source)
                 .Returns(source);
-            mock.Setup(x => x.MediaResources)
+            mock.Setup(x => x.Resources)
                 .Returns(resources.ToHashSet());
 
             return mock.Object;

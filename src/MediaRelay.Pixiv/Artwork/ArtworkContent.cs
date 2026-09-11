@@ -9,20 +9,23 @@ internal sealed partial record class ArtworkContent : IUrlContent
 {
     public required ContentId Id { get; init; }
     public required IUrlSource Source { get; init; }
-    public required IReadOnlySet<IResource> MediaResources { get; init; }
+    public required IReadOnlySet<IResource> Resources { get; init; }
 
 
     public required string Title { get; init; }
-    public required string Description { get; init; }
+    public required string Content { get; init; }
     public required string AuthorName { get; init; }
-    public required string AuthorUrl { get; init; }
+    public required Uri AuthorUrl { get; init; }
     public required DateTimeOffset UploadAt { get; init; }
     public required IReadOnlySet<string> Tags { get; init; }
 
 
-
     private ArtworkContent() { }
     public static Builder BuilderFromSource(ArtworkSource source) => new(source);
+
+
+    // Pixiv 有上传时间
+    DateTimeOffset? IUrlContent.UploadAt => UploadAt;
 }
 
 
@@ -35,7 +38,7 @@ internal sealed partial record class ArtworkContent
         private string _title = string.Empty;
         private string? _description = string.Empty;
         private string _authorName = string.Empty;
-        private string _authorUrl = string.Empty;
+        private Uri? _authorUrl;
         private DateTimeOffset _uploadTime = DateTimeOffset.MinValue;
         private readonly HashSet<string> _tags = [];
 
@@ -62,7 +65,7 @@ internal sealed partial record class ArtworkContent
             return this;
         }
 
-        public Builder SetAuthor(string name, string url)
+        public Builder SetAuthor(string name, Uri url)
         {
             _authorName = name;
             _authorUrl = url;
@@ -89,13 +92,13 @@ internal sealed partial record class ArtworkContent
             {
                 Id = _id,
                 Source = source,
-                MediaResources = _resources,
+                Resources = _resources,
 
                 AuthorName = _authorName,
                 AuthorUrl = _authorUrl,
 
                 Title = _title,
-                Description = _description ?? string.Empty,
+                Content = _description ?? string.Empty,
 
                 UploadAt = _uploadTime,
                 Tags = _tags

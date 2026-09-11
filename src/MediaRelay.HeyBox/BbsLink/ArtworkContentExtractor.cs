@@ -1,29 +1,29 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Content;
-using MediaRelay.Pixiv.Image;
+using MediaRelay.HeyBox.Image;
 using MediaRelay.Source;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MediaRelay.Pixiv.Artwork;
+namespace MediaRelay.HeyBox.BbsLink;
 
 
 internal sealed class ArtworkContentExtractor(
         IBrowserService browserService,
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
-        IOptions<PixivOptions> options
+        IOptions<XiaoHeiHeOptions> options
     ) : IContentExtractor
 {
     public bool CanExtract(ISource source)
     {
-        return source is ArtworkSource;
+        return source is LinkSource;
     }
 
     public async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
     {
-        if (source is not ArtworkSource artworkSource)
+        if (source is not LinkSource artworkSource)
             throw new NotSupportedException($"不支持的Pixiv作品来源: {source}");
 
         // Browser
@@ -33,7 +33,7 @@ internal sealed class ArtworkContentExtractor(
 
 
         // Extract
-        var builder = ArtworkContent.BuilderFromSource(artworkSource);
+        var builder = LinkContent.BuilderFromSource(artworkSource);
 
         // Image
         var extractSnapshot = await GetExtractSnapshotAsync(context, artworkSource, cancellationToken);
@@ -42,11 +42,11 @@ internal sealed class ArtworkContentExtractor(
         return builder.Build();
     }
 
-    private void FillToBuilder(ArtworkContent.Builder builder, ArtworkContentSnapshot snapshot)
+    private void FillToBuilder(LinkContent.Builder builder, ArtworkContentSnapshot snapshot)
     {
         builder.SetTitle(snapshot.Title)
-            .SetDescription(snapshot.Describe)
-            .SetAuthor(snapshot.AuthorName, new Uri( snapshot.AuthorUrl))
+            .SetContent(snapshot.Describe)
+            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
             .SetUploadTime(snapshot.UploadAt)
             .AddTags(snapshot.Tags)
             .AddResources(snapshot.Resources.Select(url =>
@@ -55,7 +55,7 @@ internal sealed class ArtworkContentExtractor(
                 return factory.Create(imageUrl);
             }));
     }
-    private async Task<ArtworkContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, ArtworkSource source, CancellationToken cancellationToken)
+    private async Task<ArtworkContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, LinkSource source, CancellationToken cancellationToken)
     {
         await using var page = await context.NewPageAsync();
         await page.GotoAsync(

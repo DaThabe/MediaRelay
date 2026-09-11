@@ -11,5 +11,5 @@ public interface IContent
 {
     ContentId Id { get; }
     ISource Source { get; }
-    IReadOnlySet<IResource> MediaResources { get; }
+    IReadOnlySet<IResource> Resources { get; }
 }

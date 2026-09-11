@@ -8,6 +8,7 @@
   <Folder Name="/Modules/">
     <Project Path="src/MediaRelay.Clipboard/MediaRelay.Clipboard.csproj" />
     <Project Path="src/MediaRelay.Console/MediaRelay.Console.csproj" />
+    <Project Path="src/MediaRelay.HeyBox/MediaRelay.HeyBox.csproj" />
     <Project Path="src/MediaRelay.Immich/MediaRelay.Immich.csproj" />
     <Project Path="src/MediaRelay.Pixiv/MediaRelay.Pixiv.csproj" />
     <Project Path="src/MediaRelay.Twitter/MediaRelay.Twitter.csproj" />

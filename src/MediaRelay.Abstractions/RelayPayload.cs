@@ -18,7 +18,7 @@ public sealed record class RelayPayload
 
 
     public string? Author { get; init; }
-    public string? AuthorUrl { get; init; }
+    public Uri? AuthorUrl { get; init; }
     public Uri? SourceUrl { get; init; }
 
 

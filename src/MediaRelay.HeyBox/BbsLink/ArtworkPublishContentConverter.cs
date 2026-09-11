@@ -1,16 +1,16 @@
 ﻿using MediaRelay.Content;
 using MediaRelay.Storage;
 
-namespace MediaRelay.Pixiv.Artwork;
+namespace MediaRelay.HeyBox.BbsLink;
 
 
 internal sealed class ArtworkPublishContentConverter(
     IResourceStorage resourceStorage) : IRelayContentCreator
 {
-    public bool CanCreate(IContent content) => content is ArtworkContent;
+    public bool CanCreate(IContent content) => content is LinkContent;
     public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
-        if (content is not ArtworkContent artwork)
+        if (content is not LinkContent artwork)
             throw new NotSupportedException($"不是有效的Pixiv作品内容: {content.Id}");
 
         // 储存所有资源

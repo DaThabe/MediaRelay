@@ -15,7 +15,7 @@ internal sealed class TweetPublishContentConverter(
 
         // 储存所有资源
         var resourceUris = await resourceStorage
-            .StoreAllAsync(tweet.MediaResources, cancellationToken);
+            .StoreAllAsync(tweet.Resources, cancellationToken);
 
         return new()
         {

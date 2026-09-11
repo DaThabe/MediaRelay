@@ -54,7 +54,7 @@ internal sealed class TweetContentExtractor(
     private void FillToBuilder(TweetContent.Builder builder, TweetContentSnapshot snapshot)
     {
         builder.SetContent(snapshot.Content)
-            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
+            .SetAuthor(snapshot.AuthorName, new Uri(snapshot.AuthorUrl))
             .SetUploadTime(snapshot.UploadAt)
             .AddTags(snapshot.Tags)
             .AddResources(snapshot.Resources.Select(url =>
