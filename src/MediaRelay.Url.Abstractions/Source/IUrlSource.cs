@@ -1,6 +1,4 @@
-﻿using MediaRelay.Source;
-
-namespace MediaRelay.Url;
+﻿namespace MediaRelay.Source;
 
 /// <summary>
 /// 表示一个网址来源

@@ -1,6 +1,4 @@
-﻿using MediaRelay.Resources;
-
-namespace MediaRelay.Url;
+﻿namespace MediaRelay.Resources;
 
 
 public interface IUrlResource : IResource

@@ -1,7 +1,6 @@
-﻿using MediaRelay.Messaging;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace MediaRelay.Url;
+namespace MediaRelay.Messaging;
 
 
 public sealed record class UrlMessage : IMessage<Uri>

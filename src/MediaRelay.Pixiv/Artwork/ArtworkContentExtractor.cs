@@ -35,7 +35,7 @@ internal sealed class ArtworkContentExtractor(
 }
 
 
-internal sealed record class ArtworkContentSnapshot : IExtractorSnapshot
+internal sealed record class ArtworkContentSnapshot : IUrlExtractorSnapshot
 {
     public required HashSet<string> Resources { get; init; }
     public string Title { get; init; } = string.Empty;
@@ -47,10 +47,10 @@ internal sealed record class ArtworkContentSnapshot : IExtractorSnapshot
 
 
 
-    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Resources => Resources;
-    [JsonIgnore] string? IExtractorSnapshot.Content => Describe;
-    [JsonIgnore] DateTimeOffset? IExtractorSnapshot.UploadAt => UploadAt;
-    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Tags => Tags;
+    [JsonIgnore] IReadOnlySet<string> IUrlExtractorSnapshot.Resources => Resources;
+    [JsonIgnore] string? IUrlExtractorSnapshot.Content => Describe;
+    [JsonIgnore] DateTimeOffset? IUrlExtractorSnapshot.UploadAt => UploadAt;
+    [JsonIgnore] IReadOnlySet<string> IUrlExtractorSnapshot.Tags => Tags;
 }
 
 [JsonSourceGenerationOptions(

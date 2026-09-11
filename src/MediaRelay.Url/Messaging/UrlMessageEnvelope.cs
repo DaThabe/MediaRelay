@@ -1,4 +1,5 @@
-﻿using MediaRelay.Messaging.Queue;
+﻿using MediaRelay.Messaging;
+using MediaRelay.Messaging.Queue;
 
 namespace MediaRelay.Url.Messaging;
 

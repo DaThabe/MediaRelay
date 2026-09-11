@@ -1,7 +1,6 @@
-﻿using MediaRelay.Resources;
-using MediaRelay.Storage;
+﻿using MediaRelay.Storage;
 
-namespace MediaRelay.Url;
+namespace MediaRelay.Resources;
 
 
 public interface IUrlResourceFactory

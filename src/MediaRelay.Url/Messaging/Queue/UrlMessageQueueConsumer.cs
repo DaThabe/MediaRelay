@@ -1,4 +1,5 @@
-﻿using MediaRelay.Messaging.Queue;
+﻿using MediaRelay.Messaging;
+using MediaRelay.Messaging.Queue;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

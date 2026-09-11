@@ -1,6 +1,5 @@
 ﻿using AsyncConsoleReader;
 using MediaRelay.Messaging;
-using MediaRelay.Url;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

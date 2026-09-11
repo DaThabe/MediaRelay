@@ -3,7 +3,6 @@ using MediaRelay.Content.Extract;
 using MediaRelay.Http;
 using MediaRelay.Resources;
 using MediaRelay.Twitter.Image;
-using MediaRelay.Url;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -53,7 +52,7 @@ internal sealed class TweetContentExtractor(
 
 
 
-internal sealed record class TweetContentSnapshot : IExtractorSnapshot
+internal sealed record class TweetContentSnapshot : IUrlExtractorSnapshot
 {
     public required HashSet<string> Resources { get; init; }
     public string Content { get; init; } = string.Empty;
@@ -63,10 +62,10 @@ internal sealed record class TweetContentSnapshot : IExtractorSnapshot
     public HashSet<string> Tags { get; init; } = [];
 
 
-    [JsonIgnore] DateTimeOffset? IExtractorSnapshot.UploadAt => UploadAt;
-    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Resources => Resources;
-    [JsonIgnore] string? IExtractorSnapshot.Title => null;
-    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Tags => Tags;
+    [JsonIgnore] DateTimeOffset? IUrlExtractorSnapshot.UploadAt => UploadAt;
+    [JsonIgnore] IReadOnlySet<string> IUrlExtractorSnapshot.Resources => Resources;
+    [JsonIgnore] string? IUrlExtractorSnapshot.Title => null;
+    [JsonIgnore] IReadOnlySet<string> IUrlExtractorSnapshot.Tags => Tags;
 }
 
 [JsonSourceGenerationOptions(

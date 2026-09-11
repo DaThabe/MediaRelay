@@ -1,7 +1,7 @@
 ﻿namespace MediaRelay.Content.Extract;
 
 
-public interface IExtractorSnapshot
+public interface IUrlExtractorSnapshot
 {
     IReadOnlySet<string> Resources { get; }
     string? Title { get; }

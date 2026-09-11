@@ -2,7 +2,6 @@
 using MediaRelay.Http;
 using MediaRelay.Resources;
 using MediaRelay.Source;
-using MediaRelay.Url;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -11,7 +10,7 @@ namespace MediaRelay.Content.Extract;
 
 public abstract class UrlContentExtractor<TSource, TExtractorSnapshot, TContentBuilder, TContent>(IBrowserService browserService) : IContentExtractor
     where TSource : IUrlSource
-    where TExtractorSnapshot : IExtractorSnapshot
+    where TExtractorSnapshot : IUrlExtractorSnapshot
     where TContentBuilder : IUrlContentBuilder<TContentBuilder, TContent>
     where TContent : IUrlContent
 {

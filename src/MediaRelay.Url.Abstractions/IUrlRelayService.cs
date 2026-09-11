@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Url;
+﻿namespace MediaRelay;
 
 /// <summary>
 /// 从 Url 转发

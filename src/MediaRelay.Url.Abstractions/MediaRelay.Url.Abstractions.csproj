@@ -12,9 +12,4 @@
 	  <ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Resources\" />
-	  <Folder Include="Source\" />
-	</ItemGroup>
-
 </Project>
