@@ -1,4 +1,6 @@
 ﻿using MediaRelay.Browser;
+using MediaRelay.Http;
+using MediaRelay.Resources;
 using MediaRelay.Source;
 using MediaRelay.Url;
 using System.Text.Json;
@@ -20,11 +22,15 @@ public abstract class UrlContentExtractor<TSource, TExtractorSnapshot, TContentB
             throw new NotSupportedException($"不支持的推文来源: {source}");
 
         // Browser
-        await using var browser = await GetBrowserAsync();
-        await using var context = await NewBrowserContextAsync(browser);
-        await using var page = await NewBrowserPageAsync(context);
+        await using var browser = await browserService.GetSharedAsync();
+        // Context
+        await using var context = await browser.NewContextAsync();
+        await context.AddCookiesAsync(GetCookies());
+        // Page
+        await using var page = await context.NewPageAsync();
+        // Goto
         var gotoOptions = new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded };
-        await GotoBrowserPageAsync(page, targetSource.Url.ToString(), gotoOptions, cancellationToken);
+        await page.GotoAsync(targetSource.Url.ToString(), gotoOptions, cancellationToken);
 
         // Extract
         var scriptFilePath = GetScriptFilePath();
@@ -38,7 +44,8 @@ public abstract class UrlContentExtractor<TSource, TExtractorSnapshot, TContentB
             .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
             .SetTitle(snapshot.Title)
             .SetContent(snapshot.Content)
-            .AddTags(snapshot.Tags);
+            .AddTags(snapshot.Tags)
+            .AddResources(snapshot.Resources.Select(ToResource));
 
         // Context
         var extractContext = new ExtractContext()
@@ -52,30 +59,25 @@ public abstract class UrlContentExtractor<TSource, TExtractorSnapshot, TContentB
             ExtractorSnapshot = snapshot,
             Builder = builder
         };
-        return await ExtractAsync(extractContext, cancellationToken);
+        await ExtractAsync(extractContext, cancellationToken);
+
+        return extractContext.Builder.Build();
     }
-
-    // Browser
-    protected virtual ValueTask<IBrowser> GetBrowserAsync() =>
-         browserService.GetSharedAsync();
-    // Context
-    protected virtual ValueTask<IBrowserContext> NewBrowserContextAsync(IBrowser browser) =>
-        browser.NewContextAsync();
-    // Page
-    protected virtual ValueTask<IPage> NewBrowserPageAsync(IBrowserContext browserContext) =>
-        browserContext.NewPageAsync();
-    // Goto
-    protected virtual ValueTask GotoBrowserPageAsync(IPage page, string targetUrl, PageGotoOptions? options, CancellationToken cancellationToken) =>
-        page.GotoAsync(targetUrl, options, cancellationToken);
-
 
     // 脚本文件路径
     protected abstract string GetScriptFilePath();
     // 脚本结果Json类型信息
     protected abstract JsonTypeInfo<TExtractorSnapshot> GetScriptResultJsonTypeInfo();
     protected abstract TContentBuilder CreateContentBuilder(TSource source);
+    // 资源转换
+    protected abstract IResource ToResource(string resourceUrl);
+    // 获取Cookie
+    protected abstract IEnumerable<HttpCookieOptions> GetCookies();
+
+
     // 提取任务
-    protected abstract ValueTask<TContent> ExtractAsync(IExtractContext context, CancellationToken cancellationToken);
+    protected virtual ValueTask ExtractAsync(IExtractContext context, CancellationToken cancellationToken) =>
+        ValueTask.CompletedTask;
 
 
     protected interface IExtractContext

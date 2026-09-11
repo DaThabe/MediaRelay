@@ -3,11 +3,11 @@
 
 public interface IExtractorSnapshot
 {
-    string[] Resources { get; }
+    IReadOnlySet<string> Resources { get; }
     string? Title { get; }
     string? Content { get; }
     DateTimeOffset? UploadAt { get; }
     string? AuthorName { get; }
     string? AuthorUrl { get; }
-    string[] Tags { get; }
+    IReadOnlySet<string> Tags { get; }
 }

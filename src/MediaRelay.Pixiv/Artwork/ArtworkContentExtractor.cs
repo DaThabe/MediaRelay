@@ -1,10 +1,11 @@
 ﻿using MediaRelay.Browser;
-using MediaRelay.Content;
+using MediaRelay.Content.Extract;
+using MediaRelay.Http;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Source;
+using MediaRelay.Resources;
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace MediaRelay.Pixiv.Artwork;
 
@@ -14,67 +15,27 @@ internal sealed class ArtworkContentExtractor(
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
         IOptions<PixivOptions> options
-    ) : IContentExtractor
+    ) : UrlContentExtractor<ArtworkSource, ArtworkContentSnapshot, ArtworkContent.Builder, ArtworkContent>(browserService)
 {
-    public bool CanExtract(ISource source)
-    {
-        return source is ArtworkSource;
-    }
+    protected override IEnumerable<HttpCookieOptions> GetCookies() =>
+        options.Value.Http.Cookies;
 
-    public async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
-    {
-        if (source is not ArtworkSource artworkSource)
-            throw new NotSupportedException($"不支持的Pixiv作品来源: {source}");
+    protected override ArtworkContent.Builder CreateContentBuilder(ArtworkSource source) =>
+        ArtworkContent.BuilderFromSource(source);
 
-        // Browser
-        await using var browser = await browserService.GetSharedAsync();
-        await using var context = await browser.NewContextAsync();
-        await context.AddCookiesAsync(options.Value.Http.Cookies);
+    protected override string GetScriptFilePath() =>
+        options.Value.Artwork.ExtractScriptPath;
 
+    protected override JsonTypeInfo<ArtworkContentSnapshot> GetScriptResultJsonTypeInfo() =>
+        ArtworkContentSnapshotJsonSerializerContext.Default.ArtworkContentSnapshot;
 
-        // Extract
-        var builder = ArtworkContent.BuilderFromSource(artworkSource);
+    protected override IResource ToResource(string resourceUrl) =>
+        factory.Create(parser.Parse(resourceUrl));
 
-        // Image
-        var extractSnapshot = await GetExtractSnapshotAsync(context, artworkSource, cancellationToken);
-        FillToBuilder(builder, extractSnapshot);
-
-        return builder.Build();
-    }
-
-    private void FillToBuilder(ArtworkContent.Builder builder, ArtworkContentSnapshot snapshot)
-    {
-        builder.SetTitle(snapshot.Title)
-            .SetContent(snapshot.Describe)
-            .SetAuthor(snapshot.AuthorName, new Uri( snapshot.AuthorUrl))
-            .SetUploadTime(snapshot.UploadAt)
-            .AddTags(snapshot.Tags)
-            .AddResources(snapshot.Resources.Select(url =>
-            {
-                var imageUrl = parser.Parse(url);
-                return factory.Create(imageUrl);
-            }));
-    }
-    private async Task<ArtworkContentSnapshot> GetExtractSnapshotAsync(IBrowserContext context, ArtworkSource source, CancellationToken cancellationToken)
-    {
-        await using var page = await context.NewPageAsync();
-        await page.GotoAsync(
-            source.Url.ToString(),
-            new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded },
-            cancellationToken);
-
-        var extractResult = await page
-            .EvaluateScriptFileAsync<string>(options.Value.Artwork.ExtractScriptPath, cancellationToken: cancellationToken);
-
-        return JsonSerializer
-            .Deserialize(extractResult, ArtworkContentSnapshotJsonSerializerContext.Default.ArtworkContentSnapshot)
-            ?? throw new ArgumentNullException($"未解析到Pixiv作品内容: {source}");
-    }
 }
 
 
-
-internal sealed record class ArtworkContentSnapshot
+internal sealed record class ArtworkContentSnapshot : IExtractorSnapshot
 {
     public required HashSet<string> Resources { get; init; }
     public string Title { get; init; } = string.Empty;
@@ -83,6 +44,13 @@ internal sealed record class ArtworkContentSnapshot
     public required DateTimeOffset UploadAt { get; init; }
     public required string AuthorName { get; init; }
     public required string AuthorUrl { get; init; }
+
+
+
+    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Resources => Resources;
+    [JsonIgnore] string? IExtractorSnapshot.Content => Describe;
+    [JsonIgnore] DateTimeOffset? IExtractorSnapshot.UploadAt => UploadAt;
+    [JsonIgnore] IReadOnlySet<string> IExtractorSnapshot.Tags => Tags;
 }
 
 [JsonSourceGenerationOptions(
