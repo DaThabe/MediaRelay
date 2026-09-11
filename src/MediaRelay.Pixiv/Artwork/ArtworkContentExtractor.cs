@@ -45,7 +45,7 @@ internal sealed class ArtworkContentExtractor(
     private void FillToBuilder(ArtworkContent.Builder builder, ArtworkContentSnapshot snapshot)
     {
         builder.SetTitle(snapshot.Title)
-            .SetDescription(snapshot.Describe)
+            .SetContent(snapshot.Describe)
             .SetAuthor(snapshot.AuthorName, new Uri( snapshot.AuthorUrl))
             .SetUploadTime(snapshot.UploadAt)
             .AddTags(snapshot.Tags)

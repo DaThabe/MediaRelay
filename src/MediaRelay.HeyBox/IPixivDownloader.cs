@@ -1,5 +1,4 @@
 ﻿using MediaRelay.Http;
-using MediaRelay.HeyBox;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
