@@ -38,26 +38,47 @@
     // 时间解析
     function parseUploadAt(raw, now = new Date()) {
         if (!raw) return null;
-
         const text = raw.trim();
 
-        // 尝试匹配：可选年份 + 月 + 日 + 可选时间
-        // 2026-09-11 / 09-11 / 2026-09-11 12:30 / 09-11 12:30
-        const match = text.match(
+        // 刚刚
+        if (text === "刚刚") return now.toISOString();
+
+        // n分钟前
+        const minutesMatch = text.match(/^(\d+)\s*分钟前$/);
+        if (minutesMatch) {
+            const d = new Date(now.getTime() - parseInt(minutesMatch[1]) * 60 * 1000);
+            return d.toISOString();
+        }
+
+        // n小时前
+        const hoursMatch = text.match(/^(\d+)\s*小时前$/);
+        if (hoursMatch) {
+            const d = new Date(now.getTime() - parseInt(hoursMatch[1]) * 60 * 60 * 1000);
+            return d.toISOString();
+        }
+
+        // n天前
+        const daysMatch = text.match(/^(\d+)\s*天前$/);
+        if (daysMatch) {
+            const d = new Date(now.getTime() - parseInt(daysMatch[1]) * 24 * 60 * 60 * 1000);
+            return d.toISOString();
+        }
+
+        // 日期格式：yyyy-MM-dd / MM-dd / yyyy-MM-dd HH:mm / MM-dd HH:mm
+        const dateMatch = text.match(
             /^(?:(\d{4})[-/])?(\d{1,2})[-/](\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?$/
         );
+        if (dateMatch) {
+            const year = dateMatch[1] ? parseInt(dateMatch[1], 10) : now.getFullYear();
+            const month = parseInt(dateMatch[2], 10);
+            const day = parseInt(dateMatch[3], 10);
+            const hour = dateMatch[4] ? parseInt(dateMatch[4], 10) : 0;
+            const minute = dateMatch[5] ? parseInt(dateMatch[5], 10) : 0;
+            const d = new Date(year, month - 1, day, hour, minute, 0);
+            return d.toISOString();
+        }
 
-        if (!match) return null;
-
-        const year = match[1] ? parseInt(match[1], 10) : now.getFullYear();
-        const month = parseInt(match[2], 10);
-        const day = parseInt(match[3], 10);
-        const hour = match[4] ? parseInt(match[4], 10) : 0;
-        const minute = match[5] ? parseInt(match[5], 10) : 0;
-
-        // 本地时间转 ISO
-        const date = new Date(year, month - 1, day, hour, minute, 0);
-        return date.toISOString();
+        return null;
     }
 
 
