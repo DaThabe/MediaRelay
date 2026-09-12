@@ -1,7 +1,6 @@
-﻿using MediaRelay.Source;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Url;
+namespace MediaRelay.Source;
 
 
 internal sealed class UrlSourceFactory(

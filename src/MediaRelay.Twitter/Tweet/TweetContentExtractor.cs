@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Content.Extract;
 using MediaRelay.Http;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using MediaRelay.Twitter.Image;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;

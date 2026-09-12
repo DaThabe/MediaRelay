@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Storage;
 using Moq;
 
-namespace MediaRelay.Resources;
+namespace MediaRelay.Resource;
 
 public static class IResourceExtensions
 {

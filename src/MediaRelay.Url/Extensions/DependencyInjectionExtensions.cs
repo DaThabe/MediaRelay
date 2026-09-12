@@ -1,11 +1,8 @@
 ﻿using MediaRelay;
 using MediaRelay.Messaging;
 using MediaRelay.Messaging.Queue;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using MediaRelay.Source;
-using MediaRelay.Url;
-using MediaRelay.Url.Messaging.Queue;
-using MediaRelay.Url.Resource;
 using Microsoft.Extensions.Configuration;
 
 

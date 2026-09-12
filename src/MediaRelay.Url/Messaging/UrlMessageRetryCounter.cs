@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Url.Messaging;
+﻿namespace MediaRelay.Messaging;
 
 internal sealed record class UrlMessageRetryCounter
 {

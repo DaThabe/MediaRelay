@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using MediaRelay.Messaging;
+using System.Text.Json.Serialization;
 
-namespace MediaRelay.Url.Messaging.Queue;
+namespace MediaRelay.Messaging.Queue;
 
 
 [JsonSourceGenerationOptions(

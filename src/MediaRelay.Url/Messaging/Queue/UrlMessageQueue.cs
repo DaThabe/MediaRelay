@@ -1,11 +1,10 @@
-﻿using MediaRelay.Messaging;
-using MediaRelay.Messaging.Queue;
-using MediaRelay.Source;
+﻿using MediaRelay.Source;
+using MediaRelay.Url.Messaging.Queue;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
-namespace MediaRelay.Url.Messaging.Queue;
+namespace MediaRelay.Messaging.Queue;
 
 
 internal sealed class UrlMessageQueue(

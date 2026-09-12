@@ -1,9 +1,9 @@
-using MediaRelay.Messaging;
 using MediaRelay.Source;
+using MediaRelay.Url;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace MediaRelay.Url.Messaging.Queue;
+namespace MediaRelay.Messaging.Queue;
 
 
 [TestClass]

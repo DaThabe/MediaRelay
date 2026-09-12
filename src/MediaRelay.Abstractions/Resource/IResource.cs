@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Storage;
 
-namespace MediaRelay.Resources;
+namespace MediaRelay.Resource;
 
 
 /// <summary>

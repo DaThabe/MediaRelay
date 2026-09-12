@@ -1,4 +1,4 @@
-﻿using MediaRelay.Resources;
+﻿using MediaRelay.Resource;
 
 namespace MediaRelay.Content;
 

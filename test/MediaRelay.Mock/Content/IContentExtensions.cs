@@ -1,4 +1,4 @@
-﻿using MediaRelay.Resources;
+﻿using MediaRelay.Resource;
 using MediaRelay.Source;
 using Moq;
 

@@ -1,4 +1,4 @@
-﻿using MediaRelay.Resources;
+﻿using MediaRelay.Resource;
 using Microsoft.Extensions.Logging;
 using System.Collections.Frozen;
 

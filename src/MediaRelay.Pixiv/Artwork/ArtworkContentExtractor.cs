@@ -2,7 +2,7 @@
 using MediaRelay.Content.Extract;
 using MediaRelay.Http;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;

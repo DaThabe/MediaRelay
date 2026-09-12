@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Resources;
+﻿namespace MediaRelay.Resource;
 
 /// <summary>
 /// 媒体资源的唯一标识

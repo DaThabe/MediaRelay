@@ -1,8 +1,7 @@
 ﻿using MediaRelay.Http;
-using MediaRelay.Resources;
 using MediaRelay.Storage;
 
-namespace MediaRelay.Url.Resource;
+namespace MediaRelay.Resource;
 
 
 internal sealed class UrlResource(IHttpClient httpClient) : IUrlResource

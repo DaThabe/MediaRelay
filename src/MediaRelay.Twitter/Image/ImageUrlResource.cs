@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Http;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using MediaRelay.Storage;
 
 namespace MediaRelay.Twitter.Image;

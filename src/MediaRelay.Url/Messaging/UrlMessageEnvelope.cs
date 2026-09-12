@@ -1,7 +1,6 @@
-﻿using MediaRelay.Messaging;
-using MediaRelay.Messaging.Queue;
+﻿using MediaRelay.Messaging.Queue;
 
-namespace MediaRelay.Url.Messaging;
+namespace MediaRelay.Messaging;
 
 
 internal sealed record class UrlMessageEnvelope : IMessageEnvelope<UrlMessage, Uri>

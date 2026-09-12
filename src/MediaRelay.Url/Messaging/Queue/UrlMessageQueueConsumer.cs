@@ -1,9 +1,8 @@
 ﻿using MediaRelay.Messaging;
-using MediaRelay.Messaging.Queue;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay.Url.Messaging.Queue;
+namespace MediaRelay.Messaging.Queue;
 
 
 public sealed class UrlMessageQueueConsumer(

@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Extensions;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

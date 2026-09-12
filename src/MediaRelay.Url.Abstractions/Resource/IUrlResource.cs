@@ -1,4 +1,4 @@
-﻿namespace MediaRelay.Resources;
+﻿namespace MediaRelay.Resource;
 
 
 public interface IUrlResource : IResource

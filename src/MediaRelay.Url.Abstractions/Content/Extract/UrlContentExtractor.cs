@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Http;
-using MediaRelay.Resources;
+using MediaRelay.Resource;
 using MediaRelay.Source;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
