@@ -3,7 +3,8 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*'  # 推送 v 开头的 tag 时触发
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,13 +28,21 @@ jobs:
         run: dotnet test -c Release --no-build
       
       - name: Publish
-        run: dotnet publish -c Release -o ./publish
+        run: dotnet publish src/MediaRelay.Launcher -c Release -r win-x64 -o ./publish
+      
+      - name: Zip
+        run: Compress-Archive -Path ./publish/* -DestinationPath ./MediaRelay-Win64.zip
       
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: MediaRelay
-          path: ./publish
-
-      - name: Zip
-        run: Compress-Archive -Path ./publish/* -DestinationPath ./MediaRelay.zip
+          path: ./MediaRelay-Win64.zip
+      
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./MediaRelay-Win64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
