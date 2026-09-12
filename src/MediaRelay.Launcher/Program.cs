@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Reflection;
 
-Console.Title = $"MediaRelay v2026.09.13";
+Console.Title = GetVersionName();
 
 await Host.CreateDefaultBuilder(args)
     .ConfigureLogging(builder => builder
@@ -22,3 +23,14 @@ await Host.CreateDefaultBuilder(args)
         .AddClipboard()
     )
     .RunConsoleAsync();
+
+
+
+static string GetVersionName()
+{
+    var version = typeof(Program).Assembly
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+        ?.InformationalVersion ?? "unknown";
+
+    return $"MediaRelay v{version}";
+}

@@ -3,6 +3,9 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<UserSecretsId>5311a0ca-fb0e-452f-ba9c-dd10bb5c5b1b</UserSecretsId>
+		
+		<Version>2026.09.13</Version>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
