@@ -11,10 +11,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<!--调试文件-->
+	</PropertyGroup>
+
+	<!--调试文件-->
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DebugType>none</DebugType>
 		<DebugSymbols>false</DebugSymbols>
-
 	</PropertyGroup>
 
 

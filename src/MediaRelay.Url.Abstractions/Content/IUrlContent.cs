@@ -23,7 +23,7 @@ public interface IUrlContent : IContent
 }
 
 
-public abstract record class UrlContent : IUrlContent
+public record class UrlContent : IUrlContent
 {
     public required ContentId Id { get; init; }
     public required IUrlSource Source { get; init; }

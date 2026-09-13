@@ -36,6 +36,8 @@ public static class DependencyInjectionExtensions
             services.AddMessageQueueWithSender<UrlMessageQueue, UrlMessage, Uri>();
             services.AddHostedService<UrlMessageQueueConsumer>();
 
+            services.AddSingleton<IRelayContentCreator, RelayUrlContentCreator>();
+
             return services;
         }
     }

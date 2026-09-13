@@ -43,7 +43,7 @@ public static class DependencyInjectionExtensions
 
             services.AddSingleton<IUrlSourceParser, LinkSource.UrlParser>();
             services.AddSingleton<IContentExtractor, LinkContentExtractor>();
-            services.AddSingleton<IRelayContentCreator, LinkPublishContentConverter>();
+            //services.AddSingleton<IRelayContentCreator, LinkPublishContentConverter>();
 
 
             return services;

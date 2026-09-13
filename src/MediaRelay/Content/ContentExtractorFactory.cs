@@ -16,12 +16,11 @@ internal sealed class ContentExtractorFactory(
         foreach (var extractor in _extractors)
         {
             if (!extractor.CanExtract(source)) continue;
-            {
-                using var _ = logger.BeginScope("Extractor", extractor.GetType().Name);
-                logger.LogDebug("开始提取");
 
-                return await extractor.ExtractAsync(source, cancellationToken);
-            }
+            using var _ = logger.BeginScope("Extractor", extractor.GetType().Name);
+            logger.LogDebug("开始提取");
+
+            return await extractor.ExtractAsync(source, cancellationToken);
         }
 
         throw new NotSupportedException($"无法提取该输入: {source.GetType().Name}");

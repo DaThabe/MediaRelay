@@ -42,7 +42,8 @@ public static class DependencyInjectionExtensions
 
 
             services.AddSingleton<IUrlSourceParser, TweetSource.UrlParser>();
-            services.AddSingleton<IRelayContentCreator, TweetPublishContentConverter>();
+            //services.AddSingleton<IRelayContentCreator, TweetPublishContentConverter>();
+            //services.AddSingleton<IRelayContentCreator, RelayUrlContentCreator>();
             services.AddSingleton<IContentExtractor, TweetContentExtractor>();
 
 
