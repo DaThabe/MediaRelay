@@ -16,7 +16,8 @@ public interface IUrlPayload : IPayload
     new IUrlMetadata Metadata { get; }
 }
 
-public record class UrlPayload : IUrlPayload
+
+public record class DefaultUrlPayload : IUrlPayload
 {
     public required ContentId ContentId { get; init; }
     public required IReadOnlySet<StorageInfo> Resources { get; init; }

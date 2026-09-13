@@ -33,7 +33,7 @@ public static class DependencyInjectionExtensions
             // Relay
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
             // Payload
-            services.AddSingleton<IPayloadCreator, UrlPayloadCreator>();
+            services.AddSingleton<IPayloadCreator, DefaultUrlPayloadCreator>();
 
 
             // Messaging

@@ -28,7 +28,7 @@ public class UrlPayloadCreator<TUrlContent>(
         var resourceUris = await resourceStorage
             .StoreAllAsync(urlContent.Resources, cancellationToken);
 
-        return new UrlPayload()
+        return new DefaultUrlPayload()
         {
             Source = urlContent.Source,
             ContentId = urlContent.Id,
@@ -37,3 +37,7 @@ public class UrlPayloadCreator<TUrlContent>(
         };
     }
 }
+
+
+public class DefaultUrlPayloadCreator(
+    IResourceStorage resourceStorage) : UrlPayloadCreator<DefaultUrlContent>(resourceStorage);
