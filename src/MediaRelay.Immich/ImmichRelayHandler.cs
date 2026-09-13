@@ -1,6 +1,5 @@
 ﻿using Apigen.Immich.Client;
 using Apigen.Immich.Models;
-using MediaRelay.Metadata;
 using MediaRelay.Payload;
 using MediaRelay.Storage;
 using Microsoft.Extensions.Logging;
@@ -13,9 +12,9 @@ internal sealed class ImmichRelayHandler(
     ILogger<ImmichRelayHandler> logger
     ) : IPayloadHandler
 {
-    public bool CanRelay(IPayload payload) => true;
+    public bool CanHandle(IPayload payload) => true;
 
-    public async ValueTask RelayAsync(IPayload payload, CancellationToken cancellationToken = default)
+    public async ValueTask HandleAsync(IPayload payload, CancellationToken cancellationToken = default)
     {
         List<Guid> mediaIds = [];
 

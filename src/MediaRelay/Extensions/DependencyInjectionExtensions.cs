@@ -49,7 +49,7 @@ public static class DependencyInjectionExtensions
 
             // relay
             services.AddSingleton<IPayloadFactory, RelayPayloadFactory>();
-            services.AddSingleton<IPayloadRelayService, RelayService>();
+            services.AddSingleton<IPayloadRelayService, PayloadRelayService>();
 
             return services;
         }
