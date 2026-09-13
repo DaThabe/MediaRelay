@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.Twitter.Tweet;
 
 
-internal sealed partial record class TweetSource : UrlSource
+internal sealed partial record class TweetSource : DefaultUrlSource
 {
     public required string Username { get; init; }
     public required string TweetId { get; init; }

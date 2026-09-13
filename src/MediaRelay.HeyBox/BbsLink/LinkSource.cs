@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.HeyBox.BbsLink;
 
 
-internal sealed partial record class LinkSource : UrlSource
+internal sealed partial record class LinkSource : DefaultUrlSource
 {
     public required long LinkId { get; init; }
 

@@ -1,4 +1,5 @@
-﻿using MediaRelay.Resource;
+﻿using MediaRelay.Metadata;
+using MediaRelay.Resource;
 using MediaRelay.Source;
 
 namespace MediaRelay.Content;
@@ -12,4 +13,14 @@ public interface IContent
     ContentId Id { get; }
     ISource Source { get; }
     IReadOnlySet<IResource> Resources { get; }
+    IMetadata Metadata { get; }
+}
+
+
+public record class DefaultContent : IContent
+{
+    public required ContentId Id { get; init; }
+    public required ISource Source { get; init; }
+    public required IReadOnlySet<IResource> Resources { get; init; }
+    public required IMetadata Metadata { get; init; }
 }

@@ -1,5 +1,4 @@
 ﻿using MediaRelay.Http;
-using MediaRelay.Resource;
 using MediaRelay.Storage;
 
 namespace MediaRelay.Resource;

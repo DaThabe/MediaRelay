@@ -26,11 +26,15 @@ public static class DependencyInjectionExtensions
 
             
 
-
+            // Source
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
+            // Reource
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
+            // Relay
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
-            services.AddSingleton<IRelayPayloadCreator, RelayUrlContentCreator>();
+            // Payload
+            services.AddSingleton<IPayloadCreator, UrlPayloadCreator>();
+
 
             // Messaging
             services.AddOptions<UrlMessageQueueOptions>()

@@ -1,4 +1,6 @@
 ﻿using MediaRelay.Browser;
+using MediaRelay.Content.Builder;
+using MediaRelay.Metadata;
 using MediaRelay.Source;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -10,20 +12,19 @@ namespace MediaRelay.Content.Extract;
 /// </summary>
 /// <typeparam name="TUrlSource">网址来源类型</typeparam>
 public abstract class UrlContentExtractor<TUrlSource>(IBrowserService browserService) :
-    UrlContentExtractor<TUrlSource, UrlContentExtractorSnapshot, UrlContentBuilder, UrlContent>(browserService)
+    UrlContentExtractor<TUrlSource, DefaultUrlContentExtractorSnapshot, DefaultUrlContentBuilder, DefaultUrlContent, DefaultUrlMetadataBuilder, DefaultUrlMetadata>(browserService)
     where TUrlSource : IUrlSource
 {
-    protected override UrlContentBuilder CreateContentBuilder(TUrlSource source)
+    protected override DefaultUrlContentBuilder CreateContentBuilder(TUrlSource source)
     {
-        return new UrlContentBuilder(ContentId.Create(source.Id.ToString()), source);
+        return new DefaultUrlContentBuilder(ContentId.Create(source.Id.ToString()), source);
     }
 
-    protected override JsonTypeInfo<UrlContentExtractorSnapshot> GetScriptResultJsonTypeInfo()
+    protected override JsonTypeInfo<DefaultUrlContentExtractorSnapshot> GetScriptResultJsonTypeInfo()
     {
-        return UrlContentJsonSerializerContext.Default.UrlContentExtractorSnapshot;
+        return UrlContentJsonSerializerContext.Default.DefaultUrlContentExtractorSnapshot;
     }
 }
-
 
 
 [JsonSourceGenerationOptions(
@@ -32,5 +33,5 @@ public abstract class UrlContentExtractor<TUrlSource>(IBrowserService browserSer
     // 格式化输出
     WriteIndented = true
 )]
-[JsonSerializable(typeof(UrlContentExtractorSnapshot))]
+[JsonSerializable(typeof(DefaultUrlContentExtractorSnapshot))]
 internal partial class UrlContentJsonSerializerContext : JsonSerializerContext;

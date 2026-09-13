@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.Pixiv.Artwork;
 
 
-internal sealed partial record class ArtworkSource : UrlSource
+internal sealed partial record class ArtworkSource : DefaultUrlSource
 {
     public required long ArtworkId { get; init; }
 

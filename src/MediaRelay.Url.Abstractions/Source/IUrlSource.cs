@@ -8,7 +8,7 @@ public interface IUrlSource : ISource
     Uri Url { get; }
 }
 
-public abstract record class UrlSource : IUrlSource
+public record class DefaultUrlSource : IUrlSource
 {
     public required Uri Url { get; init; }
     public required SourceId Id { get; init; }

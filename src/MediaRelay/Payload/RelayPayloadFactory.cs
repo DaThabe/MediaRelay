@@ -5,13 +5,13 @@ namespace MediaRelay.Payload;
 
 
 internal sealed class RelayPayloadFactory(
-        IEnumerable<IRelayPayloadCreator> relayContentCreators,
+        IEnumerable<IPayloadCreator> relayContentCreators,
         ILogger<RelayPayloadFactory> logger
-    ) : IRelayPayloadFactory
+    ) : IPayloadFactory
 {
-    private readonly IRelayPayloadCreator[] _createtors = [.. relayContentCreators];
+    private readonly IPayloadCreator[] _createtors = [.. relayContentCreators];
 
-    public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
+    public async ValueTask<IPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {
         foreach (var creator in _createtors)
         {

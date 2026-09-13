@@ -5,13 +5,13 @@ namespace MediaRelay;
 
 
 internal sealed class RelayService(
-    IEnumerable<IRelayPayloadHandler> relayHandlers,
+    IEnumerable<IPayloadHandler> relayHandlers,
     ILogger<RelayService> logger
-    ) : IRelayService
+    ) : IPayloadRelayService
 {
-    private readonly IRelayPayloadHandler[] _relayHandlers = [.. relayHandlers];
+    private readonly IPayloadHandler[] _relayHandlers = [.. relayHandlers];
 
-    public async ValueTask RelayAsync(RelayPayload content, CancellationToken cancellationToken = default)
+    public async ValueTask RelayAsync(IPayload payload, CancellationToken cancellationToken = default)
     {
         if (_relayHandlers.Length == 0) return;
 
@@ -19,10 +19,10 @@ internal sealed class RelayService(
 
         foreach (var handler in _relayHandlers)
         {
-            if (!handler.CanRelay(content)) continue;
+            if (!handler.CanRelay(payload)) continue;
             using var _ = logger.BeginScope("Handler", handler.GetType().Name);
 
-            tasks.Add(handler.RelayAsync(content, cancellationToken).AsTask());
+            tasks.Add(handler.RelayAsync(payload, cancellationToken).AsTask());
         }
 
         await Task.WhenAll(tasks);

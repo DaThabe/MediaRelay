@@ -4,8 +4,8 @@ using MediaRelay.Payload;
 namespace MediaRelay;
 
 internal sealed class ContentRelayService(
-        IRelayPayloadFactory relayContentFactory,
-        IRelayService relayOrchestrator
+        IPayloadFactory relayContentFactory,
+        IPayloadRelayService relayOrchestrator
     ) : IContentRelayService
 {
     public async ValueTask RelayAsync(IContent content, CancellationToken cancellationToken = default)

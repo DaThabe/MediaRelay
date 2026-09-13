@@ -1,5 +1,7 @@
 ﻿using MediaRelay.Browser;
+using MediaRelay.Content.Builder;
 using MediaRelay.Http;
+using MediaRelay.Metadata;
 using MediaRelay.Resource;
 using MediaRelay.Source;
 using System.Text.Json;
@@ -11,21 +13,23 @@ namespace MediaRelay.Content.Extract;
 /// <summary>
 /// 自定义网址内容提取器
 /// </summary>
-/// <typeparam name="TUrlSource">网址内容类型</typeparam>
-/// <typeparam name="TUrlContentExtractorSnapshot">网址内容提取快照类型</typeparam>
-/// <typeparam name="TUrlContentBuilder">网址内容构建器类型</typeparam>
-/// <typeparam name="TUrlContent">网址内容类型</typeparam>
-public abstract class UrlContentExtractor<TUrlSource, TUrlContentExtractorSnapshot, TUrlContentBuilder, TUrlContent>(IBrowserService browserService) : IContentExtractor
-    where TUrlSource : IUrlSource
-    where TUrlContentExtractorSnapshot : IUrlContentExtractSnapshot
-    where TUrlContentBuilder : IUrlContentBuilder<TUrlContentBuilder, TUrlContent>
-    where TUrlContent : IUrlContent
+/// <typeparam name="TSource">网址内容类型</typeparam>
+/// <typeparam name="TContentExtractorSnapshot">网址内容提取快照类型</typeparam>
+/// <typeparam name="TContentBuilder">网址内容构建器类型</typeparam>
+/// <typeparam name="TContent">网址内容类型</typeparam>
+public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot, TContentBuilder, TContent, TMetadataBuilder, TMetadata>(IBrowserService browserService) : IContentExtractor
+    where TSource : IUrlSource
+    where TContentExtractorSnapshot : IUrlContentExtractSnapshot
+    where TContentBuilder : IUrlContentBuilder<TContentBuilder, TContent, TMetadataBuilder, TMetadata>
+    where TContent : IUrlContent
+    where TMetadataBuilder : IUrlMetadataBuilder<TMetadataBuilder, TMetadata, TContentBuilder, TContent>
+    where TMetadata : IUrlMetadata
 {
     public virtual bool CanExtract(ISource source) =>
-        source is TUrlSource;
+        source is TSource;
     public virtual async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
     {
-        if (source is not TUrlSource targetSource)
+        if (source is not TSource targetSource)
             throw new NotSupportedException($"不支持的推文来源: {source}");
 
         // Browser
@@ -48,10 +52,9 @@ public abstract class UrlContentExtractor<TUrlSource, TUrlContentExtractorSnapsh
         // Builder
         ArgumentNullException.ThrowIfNull(snapshot);
         var builder = CreateContentBuilder(targetSource)
-            .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
-            .SetTitle(snapshot.Title)
-            .SetContent(snapshot.Content)
-            .AddTags(snapshot.Tags)
+            .MetadataBuilder
+            .FromMetadata(snapshot.Metadata)
+            .ContentBuilder
             .AddResources(snapshot.Resources.Select(ToResource));
 
         // Context
@@ -74,8 +77,8 @@ public abstract class UrlContentExtractor<TUrlSource, TUrlContentExtractorSnapsh
     // 脚本文件路径
     protected abstract string GetScriptFilePath();
     // 脚本结果Json类型信息
-    protected abstract JsonTypeInfo<TUrlContentExtractorSnapshot> GetScriptResultJsonTypeInfo();
-    protected abstract TUrlContentBuilder CreateContentBuilder(TUrlSource source);
+    protected abstract JsonTypeInfo<TContentExtractorSnapshot> GetScriptResultJsonTypeInfo();
+    protected abstract TContentBuilder CreateContentBuilder(TSource source);
     // 资源转换
     protected abstract IResource ToResource(string resourceUrl);
     // 获取Cookie
@@ -89,15 +92,15 @@ public abstract class UrlContentExtractor<TUrlSource, TUrlContentExtractorSnapsh
 
     protected sealed class ExtractContext
     {
-        public required TUrlSource Source { get; init; }
+        public required TSource Source { get; init; }
         public required IBrowser Browser { get; init; }
         public required IBrowserContext BrowserContext { get; init; }
         public required IPage Page { get; init; }
 
         public required string ScriptFilePath { get; init; }
-        public required TUrlContentExtractorSnapshot ExtractorSnapshot { get; init; }
-        public required JsonTypeInfo<TUrlContentExtractorSnapshot> ScriptResultJsonTypeInfo { get; init; }
+        public required TContentExtractorSnapshot ExtractorSnapshot { get; init; }
+        public required JsonTypeInfo<TContentExtractorSnapshot> ScriptResultJsonTypeInfo { get; init; }
 
-        public required TUrlContentBuilder Builder { get; init; }
+        public required TContentBuilder Builder { get; init; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using MediaRelay.Metadata;
+using System.Text.Json.Serialization;
 
 namespace MediaRelay.Content.Extract;
 
@@ -9,18 +10,13 @@ namespace MediaRelay.Content.Extract;
 public interface IUrlContentExtractSnapshot
 {
     IReadOnlySet<string> Resources { get; }
-    string? Title { get; }
-    string? Content { get; }
-    DateTimeOffset? UploadAt { get; }
-    string? AuthorName { get; }
-    string? AuthorUrl { get; }
-    IReadOnlySet<string> Tags { get; }
+    IUrlMetadata Metadata { get; }
 }
 
 /// <summary>
 /// 网址内容提取快照
 /// </summary>
-public record class UrlContentExtractorSnapshot : IUrlContentExtractSnapshot
+public record class DefaultUrlContentExtractorSnapshot : IUrlContentExtractSnapshot
 {
     public required string[] Resources { get; init; }
     public string? Title { get; init; }
@@ -28,9 +24,22 @@ public record class UrlContentExtractorSnapshot : IUrlContentExtractSnapshot
     public DateTimeOffset? UploadAt { get; init; }
     public string? AuthorName { get; init; }
     public string? AuthorUrl { get; init; }
-    public string[] Tags{ get; init; } = [];
+    public string[] Tags { get; init; } = [];
 
 
-    [JsonIgnore] IReadOnlySet<string> IUrlContentExtractSnapshot.Resources => Resources.ToHashSet();
-    [JsonIgnore] IReadOnlySet<string> IUrlContentExtractSnapshot.Tags => Tags.ToHashSet();
+
+    [JsonIgnore]
+    IReadOnlySet<string> IUrlContentExtractSnapshot.Resources => Resources.ToHashSet();
+
+
+    [JsonIgnore]
+    IUrlMetadata IUrlContentExtractSnapshot.Metadata => new DefaultUrlMetadata()
+    {
+        AuthorName = AuthorName,
+        AuthorUrl = AuthorUrl is null ? null : new Uri(AuthorUrl),
+        Title = Title,
+        Description = Content,
+        PublishedAt = UploadAt,
+        Tags = Tags.ToHashSet()
+    };
 }
