@@ -11,6 +11,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
+		<!--调试文件-->
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+
 	</PropertyGroup>
 
 
