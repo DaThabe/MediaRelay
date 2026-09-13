@@ -1,4 +1,6 @@
-﻿namespace MediaRelay.Storage;
+﻿using MediaRelay.Storage.Hash;
+
+namespace MediaRelay.Storage;
 
 
 public record StorageInfo

@@ -1,12 +1,15 @@
 ﻿using MediaRelay.Content;
 
-namespace MediaRelay;
+namespace MediaRelay.Payload;
 
 
 /// <summary>
-/// 转发内容创建工厂
+/// 从内容创建转发数据
 /// </summary>
 public interface IRelayPayloadFactory
 {
+    /// <summary>
+    /// 从内容创建转发数据
+    /// </summary>
     ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default);
 }

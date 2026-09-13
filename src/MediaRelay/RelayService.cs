@@ -1,14 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediaRelay.Payload;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay;
 
 
 internal sealed class RelayService(
-    IEnumerable<IRelayHandler> relayHandlers,
+    IEnumerable<IRelayPayloadHandler> relayHandlers,
     ILogger<RelayService> logger
     ) : IRelayService
 {
-    private readonly IRelayHandler[] _relayHandlers = [.. relayHandlers];
+    private readonly IRelayPayloadHandler[] _relayHandlers = [.. relayHandlers];
 
     public async ValueTask RelayAsync(RelayPayload content, CancellationToken cancellationToken = default)
     {

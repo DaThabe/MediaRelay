@@ -8,8 +8,4 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Replay\" />
-	</ItemGroup>
-
 </Project>

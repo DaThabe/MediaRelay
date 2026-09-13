@@ -2,9 +2,12 @@
 using MediaRelay.Source;
 using MediaRelay.Storage;
 
-namespace MediaRelay;
+namespace MediaRelay.Payload;
 
 
+/// <summary>
+/// 转发数据
+/// </summary>
 public sealed record class RelayPayload
 {
     public required SourceId SourceId { get; init; }

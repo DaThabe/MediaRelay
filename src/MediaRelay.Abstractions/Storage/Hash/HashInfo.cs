@@ -1,10 +1,4 @@
-﻿namespace MediaRelay.Storage;
-
-public interface IHasher
-{
-    ValueTask<HashInfo> HashAsync(Stream stream, CancellationToken cancellationToken = default);
-}
-
+﻿namespace MediaRelay.Storage.Hash;
 
 public sealed record class HashInfo : IEquatable<HashInfo>
 {

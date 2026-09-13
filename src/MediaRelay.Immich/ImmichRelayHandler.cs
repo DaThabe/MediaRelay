@@ -1,5 +1,6 @@
 ﻿using Apigen.Immich.Client;
 using Apigen.Immich.Models;
+using MediaRelay.Payload;
 using MediaRelay.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -9,7 +10,7 @@ namespace MediaRelay.Immich;
 internal sealed class ImmichRelayHandler(
     ImmichApiClient apiClient,
     ILogger<ImmichRelayHandler> logger
-    ) : IRelayHandler
+    ) : IRelayPayloadHandler
 {
     public bool CanRelay(RelayPayload payload) => true;
 

@@ -1,15 +1,15 @@
 ﻿using MediaRelay.Content;
 using Microsoft.Extensions.Logging;
 
-namespace MediaRelay;
+namespace MediaRelay.Payload;
 
 
 internal sealed class RelayPayloadFactory(
-        IEnumerable<IRelayContentCreator> relayContentCreators,
+        IEnumerable<IRelayPayloadCreator> relayContentCreators,
         ILogger<RelayPayloadFactory> logger
     ) : IRelayPayloadFactory
 {
-    private readonly IRelayContentCreator[] _createtors = [.. relayContentCreators];
+    private readonly IRelayPayloadCreator[] _createtors = [.. relayContentCreators];
 
     public async ValueTask<RelayPayload> CreateAsync(IContent content, CancellationToken cancellationToken = default)
     {

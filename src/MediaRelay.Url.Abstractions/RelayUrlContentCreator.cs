@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Content;
+using MediaRelay.Payload;
 using MediaRelay.Storage;
 
 namespace MediaRelay;
@@ -8,7 +9,7 @@ namespace MediaRelay;
 /// </summary>
 /// <typeparam name="TUrlContent">网址内容类型</typeparam>
 public class RelayUrlContentCreator<TUrlContent>(
-    IResourceStorage resourceStorage) : IRelayContentCreator
+    IResourceStorage resourceStorage) : IRelayPayloadCreator
     where TUrlContent : IUrlContent
 {
     public bool CanCreate(IContent content) => content is TUrlContent;

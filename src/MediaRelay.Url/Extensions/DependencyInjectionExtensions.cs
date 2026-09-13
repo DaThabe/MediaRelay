@@ -1,6 +1,7 @@
 ﻿using MediaRelay;
 using MediaRelay.Messaging;
 using MediaRelay.Messaging.Queue;
+using MediaRelay.Payload;
 using MediaRelay.Resource;
 using MediaRelay.Source;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +30,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
-            services.AddSingleton<IRelayContentCreator, RelayUrlContentCreator>();
+            services.AddSingleton<IRelayPayloadCreator, RelayUrlContentCreator>();
 
             // Messaging
             services.AddOptions<UrlMessageQueueOptions>()
