@@ -20,6 +20,7 @@ public sealed class DefaultUrlContentBuilder(ContentId contentId, IUrlSource url
         };
     }
 }
+
 public sealed class DefaultUrlMetadataBuilder(DefaultUrlContentBuilder contentBuilder) :
     UrlMetadataBuilder<DefaultUrlMetadataBuilder, DefaultUrlMetadata, DefaultUrlContentBuilder, DefaultUrlContent>(contentBuilder)
 {

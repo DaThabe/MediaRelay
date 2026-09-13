@@ -13,7 +13,7 @@ internal sealed class LinkContentExtractor(
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
         IOptions<HeyBoxOptions> options
-    ) : UrlContentExtractor<LinkSource>(browserService)
+    ) : UrlSourceContentExtractor<LinkSource>(browserService)
 {
     protected override IEnumerable<HttpCookieOptions> GetCookies() =>
         options.Value.Http.Cookies;

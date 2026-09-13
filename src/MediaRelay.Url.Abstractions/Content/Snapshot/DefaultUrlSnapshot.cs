@@ -1,22 +1,9 @@
 ﻿using MediaRelay.Metadata;
 using System.Text.Json.Serialization;
 
-namespace MediaRelay.Content.Extract;
+namespace MediaRelay.Content.Snapshot;
 
-
-/// <summary>
-/// 网址内容提取快照
-/// </summary>
-public interface IUrlContentExtractSnapshot
-{
-    IReadOnlySet<string> Resources { get; }
-    IUrlMetadata Metadata { get; }
-}
-
-/// <summary>
-/// 网址内容提取快照
-/// </summary>
-public record class DefaultUrlContentExtractorSnapshot : IUrlContentExtractSnapshot
+public record class DefaultUrlSnapshot : IUrlSnapshot
 {
     public required string[] Resources { get; init; }
     public string? Title { get; init; }
@@ -29,11 +16,11 @@ public record class DefaultUrlContentExtractorSnapshot : IUrlContentExtractSnaps
 
 
     [JsonIgnore]
-    IReadOnlySet<string> IUrlContentExtractSnapshot.Resources => Resources.ToHashSet();
+    IReadOnlySet<string> IUrlSnapshot.Resources => Resources.ToHashSet();
 
 
     [JsonIgnore]
-    IUrlMetadata IUrlContentExtractSnapshot.Metadata => new DefaultUrlMetadata()
+    IUrlMetadata IUrlSnapshot.Metadata => new DefaultUrlMetadata()
     {
         AuthorName = AuthorName,
         AuthorUrl = AuthorUrl is null ? null : new Uri(AuthorUrl),

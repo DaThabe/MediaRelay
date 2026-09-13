@@ -13,7 +13,7 @@ internal sealed class TweetContentExtractor(
         ImageUrlResource.Factory factory,
         IUrlResourceFactory urlResourceFactory,
         IOptions<TwitterOptions> options
-    ) : UrlContentExtractor<TweetSource>(browserService)
+    ) : UrlSourceContentExtractor<TweetSource>(browserService)
 {
     protected override IEnumerable<HttpCookieOptions> GetCookies() =>
         options.Value.Http.Cookies;

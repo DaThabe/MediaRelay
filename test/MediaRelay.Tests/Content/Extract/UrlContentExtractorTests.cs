@@ -16,7 +16,7 @@ public sealed class UrlContentExtractorTests
 }
 
 
-file sealed class TestUrlContentExtractor(IBrowserService browserService) : UrlContentExtractor(browserService)
+file sealed class TestUrlContentExtractor(IBrowserService browserService) : DefaultUrlContentExtractor(browserService)
 {
     protected override IEnumerable<HttpCookieOptions> GetCookies()
     {

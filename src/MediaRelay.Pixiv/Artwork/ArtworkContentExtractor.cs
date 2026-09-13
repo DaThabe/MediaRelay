@@ -13,7 +13,7 @@ internal sealed class ArtworkContentExtractor(
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
         IOptions<PixivOptions> options
-    ) : UrlContentExtractor<ArtworkSource>(browserService)
+    ) : UrlSourceContentExtractor<ArtworkSource>(browserService)
 {
     protected override IEnumerable<HttpCookieOptions> GetCookies() =>
         options.Value.Http.Cookies;
