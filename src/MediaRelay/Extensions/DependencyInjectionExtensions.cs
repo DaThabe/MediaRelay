@@ -48,7 +48,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IContentRelayService, ContentRelayService>();
 
             // relay
-            services.AddSingleton<IPayloadFactory, RelayPayloadFactory>();
+            services.AddSingleton<IPayloadFactory, PayloadFactory>();
             services.AddSingleton<IPayloadRelayService, PayloadRelayService>();
 
             return services;

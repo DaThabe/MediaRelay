@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace MediaRelay.Content.Snapshot;
 
+
 public record class DefaultUrlSnapshot : IUrlSnapshot
 {
     public required string[] Resources { get; init; }
@@ -17,7 +18,6 @@ public record class DefaultUrlSnapshot : IUrlSnapshot
 
     [JsonIgnore]
     IReadOnlySet<string> IUrlSnapshot.Resources => Resources.ToHashSet();
-
 
     [JsonIgnore]
     IUrlMetadata IUrlSnapshot.Metadata => new DefaultUrlMetadata()

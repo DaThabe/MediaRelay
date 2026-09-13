@@ -4,9 +4,9 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay.Payload;
 
 
-internal sealed class RelayPayloadFactory(
+internal sealed class PayloadFactory(
         IEnumerable<IPayloadCreator> relayContentCreators,
-        ILogger<RelayPayloadFactory> logger
+        ILogger<PayloadFactory> logger
     ) : IPayloadFactory
 {
     private readonly IPayloadCreator[] _createtors = [.. relayContentCreators];
