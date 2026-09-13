@@ -5,10 +5,8 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.HeyBox.BbsLink;
 
 
-internal sealed partial record class LinkSource : IUrlSource
+internal sealed partial record class LinkSource : UrlSource
 {
-    public required SourceId Id { get; init; }
-    public required Uri Url { get; init; }
     public required long LinkId { get; init; }
 
     private LinkSource() { }
@@ -17,7 +15,7 @@ internal sealed partial record class LinkSource : IUrlSource
 // Factory
 internal sealed partial record class LinkSource
 {
-    internal sealed class UrlParser(IOptions<HeyBoxBbsLinkUrlOptions> options) : IUrlSourceParser
+    internal sealed class UrlSourceParser(IOptions<HeyBoxBbsLinkUrlOptions> options) : IUrlSourceParser
     {
         private readonly Regex _regex = new
         (

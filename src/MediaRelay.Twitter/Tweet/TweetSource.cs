@@ -5,10 +5,8 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.Twitter.Tweet;
 
 
-internal sealed partial record class TweetSource : IUrlSource
+internal sealed partial record class TweetSource : UrlSource
 {
-    public required SourceId Id { get; init; }
-    public required Uri Url { get; init; }
     public required string Username { get; init; }
     public required string TweetId { get; init; }
 
@@ -19,7 +17,7 @@ internal sealed partial record class TweetSource : IUrlSource
 // Factory
 internal sealed partial record class TweetSource
 {
-    internal sealed class UrlParser(IOptions<TwitterTweetUrlOptions> options) : IUrlSourceParser
+    internal sealed class UrlSourceParser(IOptions<TwitterTweetUrlOptions> options) : IUrlSourceParser
     {
         private readonly Regex _regex = new
         (

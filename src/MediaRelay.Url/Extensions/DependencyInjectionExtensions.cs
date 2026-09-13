@@ -23,20 +23,23 @@ public static class DependencyInjectionExtensions
                      .GetSection(UrlOptions.SectionPath)
                      .Bind(options));
 
-            services.AddOptions<UrlMessageQueueOptions>()
-                .Configure<IConfiguration>((options, configuration) => configuration
-                     .GetSection(UrlMessageQueueOptions.SectionPath)
-                     .Bind(options));
+            
 
 
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
             services.AddSingleton<IUrlRelayService, UrlRelayService>();
+            services.AddSingleton<IRelayContentCreator, RelayUrlContentCreator>();
+
+            // Messaging
+            services.AddOptions<UrlMessageQueueOptions>()
+                .Configure<IConfiguration>((options, configuration) => configuration
+                     .GetSection(UrlMessageQueueOptions.SectionPath)
+                     .Bind(options));
 
             services.AddMessageQueueWithSender<UrlMessageQueue, UrlMessage, Uri>();
             services.AddHostedService<UrlMessageQueueConsumer>();
 
-            services.AddSingleton<IRelayContentCreator, RelayUrlContentCreator>();
 
             return services;
         }

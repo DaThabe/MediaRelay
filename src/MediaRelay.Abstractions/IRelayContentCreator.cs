@@ -4,7 +4,7 @@ namespace MediaRelay;
 
 
 /// <summary>
-/// 转发内容创建者
+/// 从内容创建转发内容
 /// </summary>
 public interface IRelayContentCreator
 {

@@ -41,7 +41,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<OriginalImageUrlResource.Factory>();
 
 
-            services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlParser>();
+            services.AddSingleton<IUrlSourceParser, ArtworkSource.UrlSourceParser>();
             services.AddSingleton<IContentExtractor, ArtworkContentExtractor>();
             services.AddSingleton<IPixivDownloader, PixivDownloader>();
             //services.AddSingleton<IRelayContentCreator, ArtworkPublishContentConverter>();

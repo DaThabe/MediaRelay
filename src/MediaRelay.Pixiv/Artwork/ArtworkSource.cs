@@ -5,10 +5,8 @@ using System.Text.RegularExpressions;
 namespace MediaRelay.Pixiv.Artwork;
 
 
-internal sealed partial record class ArtworkSource : IUrlSource
+internal sealed partial record class ArtworkSource : UrlSource
 {
-    public required SourceId Id { get; init; }
-    public required Uri Url { get; init; }
     public required long ArtworkId { get; init; }
 
     private ArtworkSource() { }
@@ -17,7 +15,7 @@ internal sealed partial record class ArtworkSource : IUrlSource
 // Factory
 internal sealed partial record class ArtworkSource
 {
-    internal sealed class UrlParser(IOptions<PixivArtworkUrlOptions> options) : IUrlSourceParser
+    internal sealed class UrlSourceParser(IOptions<PixivArtworkUrlOptions> options) : IUrlSourceParser
     {
         private readonly Regex _regex = new
         (

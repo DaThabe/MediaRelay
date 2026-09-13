@@ -20,6 +20,7 @@ internal sealed class ArtworkContentExtractor(
 
     protected override string GetScriptFilePath() =>
         options.Value.Artwork.ExtractScriptPath;
+
     protected override IResource ToResource(string resourceUrl) =>
         factory.Create(parser.Parse(resourceUrl));
 

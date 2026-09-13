@@ -15,10 +15,14 @@ internal sealed class TweetContentExtractor(
         IOptions<TwitterOptions> options
     ) : UrlContentExtractor<TweetSource>(browserService)
 {
-    protected override IEnumerable<HttpCookieOptions> GetCookies() => options.Value.Http.Cookies;
-    protected override string GetScriptFilePath() => options.Value.Tweet.ExtractScriptPath;
-    protected override IResource ToResource(string resourceUrl) => factory.Create(parser.Parse(resourceUrl));
+    protected override IEnumerable<HttpCookieOptions> GetCookies() =>
+        options.Value.Http.Cookies;
 
+    protected override string GetScriptFilePath() =>
+        options.Value.Tweet.ExtractScriptPath;
+
+    protected override IResource ToResource(string resourceUrl) =>
+        factory.Create(parser.Parse(resourceUrl));
 
 
     protected override async ValueTask ExtractAsync(ExtractContext context, CancellationToken cancellationToken)

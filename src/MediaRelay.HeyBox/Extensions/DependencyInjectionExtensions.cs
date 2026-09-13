@@ -41,9 +41,8 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<OriginalImageUrlResource.Factory>();
 
 
-            services.AddSingleton<IUrlSourceParser, LinkSource.UrlParser>();
+            services.AddSingleton<IUrlSourceParser, LinkSource.UrlSourceParser>();
             services.AddSingleton<IContentExtractor, LinkContentExtractor>();
-            //services.AddSingleton<IRelayContentCreator, LinkPublishContentConverter>();
 
 
             return services;
