@@ -7,6 +7,7 @@ public static class UriExtensions
 {
     extension(Uri)
     {
+        public static Uri Empty => new Uri("", UriKind.Relative);
         public static Uri AboutBlank => new("about:blank");
         public static Uri TestHttpUrl => new("http://mock.mediarelay.com/");
         public static Uri TestHttpsUrl => new("http://mock.mediarelay.com/");

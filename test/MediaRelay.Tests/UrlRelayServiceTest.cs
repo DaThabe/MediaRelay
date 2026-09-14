@@ -1,5 +1,10 @@
-﻿using MediaRelay.Source;
-using MediaRelay.Url;
+﻿using MediaRelay.Messaging;
+using MediaRelay.Messaging.Envelope;
+using MediaRelay.Messaging.Queue;
+using MediaRelay.Source;
+using Microsoft.Extensions.Logging;
+using Moq;
+using System.Collections;
 
 namespace MediaRelay;
 
@@ -7,19 +12,42 @@ namespace MediaRelay;
 [TestClass]
 public class UrlRelayServiceTest
 {
+    private UrlRelayService _urlRelayService = null!;
+
+
+    [TestInitialize]
+    public async Task SetupAsync()
+    {
+        // UrlSource
+        var mockUrlSource = new Mock<IUrlSource>();
+
+        // UrlSourceFactory
+        var mockUrlSourceFactory = new Mock<IUrlSourceFactory>();
+        mockUrlSourceFactory.Setup(x => x.Create(It.IsAny<Uri>()))
+            .Returns(mockUrlSource.Object);
+
+        // SourceRelayService
+        var mockSourceRelayService = new Mock<ISourceRelayService>();
+
+        // Logger
+        var logger = Logger<UrlMessageQueue>.Create();
+
+        // Queue
+        _urlRelayService = new UrlRelayService(mockUrlSourceFactory.Object, mockSourceRelayService.Object);
+    }
+
+
+
     [TestMethod]
     public async Task RelayAsync_ShouldCompleteSuccessfully()
     {
+        // Arrange
         var url = Uri.TestHttpsUrl;
 
-        var urlSource = IUrlSource.Mock(SourceId.TestId, url);
-        var urlSourceFactory = IUrlSourceFactory.Mock(url, urlSource);
-
-        var sourceRelayService = ISourceRelayService.Mock(urlSource, TestContext.CancellationToken);
-
-        var urlRelayService = new UrlRelayService(urlSourceFactory, sourceRelayService);
-        await urlRelayService.RelayAsync(url, TestContext.CancellationToken);
+        // Act
+        await _urlRelayService.RelayAsync(url, TestContext.CancellationToken);
     }
+
 
     public TestContext TestContext { get; set; } = null!;
 }

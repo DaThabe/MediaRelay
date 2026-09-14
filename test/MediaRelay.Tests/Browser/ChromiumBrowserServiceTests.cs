@@ -1,5 +1,4 @@
-﻿using Castle.Core.Logging;
-using MediaRelay.Playwright;
+﻿using MediaRelay.Playwright;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;

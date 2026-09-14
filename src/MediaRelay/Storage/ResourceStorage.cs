@@ -1,5 +1,6 @@
 ﻿using MediaRelay.Resource;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.Collections.Frozen;
 
 namespace MediaRelay.Storage;
@@ -9,9 +10,6 @@ internal sealed class ResourceStorage(
     IStorage storage,
     ILogger<ResourceStorage> logger) : IResourceStorage
 {
-    /// <inheritdoc/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="ArgumentOutOfRangeException"/>
     public async ValueTask<IReadOnlyDictionary<ResourceId, StorageInfo>> StoreAllAsync(
         IEnumerable<IResource> resources,
         CancellationToken cancellationToken = default)
@@ -23,44 +21,48 @@ internal sealed class ResourceStorage(
             return FrozenDictionary<ResourceId, StorageInfo>.Empty;
         }
 
-
-        var index = 0;
-        var successed = 0;
-        var uris = new Dictionary<ResourceId, StorageInfo>();
-
-        using var _ = logger.BeginScope("ResourceCount", resourcesArray.Length);
-        logger.LogInformation("开始储存资源");
-
-        foreach (var resource in resourcesArray)
-        {
-            using var __ = logger.Scope("Index", index++)
-                .Add("Resource", resource)
+        using var _ = logger.Scope("Total", resourcesArray.Length)
                 .Begin();
+
+        var sequence = 0;
+        var uris = new ConcurrentDictionary<ResourceId, StorageInfo>();
+        var parallelOptions = new ParallelOptions()
+        {
+            MaxDegreeOfParallelism = 6,
+            CancellationToken = cancellationToken
+        };
+
+        await Parallel.ForEachAsync(resourcesArray, parallelOptions, async (resource, ct) =>
+        {
+            var currentSequence = Interlocked.Increment(ref sequence);
 
             try
             {
-                await using var stream = await resource
-                .GetStreamAsync(cancellationToken);
+                uris[resource.Id] = await StoreResourceAsync(resource, ct);
 
-
-                logger.LogInformation("正在储存资源");
-
-                var info = await storage
-                    .StoreAsync(stream, resource.Type, cancellationToken);
-
-                logger.LogInformation("资源储已储存");
-                uris[resource.Id] = info;
-                successed++;
+                if (logger.IsEnabled(LogLevel.Information))
+                {
+                    logger.LogInformation("资源已储存 ResourceId={ResourceId}, Sequence={Sequence}", resource.Id, currentSequence);
+                }
             }
-            catch (Exception ex)
+            catch (OperationCanceledException)
             {
-                logger.LogError(ex, "资源储失败");
+                logger.LogWarning("资源下载已取消 ResourceId={ResourceId}, Sequence={Sequence}", resource.Id, currentSequence);
+                throw;
             }
-        }
+        });
 
-        using var ___ = logger.BeginScope("Successed", successed);
-        logger.LogInformation("资源储存完毕");
+        logger.LogWarning("资源下载完成");
+        return uris.AsReadOnly();
+    }
 
-        return uris;
+
+    private async ValueTask<StorageInfo> StoreResourceAsync(IResource resource, CancellationToken cancellationToken)
+    {
+        await using var stream = await resource
+                     .GetStreamAsync(cancellationToken);
+
+        return await storage
+            .StoreAsync(stream, resource.Type, cancellationToken);
     }
 }

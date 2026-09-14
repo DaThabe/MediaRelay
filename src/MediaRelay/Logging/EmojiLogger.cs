@@ -8,12 +8,15 @@ internal sealed class EmojiLogger(string categoryName, ILoggerWriter writer) : I
 {
     private LoggerScope? _rootScope;
     private LoggerScope? _currentScope;
+    private Lock _beginScopeLock = new();
 
 
     public bool IsEnabled(LogLevel logLevel) => true;
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
+        using var _ = _beginScopeLock.EnterScope();
+
         if (state is not IDictionary<string, object> dict) return null;
 
         if (_rootScope is null)

@@ -5,7 +5,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Spectre.Console.Testing" />
+		<PackageReference Include="Moq" />
+		<PackageReference Include="Spectre.Console.Testing" />
+		<PackageReference Include="Microsoft.Extensions.Logging" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -16,7 +19,6 @@
 		<ProjectReference Include="..\..\src\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Url\MediaRelay.Url.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay\MediaRelay.csproj" />
-		<ProjectReference Include="..\MediaRelay.Mock\MediaRelay.Mock.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -15,4 +15,8 @@
 		<ProjectReference Include="..\..\src\MediaRelay.Url.Abstractions\MediaRelay.Url.Abstractions.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Extensions\" />
+	</ItemGroup>
+
 </Project>

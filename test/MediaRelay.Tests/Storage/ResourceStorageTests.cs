@@ -1,7 +1,6 @@
-﻿using MediaRelay.Extensions;
-using MediaRelay.Resource;
+﻿using MediaRelay.Resource;
+using MediaRelay.Storage.Hash;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace MediaRelay.Storage;
@@ -10,110 +9,143 @@ namespace MediaRelay.Storage;
 [TestClass]
 public class ResourceStorageTests
 {
-    [TestMethod]
-    public async Task StoreAllAsync_ShouldCompleteSuccessfully()
+    private ResourceStorage _resourceStorage = null!;
+
+
+    [TestInitialize]
+    public async Task SetupAsync()
     {
-        // Data
-        var resources = new IResource[]
+        var storageInfo = new StorageInfo()
         {
-            IResource.Mock(ResourceId.Create("1"), MediaType.Jpg, "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
-            IResource.Mock(ResourceId.Create("2"), MediaType.Png, "HelloWorld2!".ToMemoryStreamUTF8(), TestContext.CancellationToken),
-            IResource.Mock(ResourceId.Create("3"), MediaType.Mp4, "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken)
+            HashInfo = HashInfo.FromSHA256([0, 1, 2, 3, 4, 5, 6]),
+            MediaType = MediaType.Empty,
+            Size = 0,
+            Uri = Uri.Empty
         };
 
-        // Assert
-        var resourceStorage = GetResourceStorage();
-        var storageResources = await resourceStorage
+        // Storage
+        var mockStorage = new Mock<IStorage>();
+        mockStorage.Setup(x => x.StoreAsync(It.IsAny<Stream>(), It.IsAny<MediaType>(), It.IsAny<CancellationToken>()))
+            .Returns(new ValueTask<StorageInfo>(storageInfo));
+
+        // Logger
+        var logger = Logger<ResourceStorage>.Create();
+
+        // ResourceStorage
+        _resourceStorage = new ResourceStorage(mockStorage.Object, logger);
+    }
+
+
+
+    [TestMethod(DisplayName = "正常储存所有资源")]
+    public async Task StoreAllAsync_ShouldCompleteSuccessfully()
+    {
+        // Arrange
+        var mockResource1 = new Mock<IResource>();
+        mockResource1.Setup(x => x.Id).Returns(ResourceId.Create("1"));
+
+        var mockResource2 = new Mock<IResource>();
+        mockResource2.Setup(x => x.Id).Returns(ResourceId.Create("2"));
+
+        var mockResource3 = new Mock<IResource>();
+        mockResource3.Setup(x => x.Id).Returns(ResourceId.Create("3"));
+
+        var resources = new IResource[]
+        {
+            mockResource1.Object,
+            mockResource2.Object,
+            mockResource3.Object,
+        };
+
+        // Act
+        var storageResources = await _resourceStorage
             .StoreAllAsync(resources, TestContext.CancellationToken);
 
+        // Assert
         CollectionAssert.AreEquivalent(
             resources.Select(x => x.Id).ToArray(),
             storageResources.Select(x => x.Key).ToArray());
-
-        // Clean
-        CleanFiles([.. storageResources.Select(x => x.Value.Uri.LocalPath)]);
     }
 
-    [TestMethod]
-    public async Task StoreAllAsync_WhenOneResourceFails_ShouldStoreOthers()
-    {
-        // Resource
-        var mockExceptionResource = new Mock<IResource>();
-        mockExceptionResource.Setup(x => x.Id).Returns(ResourceId.Create("2"));
-        mockExceptionResource.Setup(x => x.Type).Returns(MediaType.Png);
-
-        static ValueTask<Stream> GetStreamWithException() => throw new InvalidOperationException("我是故意失败的");
-        mockExceptionResource.Setup(x => x.GetStreamAsync(TestContext.CancellationToken))
-            .Returns(GetStreamWithException);
-
-        var resource1 = IResource.Mock(ResourceId.Create("1"), MediaType.Jpg, "HelloWorld1!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
-        var resource2 = mockExceptionResource.Object;
-        var resource3 = IResource.Mock(ResourceId.Create("3"), MediaType.Mp4, "HelloWorld3!".ToMemoryStreamUTF8(), TestContext.CancellationToken);
-
-        // Data
-        IResource[] allResources = [resource1, resource2, resource3];
-        IResource[] successResources = [resource1, resource3];
-
-        // Assert
-        var resourceStorage = GetResourceStorage();
-        var storageResources = await resourceStorage
-            .StoreAllAsync(allResources, TestContext.CancellationToken);
-
-        CollectionAssert.AreEquivalent(
-            successResources.Select(x => x.Id).ToArray(),
-            storageResources.Select(x => x.Key).ToArray());
-
-        // Clean
-        CleanFiles([.. storageResources.Select(x => x.Value.Uri.LocalPath)]);
-    }
-
-    [TestMethod]
+    [TestMethod(DisplayName = "储存了资源空集合，返回空结果")]
     public async Task StoreAllAsync_WhenNoResources_ShouldReturnEmpty()
     {
-        var resourceStorage = GetResourceStorage();
-
-        // Assert
-        var result1 = await resourceStorage
+        // Act
+        var result = await _resourceStorage
             .StoreAllAsync(null!, TestContext.CancellationToken);
 
-        var result2 = await resourceStorage
-            .StoreAllAsync([], TestContext.CancellationToken);
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result);
 
-        Assert.IsNotNull(result1);
-        Assert.IsEmpty(result1);
-
-        Assert.IsNotNull(result2);
-        Assert.IsEmpty(result2);
-
-        Assert.HasCount(result1.Count, result2);
+        Assert.HasCount(0, result);
     }
 
-
-    private static ResourceStorage GetResourceStorage()
+    [TestMethod(DisplayName = "储存所有资源，其中一个抛异常，中断并抛出")]
+    public async Task StoreAllAsync_ResourceInnerException_StopStore_ThrowInnerException()
     {
-        // Storage
-        var tempFodler = Path.GetTempPath();
-        var options = IOptions<StorageOptions>.Mock(x =>x.RootPath = tempFodler);
-        var hasher = new SHA256Hasher();
-        var storageLogger = ILogger<Storage>.Create();
-        var storage = new Storage(options, hasher, storageLogger);
+        // Arrange
+        using var cts = new CancellationTokenSource();
 
+        var mockStream = new Mock<Stream>();
 
-        var resourceStorageLogger = ILogger<ResourceStorage>.Create();
-        return new ResourceStorage(storage, resourceStorageLogger);
+        var resource1 = new Mock<IResource>();
+        resource1.Setup(x => x.Id).Returns(ResourceId.Create("1"));
+        resource1.Setup(x => x.GetStreamAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockStream.Object);
+
+        var resource2 = new Mock<IResource>();
+        resource2.Setup(x => x.Id).Returns(ResourceId.Create("2"));
+        resource2.Setup(x => x.GetStreamAsync(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("模拟失败"));
+
+        var resource3 = new Mock<IResource>();
+        resource3.Setup(x => x.Id).Returns(ResourceId.Create("3"));
+
+        // Act
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
+            await _resourceStorage.StoreAllAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
+
+        // Assert
+        Assert.IsInstanceOfType<InvalidOperationException>(ex);
     }
 
-    private static void CleanFiles(List<string> filePaths)
+    [TestMethod(DisplayName = "储存所有资源，如果取消了则直接放弃储存")]
+    public async Task StoreAllAsync_WhenCanceledDuringProcessing_ShouldAbortRemaining()
     {
-        filePaths.ForEach(path =>
-        {
-            if (!File.Exists(path)) return;
+        // Arrange
+        using var cts = new CancellationTokenSource();
 
-            File.Delete(path);
-            System.Console.WriteLine($"文件已清理: {path}");
-        });
+        var mockStream = new Mock<Stream>();
+
+        var resource1 = new Mock<IResource>();
+        resource1.Setup(x => x.Id).Returns(ResourceId.Create("1"));
+        resource1.Setup(x => x.GetStreamAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(mockStream.Object);
+
+        var resource2 = new Mock<IResource>();
+        resource2.Setup(x => x.Id).Returns(ResourceId.Create("2"));
+        resource2.Setup(x => x.GetStreamAsync(It.IsAny<CancellationToken>()))
+            .Returns(async (CancellationToken ct) =>
+            {
+                await cts.CancelAsync();
+                ct.ThrowIfCancellationRequested();
+
+                return mockStream.Object;
+            });
+
+        var resource3 = new Mock<IResource>();
+        resource3.Setup(x => x.Id).Returns(ResourceId.Create("3"));
+
+        // Act
+        var ex = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
+            await _resourceStorage.StoreAllAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
+
+        // Assert
+        Assert.IsInstanceOfType<OperationCanceledException>(ex);
     }
 
 
-    public TestContext TestContext { get; set; } = null;
+
+    public TestContext TestContext { get; set; }
 }

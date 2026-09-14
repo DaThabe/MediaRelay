@@ -1,7 +1,5 @@
 ﻿using MediaRelay.Messaging.Envelope;
-using MediaRelay.Source;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 
 namespace MediaRelay.Messaging.Queue.UrlMessageQueueTests;
