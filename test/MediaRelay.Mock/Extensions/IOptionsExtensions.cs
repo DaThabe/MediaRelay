@@ -28,5 +28,11 @@ public static class IOptionsExtensions
 
             return Mock(options);
         }
+
+        public static IOptions<T> Mock()
+        {
+            var options = new T();
+            return Mock(options);
+        }
     }
 }

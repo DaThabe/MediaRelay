@@ -7,52 +7,106 @@ namespace MediaRelay.Browser;
 
 internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IPage
 {
+    private bool _disposed;
+
+    public bool IsClosed => page.IsClosed;
+
+
     public async ValueTask<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(
         string expression, object? arg = default, CancellationToken cancellationToken = default)
     {
-        await using var registration = cancellationToken.Register(async () =>
-        {
-            await page.CloseAsync();
-            logger.LogInformation("页面已取消");
-        });
-
-        return await page.EvaluateAsync<T>(expression, arg);
-    }
-    public async ValueTask<JsonElement?> EvaluateAsync(string expression, object? arg = null, CancellationToken cancellationToken = default)
-    {
-        await using var registration = cancellationToken.Register(async () =>
-        {
-            await page.CloseAsync();
-            logger.LogInformation("页面已取消");
-        });
-
-        return await page.EvaluateAsync(expression, arg);
-    }
-
-    public async ValueTask GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        await using var registration = cancellationToken.Register(async () =>
-        {
-            await page.CloseAsync();
-            logger.LogInformation("页面已取消");
-        });
+        ObjectDisposedException.ThrowIf(page.IsClosed, this);
 
         try
         {
-            await page.GotoAsync(url, Parse(options));
-            logger.LogInformation("页面已跳转");
-            return;
+            return await page.EvaluateAsync<T>(expression, arg)
+                .WaitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("页面脚本执行已取消");
+            await DisposeAsync();
+            throw;
         }
         catch (Exception)
         {
-            await page.CloseAsync();
+            await DisposeAsync();
+            throw;
+        }
+    }
+    public async ValueTask<JsonElement?> EvaluateAsync(string expression, object? arg = null, CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+
+        try
+        {
+            return await page.EvaluateAsync(expression, arg)
+                .WaitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("页面脚本执行已取消");
+            await DisposeAsync();
+            throw;
+        }
+        catch (Exception)
+        {
+            await DisposeAsync();
             throw;
         }
     }
 
-    public ValueTask DisposeAsync()
+    public async ValueTask GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
     {
-        return page.DisposeAsync();
+        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+
+        try
+        {
+            await page.GotoAsync(url, Parse(options))
+                .WaitAsync(cancellationToken);
+
+            logger.LogInformation("页面已跳转");
+            return;
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogWarning("页面已取消跳转");
+            await DisposeAsync();
+            throw;
+        }
+        catch (Exception)
+        {
+            await DisposeAsync();
+            throw;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        try
+        {
+            await page.DisposeAsync();
+            logger.LogDebug("页面已释放");
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "释放页面时出错");
+        }
+    }
+
+
+    private CancellationTokenRegistration BindingCancellationToken(CancellationToken cancellationToken)
+    {
+        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+
+        return cancellationToken.Register(async () =>
+        {
+            await DisposeAsync();
+            logger.LogInformation("页面已取消");
+        });
     }
 
 

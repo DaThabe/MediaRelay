@@ -8,11 +8,11 @@ namespace MediaRelay.Browser;
 
 internal sealed class ChromiumBrowserService(
     IPlaywrightService playwrightService,
-    IOptions<BrowserLaunchOptions> launchOptions,
-    IOptions<BrowserNewContextOptions> newContextOptions,
+    IOptions<BrowserOptions> browserOptions,
     ILogger<ChromiumBrowserService> logger
     ) : IBrowserService, IAsyncDisposable
 {
+    private bool _disposed;
     private SharedBrowserWrapper? _sharedBrowser;
     private SharedBrowserContextWrapper? _sharedBrowserContext;
     private readonly SemaphoreSlim _sharedBrowserLock = new(1, 1);
@@ -21,7 +21,9 @@ internal sealed class ChromiumBrowserService(
 
     public async ValueTask<IBrowser> GetSharedAsync()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (_sharedBrowser is not null) return _sharedBrowser;
+
 
         await _sharedBrowserLock.WaitAsync();
         try
@@ -31,7 +33,7 @@ internal sealed class ChromiumBrowserService(
 
             // 启动
             logger.LogInformation("正在启动共享浏览器");
-            var browser = await playwright.Chromium.LaunchAsync(Parse(launchOptions.Value));
+            var browser = await playwright.Chromium.LaunchAsync(Parse(browserOptions.Value.Launch));
             _sharedBrowser = new SharedBrowserWrapper(new Browser(browser, logger));
 
             // 完成
@@ -47,6 +49,7 @@ internal sealed class ChromiumBrowserService(
     }
     public async ValueTask<IBrowserContext> GetSharedContextAsync()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         if (_sharedBrowserContext is not null) return _sharedBrowserContext;
 
         await _sharedBrowserContextLock.WaitAsync();
@@ -57,7 +60,7 @@ internal sealed class ChromiumBrowserService(
 
             // 启动
             logger.LogInformation("正在创建浏览器共享上下文");
-            var browserContext = await sharedBrowser.NewContextAsync(newContextOptions.Value);
+            var browserContext = await sharedBrowser.NewContextAsync(browserOptions.Value.NewContext);
             logger.LogInformation("浏览器共享上下文已创建");
 
             return _sharedBrowserContext = new SharedBrowserContextWrapper(browserContext);
@@ -68,14 +71,16 @@ internal sealed class ChromiumBrowserService(
         }
     }
 
-
-
     public ValueTask<IBrowser> LaunchDefaultAsync()
     {
-        return LaunchAsync(launchOptions.Value);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        return LaunchAsync(browserOptions.Value.Launch);
     }
     public async ValueTask<IBrowser> LaunchAsync(BrowserLaunchOptions? options = null)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         var playwright = await playwrightService.GetPlaywrightAsync();
         var browser = await playwright.Chromium.LaunchAsync(Parse(options));
         logger.LogInformation("正在启动浏览器");
@@ -83,11 +88,14 @@ internal sealed class ChromiumBrowserService(
         return new Browser(browser, logger);
     }
 
-
     public async ValueTask DisposeAsync()
     {
+        if (_disposed) return;
+
         if (_sharedBrowser is not null) await _sharedBrowser.DisposeAsync();
         _sharedBrowserLock.Dispose();
+
+        _disposed = true;
 
         logger.LogDebug("浏览器业务已释放");
     }
@@ -106,6 +114,4 @@ internal sealed class ChromiumBrowserService(
             Args = options.Args,
         };
     }
-
-
 }

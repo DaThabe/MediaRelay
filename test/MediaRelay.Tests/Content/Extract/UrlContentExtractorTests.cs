@@ -11,7 +11,7 @@ public sealed class UrlContentExtractorTests
     [TestMethod]
     public void Fuck()
     {
-
+        //var a = new DefaultUrlContentExtractor();
     }
 }
 

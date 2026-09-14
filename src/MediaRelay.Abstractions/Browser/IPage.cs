@@ -5,6 +5,8 @@ namespace MediaRelay.Browser;
 
 public interface IPage : IAsyncDisposable
 {
+    bool IsClosed { get; }
+
     ValueTask GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default);
     ValueTask<JsonElement?> EvaluateAsync(string expression, object? arg = default, CancellationToken cancellationToken = default);
     ValueTask<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(

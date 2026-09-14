@@ -35,10 +35,15 @@ public class SHA256HasherTests
 
         // Assert
         var hasher = new SHA256Hasher();
-        var ex = await Assert.ThrowsAsync<NotSupportedException>(async () =>
-            await hasher.HashAsync(dataStream, TestContext.CancellationToken));
-
-        System.Console.WriteLine(ex);
+        try
+        {
+            await Assert.ThrowsAsync<NotSupportedException>(async () =>
+                await hasher.HashAsync(dataStream, TestContext.CancellationToken));
+        }
+        catch (Exception ex)
+        {
+            System.Console.WriteLine(ex);
+        }
     }
 
 

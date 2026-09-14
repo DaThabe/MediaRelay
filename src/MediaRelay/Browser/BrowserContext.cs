@@ -6,8 +6,12 @@ namespace MediaRelay.Browser;
 
 internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext context, ILogger logger) : IBrowserContext
 {
+    private bool _disposed;
+
     public async ValueTask<IPage> NewPageAsync()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         var page = await context.NewPageAsync();
         logger.LogDebug("新建页面");
 
@@ -15,7 +19,9 @@ internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext contex
     }
     public async ValueTask AddCookiesAsync(IEnumerable<HttpCookieOptions> cookieOptions)
     {
-        var cookies = cookieOptions.Select(Parse);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        var cookies = cookieOptions.Select(Parse).ToArray();
         await context.AddCookiesAsync(cookies);
 
         var cookieString = string.Join(',', cookies.Select(x => $"{x.Domain}/{x.Name}"));
@@ -24,7 +30,11 @@ internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext contex
     }
     public async ValueTask DisposeAsync()
     {
+        if (_disposed) return;
+
         await context.DisposeAsync();
+        _disposed = true;
+
         logger.LogDebug("浏览器上下文已释放");
     }
 
@@ -47,7 +57,6 @@ internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext contex
             SameSite = Parse(options.SameSite)
         };
     }
-
     private static Microsoft.Playwright.SameSiteAttribute? Parse(HttpCookieSameSite? options)
     {
         if (options is null) return null;

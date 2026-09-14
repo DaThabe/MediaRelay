@@ -5,10 +5,22 @@ namespace MediaRelay.Browser;
 
 internal sealed class Browser(Microsoft.Playwright.IBrowser browser, ILogger logger) : IBrowser
 {
-    public string Version => browser.Version;
+    private bool _disposed;
+
+    public string Version
+    {
+        get
+        {
+            ObjectDisposedException.ThrowIf(_disposed, this);
+            return browser.Version;
+        }
+    }
 
     public async ValueTask<IBrowserContext> NewContextAsync(BrowserNewContextOptions? options = null)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+
         var context = await browser.NewContextAsync(Parse(options));
         logger.LogDebug("已创建浏览器上下文");
 
@@ -17,7 +29,11 @@ internal sealed class Browser(Microsoft.Playwright.IBrowser browser, ILogger log
 
     public async ValueTask DisposeAsync()
     {
+        if (_disposed) return;
+
         await browser.DisposeAsync();
+        _disposed = true;
+
         logger.LogDebug("浏览器已释放");
     }
 
@@ -34,7 +50,7 @@ internal sealed class Browser(Microsoft.Playwright.IBrowser browser, ILogger log
 
     private static Microsoft.Playwright.ViewportSize? Parse(ViewportSize? size)
     {
-        if (size is null ) return null;
+        if (size is null) return null;
         return new() { Width = size.Value.Width, Height = size.Value.Height };
     }
 }
