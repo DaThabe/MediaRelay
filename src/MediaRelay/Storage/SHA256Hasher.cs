@@ -16,4 +16,14 @@ internal sealed class SHA256Hasher : IHasher
 
         return HashInfo.FromSHA256(data);
     }
+
+    public HashInfo Hash(ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.IsEmpty)
+            throw new ArgumentException("Hash 数据流不可为空", nameof(bytes));
+
+        var data = SHA256.HashData(bytes);
+
+        return HashInfo.FromSHA256(data);
+    }
 }

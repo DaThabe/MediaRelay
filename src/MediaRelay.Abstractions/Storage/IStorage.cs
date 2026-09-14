@@ -3,5 +3,6 @@
 
 public interface IStorage
 {
-    ValueTask<StorageInfo> StoreAsync(Stream stream, MediaType format, CancellationToken cancellationToken = default);
+    ValueTask<bool> ExistsAsync(MediaType mediaType, StorageFileName fileName, CancellationToken cancellationToken = default);
+    ValueTask<StorageInfo> StoreAsync(Stream stream, MediaType mediaType, StorageFileName fileName, CancellationToken cancellationToken = default);
 }

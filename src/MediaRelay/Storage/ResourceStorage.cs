@@ -2,12 +2,15 @@
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MediaRelay.Storage;
 
 
 internal sealed class ResourceStorage(
     IStorage storage,
+    IFileNameFactory fileNameCreator,
     ILogger<ResourceStorage> logger) : IResourceStorage
 {
     public async ValueTask<IReadOnlyDictionary<ResourceId, StorageInfo>> StoreAllAsync(
@@ -62,7 +65,10 @@ internal sealed class ResourceStorage(
         await using var stream = await resource
                      .GetStreamAsync(cancellationToken);
 
+        var fileName = fileNameCreator
+            .Create(resource);
+
         return await storage
-            .StoreAsync(stream, resource.Type, cancellationToken);
+            .StoreAsync(stream, resource.Type, fileName, cancellationToken);
     }
 }

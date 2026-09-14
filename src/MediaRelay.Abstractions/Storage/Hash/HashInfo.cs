@@ -1,4 +1,6 @@
-﻿namespace MediaRelay.Storage.Hash;
+﻿using System.Text.Json.Serialization;
+
+namespace MediaRelay.Storage.Hash;
 
 public sealed record class HashInfo : IEquatable<HashInfo>
 {
@@ -8,17 +10,17 @@ public sealed record class HashInfo : IEquatable<HashInfo>
 
 
 
-    public required string Algorithm { get; init; }
-    public required byte[] Data { get; init; }
+    public string Algorithm { get; init; }
+    public byte[] Data { get; init; }
 
 
-    public int Length => Data.Length;
-    public string HexString => Convert.ToHexString(Data).ToLowerInvariant();
-    public string Base64String => Convert.ToBase64String(Data);
+    [JsonIgnore] public int Length => Data.Length;
+    [JsonIgnore] public string HexString => Convert.ToHexString(Data).ToLowerInvariant();
+    [JsonIgnore] public string Base64String => Convert.ToBase64String(Data);
 
 
-
-    private HashInfo() { }
+    [JsonConstructor]
+    private HashInfo(string algorithm, byte[] data) => (Algorithm, Data) = (algorithm, data);
     public static HashInfo Create(string algorithm, ReadOnlySpan<byte> data)
     {
         if (string.IsNullOrWhiteSpace(algorithm))
@@ -27,11 +29,7 @@ public sealed record class HashInfo : IEquatable<HashInfo>
         if (data.Length == 0)
             throw new ArgumentException("Hash数据长度必须大于0");
 
-        return new()
-        {
-            Algorithm = algorithm.Trim().ToUpperInvariant(),
-            Data = data.ToArray()
-        };
+        return new(algorithm.Trim().ToUpperInvariant(), data.ToArray());
     }
     public static HashInfo FromSHA256(ReadOnlySpan<byte> data) =>
         Create(SHA256, data);

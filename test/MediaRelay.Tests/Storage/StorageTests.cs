@@ -21,9 +21,11 @@ public class StorageTests
         var bytes = Encoding.UTF8.GetBytes(content);
         await using var dataStream = new MemoryStream(bytes);
 
+        var fileName = StorageFileName.Create("123");
+
         // Storage
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(dataStream, mediaType, TestContext.CancellationToken);
+        var info = await storage.StoreAsync(dataStream, mediaType, fileName, TestContext.CancellationToken);
 
         // Assert
         dataStream.EnsureAtStart();
@@ -42,9 +44,11 @@ public class StorageTests
         await using var writeDataStream = new NonSeekableMemoryStream(bytes);
         await using var dataStream = new MemoryStream(bytes);
 
+        var fileName = StorageFileName.Create("123");
+
         // Act
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(writeDataStream, mediaType, TestContext.CancellationToken);
+        var info = await storage.StoreAsync(writeDataStream, mediaType, fileName, TestContext.CancellationToken);
 
         // Assert
         await AssertFileAndClearAsync(hasher, dataStream, mediaType, info, TestContext.CancellationToken);

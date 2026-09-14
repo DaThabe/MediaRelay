@@ -1,4 +1,6 @@
-﻿namespace MediaRelay.Storage;
+﻿using System.Text.Json.Serialization;
+
+namespace MediaRelay.Storage;
 
 
 public readonly record struct MediaType : IEquatable<MediaType>
@@ -28,10 +30,11 @@ public readonly record struct MediaType : IEquatable<MediaType>
     public string Extensions { get => field ?? string.Empty; init; }
 
 
-    public bool IsImage => Category == TypeCategory.Image;
-    public bool IsVideo => Category == TypeCategory.Video;
+    [JsonIgnore] public bool IsImage => Category == TypeCategory.Image;
+    [JsonIgnore] public bool IsVideo => Category == TypeCategory.Video;
 
 
+    [JsonConstructor]
     private MediaType(string extension, TypeCategory category) =>
         (Extensions, Category) = (extension, category);
     public override string ToString() => Extensions;

@@ -25,14 +25,17 @@ public class ResourceStorageTests
 
         // Storage
         var mockStorage = new Mock<IStorage>();
-        mockStorage.Setup(x => x.StoreAsync(It.IsAny<Stream>(), It.IsAny<MediaType>(), It.IsAny<CancellationToken>()))
+        mockStorage.Setup(x => x.StoreAsync(It.IsAny<Stream>(), It.IsAny<MediaType>(), It.IsAny<StorageFileName>(), It.IsAny<CancellationToken>()))
             .Returns(new ValueTask<StorageInfo>(storageInfo));
+
+        // FileNameFactory
+        var mockFileNameFactory = new Mock<IFileNameFactory>();
 
         // Logger
         var logger = Logger<ResourceStorage>.Create();
 
         // ResourceStorage
-        _resourceStorage = new ResourceStorage(mockStorage.Object, logger);
+        _resourceStorage = new ResourceStorage(mockStorage.Object, mockFileNameFactory.Object, logger);
     }
 
 
