@@ -84,10 +84,13 @@ internal sealed class ImmichRelayHandler(
     }
 
     // 打标签
-    private async Task TagAssetsAsync(Guid assetsId, IEnumerable<string?> tags, CancellationToken cancellationToken)
+    private async Task TagAssetsAsync(Guid assetsId, IReadOnlySet<string> tags, CancellationToken cancellationToken)
     {
+        var tagList = tags?.ToList() ?? [];
+        if (tagList.Count == 0) return;
+
         var upsertResults = await apiClient.Tags
-            .UpsertTagsAsync(new() { Tags = [.. tags] }, cancellationToken);
+            .UpsertTagsAsync(new() { Tags = tagList! }, cancellationToken);
 
         List<string> addedTags = [];
 

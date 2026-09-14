@@ -82,7 +82,7 @@ public abstract class UrlMetadataBuilder<TMetadataBuilder, TMetadata, TUrlConten
     }
     public TMetadataBuilder AddTags(params IEnumerable<string> tags)
     {
-        _tags.UnionWith(tags);
+        _tags.UnionWith(tags.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim()));
         return This();
     }
 
