@@ -61,11 +61,14 @@ public class StorageTests
         var tempFodler = Path.GetTempPath();
         var options = IOptions<StorageOptions>.Mock(x => x.RootPath = tempFodler);
 
+        // Options
+        var mockStorageInfoRepository = new Mock<IStorageInfoRepository>();
+
         // Logger
         var logger = ILogger<Storage>.Create();
 
         // Storage
-        return new Storage(options, hasher, logger);
+        return new Storage(options, hasher, mockStorageInfoRepository.Object, logger);
     }
 
     private static async Task AssertFileAndClearAsync(SHA256Hasher hasher, Stream content, MediaType mediaType, StorageInfo info, CancellationToken cancellationToken = default)

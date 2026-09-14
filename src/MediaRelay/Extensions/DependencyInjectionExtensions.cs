@@ -110,6 +110,7 @@ public static class DependencyInjectionExtensions
 
             services.AddSingleton<IHasher, SHA256Hasher>();
             services.AddSingleton<IFileNameFactory, FileNameFactory>();
+            services.AddSingleton<IStorageInfoRepository, StorageInfoRepository>();
 
             services.AddSingleton<IStorage, Storage>();
             services.AddSingleton<IResourceStorage, ResourceStorage>();
