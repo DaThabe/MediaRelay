@@ -1,6 +1,7 @@
-﻿namespace MediaRelay.Messaging;
+﻿namespace MediaRelay.Messaging.Envelope;
 
-internal sealed record class UrlMessageRetryCounter
+
+public sealed record class UrlMessageRetryCounter
 {
     public int CurrentCount { get; private set; }
     public required int MaxCount { get; init; }

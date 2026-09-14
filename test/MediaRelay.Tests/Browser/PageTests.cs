@@ -29,7 +29,6 @@ public sealed class PageTests
         // Logger
         _logger = ILogger<Page>.Create();
     }
-
     [TestCleanup]
     public void Cleanup()
     {

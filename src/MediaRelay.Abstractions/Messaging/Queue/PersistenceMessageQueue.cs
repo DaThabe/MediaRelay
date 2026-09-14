@@ -4,16 +4,24 @@ using Microsoft.Extensions.Logging;
 namespace MediaRelay.Messaging.Queue;
 
 
-public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
-    IMessageQueue<TMessage, TContent>, IMessageSender<TMessage, TContent>, IAsyncDisposable
-    where TMessage : IMessage<TContent>
-    where TEnvelope : IMessageEnvelope<TMessage, TContent>
+public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
+    IMessageQueue<TMessage, TContent>,
+    IMessageSender<TMessage, TContent>,
+    IAsyncDisposable
+        where TMessage : IMessage<TContent>
+        where TEnvelope : IMessageEnvelope<TMessage, TContent>
 {
+    private readonly IMessageEnvelopePersistence<TEnvelope, TMessage, TContent> _envelopePersistence;
+    private readonly IMessageEnvelopeCreator<TEnvelope, TMessage, TContent> _envelopeCreator;
+    private readonly IMessageEnqueueFilter<TMessage, TContent>? _enqueueFilter;
     private readonly ILogger? _logger;
-    private readonly CancellationTokenSource _innerTaskCts = new();
+
+
+    private bool _disposed;
     private readonly SemaphoreSlim _lock = new(1, 1);
-    private readonly TaskCompletionSource _loadTcs = new();
+    private Task? _initTask;
     private readonly AsyncManualResetEvent _newMessageEvent = new();
+
 
     private List<TEnvelope> _pendings = [];
     private List<TEnvelope> _deads = [];
@@ -22,47 +30,59 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
     public int Count => _pendings.Count;
 
 
-    protected PersistenceMessageQueue(ILogger? logger = null)
+    protected PersistenceMessageQueue(
+        IMessageEnvelopePersistence<TEnvelope, TMessage, TContent> envelopePersistence,
+        IMessageEnvelopeCreator<TEnvelope, TMessage, TContent> envelopeCreator,
+        IMessageEnqueueFilter<TMessage, TContent>? enqueueFilter = null,
+        ILogger? logger = null)
     {
+        _enqueueFilter = enqueueFilter;
+        _envelopeCreator = envelopeCreator;
+        _envelopePersistence = envelopePersistence;
         _logger = logger;
-        Task.Run(() => InitAsync(_innerTaskCts.Token), _innerTaskCts.Token);
     }
-
-
-
 
     public async ValueTask EnqueueAsync(TMessage message, CancellationToken cancellationToken = default)
     {
-        if (!CanEnqueue(message)) throw new InvalidOperationException("该消息禁止入队");
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(message);
+
+        if (!(_enqueueFilter?.CanEnqueue(message) ?? true))
+            throw new InvalidOperationException($"该消息禁止入队: {message.Id}");
 
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
+        using var __ = _logger?.BeginScope("MessageId", message.Id);
 
         // 从死信队列删除
-        _deads.RemoveAll(x => x.Message.Id == message.Id);
+        int removeCount = _deads.RemoveAll(x => x.Message.Id == message.Id);
 
-        if (_pendings.Find(x => x.Message.Id == message.Id) is not null)
+        // 加入等待队列
+        if (_pendings.Find(x => x.Message.Id == message.Id) is null)
+        {
+            if (!_envelopeCreator.CanCreate(message))
+                throw new InvalidOperationException($"该消息无法创建信封: {message.Id}");
+
+            var envelope = _envelopeCreator.Create(message);
+            _pendings.Add(envelope);
+            await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
+
+            _newMessageEvent.Set();
+            _logger?.LogDebug("消息已入队");
+        }
+        else
         {
             _logger?.LogWarning("消息已存在");
-            return;
+            if (removeCount == 0) return;
+
+            await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
         }
-
-        // 加入死信队列
-        var envelope = CreateEnvelope(message);
-        _pendings.Add(envelope);
-
-        await SaveAsync([.. _pendings, .. _deads], cancellationToken);
-        _newMessageEvent.Set();
-
-        // Log
-        using var __ = _logger?.BeginScope("Envelope", envelope);
-        _logger?.LogDebug("消息已入队");
     }
     public async ValueTask<TMessage> DequeueAsync(CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
 
-        while (!cancellationToken.IsCancellationRequested && !_innerTaskCts.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             await _lock.WaitAsync(cancellationToken);
             try
@@ -72,7 +92,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
                     var envelope = _pendings[0];
                     envelope.MarkProcessing();
 
-                    using var _ = _logger?.BeginScope("Envelope", envelope);
+                    using var _ = _logger?.BeginScope("MessageId", envelope.Message.Id);
                     _logger?.LogDebug("消息已出队");
 
 
@@ -94,6 +114,7 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
+        using var __ = _logger?.BeginScope("MessageId", messageId);
 
         var envelope = _pendings.FirstOrDefault(x => x.Message.Id == messageId);
         if (envelope is null)
@@ -106,15 +127,15 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
         _pendings.Remove(envelope);
 
         // Save
-        await SaveAsync([.. _pendings, .. _deads], cancellationToken);
+        await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
 
-        using var __ = _logger?.BeginScope("Envelope", envelope);
         _logger?.LogDebug("消息已确认");
     }
     public async ValueTask RejectAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
+        using var __ = _logger?.BeginScope("MessageId", messageId);
 
         // 查询信封
         var envelope = _pendings.Find(x => x.Message.Id == messageId);
@@ -126,83 +147,87 @@ public abstract class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
         // 先删除
         _pendings.Remove(envelope);
 
+        var hasRetry = false;
 
         if (envelope.TryRetry())
         {
             _pendings.Add(envelope);
-            _logger?.LogInformation("消息已重试");
+            hasRetry = true;
         }
         else
         {
             envelope.MarkRejected();
             if (_deads.Find(x => x.Message.Id == messageId) is null) _deads.Add(envelope);
-            _logger?.LogInformation("消息已拒绝");
         }
 
-        await SaveAsync([.. _pendings, .. _deads], cancellationToken);
+        await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
+
+        if (hasRetry) _logger?.LogDebug("消息将重试");
+        else _logger?.LogWarning("消息无法重试, 已拒绝");
     }
 
 
     public async ValueTask DisposeAsync()
     {
-        await _innerTaskCts.CancelAsync();
-        _innerTaskCts.Dispose();
+        if (_disposed) return;
+        _disposed = true;
+
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "持久化消息队列释放失败");
+        }
 
         GC.SuppressFinalize(this);
     }
 
 
-    bool IMessageSender<TMessage, TContent>.CanSend(TMessage message) => CanEnqueue(message);
-    ValueTask IMessageSender<TMessage, TContent>.SendAsync(TMessage message, CancellationToken cancellationToken) =>
-        EnqueueAsync(message, cancellationToken);
-
-
-    protected virtual bool CanEnqueue(TMessage message) => true;
-    protected abstract ValueTask<IEnumerable<TEnvelope>> LoadAsync(CancellationToken cancellationToken = default);
-    protected abstract ValueTask SaveAsync(IEnumerable<TEnvelope> envelopes, CancellationToken cancellationToken = default);
-    protected abstract TEnvelope CreateEnvelope(TMessage message);
+    bool IMessageSender<TMessage, TContent>.CanSend(TMessage message)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        return _enqueueFilter?.CanEnqueue(message) ?? true;
+    }
+    ValueTask IMessageSender<TMessage, TContent>.SendAsync(TMessage message, CancellationToken cancellationToken)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        return EnqueueAsync(message, cancellationToken);
+    }
 
 
     private async Task WaitForInitAsync(CancellationToken cancellationToken = default)
     {
-        await _loadTcs.Task.WaitAsync(cancellationToken);
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
+        _initTask ??= InitAsync(cancellationToken);
+        await _initTask.WaitAsync(cancellationToken);
     }
     private async Task InitAsync(CancellationToken cancellationToken)
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
-        try
+
+
+        var messages = await _envelopePersistence.LoadAsync(cancellationToken);
+
+        // 分类
+        var processings = new List<TEnvelope>();
+        var rejecteds = new List<TEnvelope>();
+        var pendings = new List<TEnvelope>();
+
+        foreach (var message in messages.OrderBy(x => x.CreateAt).ToArray())
         {
-            var messages = await LoadAsync(cancellationToken);
-
-            // 分类
-            var processings = new List<TEnvelope>();
-            var rejecteds = new List<TEnvelope>();
-            var pendings = new List<TEnvelope>();
-
-            foreach (var message in messages.OrderBy(x => x.CreateAt).ToArray())
-            {
-                if (message.Status is MessageEnvelopeStatus.Rejected) rejecteds.Add(message);
-                else if (message.Status is MessageEnvelopeStatus.Pending) pendings.Add(message);
-                else if (message.Status is MessageEnvelopeStatus.Processing) processings.Add(message);
-            }
-
-            // 初始化
-            _pendings = [.. processings, .. pendings];
-            _deads = rejecteds;
-
-            _loadTcs.TrySetResult();
+            if (message.Status is MessageEnvelopeStatus.Rejected) rejecteds.Add(message);
+            else if (message.Status is MessageEnvelopeStatus.Pending) pendings.Add(message);
+            else if (message.Status is MessageEnvelopeStatus.Processing) processings.Add(message);
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-            _loadTcs.TrySetCanceled(cancellationToken);
-            _logger?.LogInformation("数据初始化已取消");
-        }
-        catch (Exception ex)
-        {
-            _loadTcs.TrySetException(ex);
-        }
+
+        // 初始化
+        _pendings = [.. processings, .. pendings];
+        _deads = rejecteds;
     }
-
 
 
     private sealed class AsyncManualResetEvent

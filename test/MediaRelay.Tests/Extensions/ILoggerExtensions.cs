@@ -12,5 +12,7 @@ public static class ILoggerExtensions
         public static ILogger<T> Create() => _factory.CreateLogger<T>();
     }
 
-    private static readonly ILoggerFactory _factory = LoggerFactory.Create(x => x.AddEmojiConsole());
+    private static readonly ILoggerFactory _factory = LoggerFactory.Create(x => x
+        .AddEmojiConsole()
+        .SetMinimumLevel(LogLevel.Trace));
 }

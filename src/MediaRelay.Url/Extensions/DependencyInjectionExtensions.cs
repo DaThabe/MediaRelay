@@ -1,6 +1,8 @@
 ﻿using MediaRelay;
 using MediaRelay.Messaging;
+using MediaRelay.Messaging.Envelope;
 using MediaRelay.Messaging.Queue;
+using MediaRelay.Messaging.Queue.Envelope;
 using MediaRelay.Payload;
 using MediaRelay.Resource;
 using MediaRelay.Source;
@@ -24,7 +26,7 @@ public static class DependencyInjectionExtensions
                      .GetSection(UrlOptions.SectionPath)
                      .Bind(options));
 
-            
+
 
             // Source
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
@@ -42,7 +44,14 @@ public static class DependencyInjectionExtensions
                      .GetSection(UrlMessageQueueOptions.SectionPath)
                      .Bind(options));
 
+            // Productor
+            services.AddSingleton<IUrlMessageEnqueueFilter, UrlMessageEnqueueFilter>();
+            services.AddSingleton<IUrlMessageEnvelopeCreator, UrlMessageEnvelopeCreator>();
+            services.AddSingleton<IUrlMessageEnvelopePersistence, UrlMessageEnvelopePersistence>();
             services.AddMessageQueueWithSender<UrlMessageQueue, UrlMessage, Uri>();
+
+
+            // Consumer
             services.AddHostedService<UrlMessageQueueConsumer>();
 
 

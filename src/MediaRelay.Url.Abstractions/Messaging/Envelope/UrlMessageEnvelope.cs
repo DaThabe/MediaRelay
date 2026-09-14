@@ -1,9 +1,9 @@
 ﻿using MediaRelay.Messaging.Queue;
 
-namespace MediaRelay.Messaging;
+namespace MediaRelay.Messaging.Envelope;
 
 
-internal sealed record class UrlMessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
+public sealed record class UrlMessageEnvelope : IMessageEnvelope<UrlMessage, Uri>
 {
     private MessageEnvelopeStatus _status = MessageEnvelopeStatus.Pending;
 
