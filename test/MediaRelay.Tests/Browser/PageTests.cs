@@ -38,7 +38,7 @@ public sealed class PageTests
 
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "取消跳转页面抛出异常(OperationCanceledException)")]
     public async Task GotoAsync_Cancel_ThrowOperationCanceledException()
     {
         // Arrange
@@ -61,7 +61,8 @@ public sealed class PageTests
         // Assert
         Assert.IsTrue(page.IsClosed);
     }
-    [TestMethod]
+
+    [TestMethod(DisplayName = "取消页面脚本执行抛出异常(OperationCanceledException)")]
     public async Task EvaluateAsync_Cancel_ThrowOperationCanceledException()
     {
         // Arrange
@@ -82,7 +83,8 @@ public sealed class PageTests
         // Assert
         Assert.IsTrue(page.IsClosed);
     }
-    [TestMethod]
+    
+    [TestMethod(DisplayName = "取消页面脚本执行抛出异常(OperationCanceledException)")]
     public async Task EvaluateAsync_T_Cancel_ThrowOperationCanceledException()
     {
         // Arrange

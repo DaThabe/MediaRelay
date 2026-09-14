@@ -1,6 +1,7 @@
 ﻿using MediaRelay.Storage.Hash;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using System.Text;
 
 namespace MediaRelay.Storage;
@@ -9,7 +10,7 @@ namespace MediaRelay.Storage;
 [TestClass]
 public class StorageTests
 {
-    [TestMethod]
+    [TestMethod(DisplayName = "正常储存流数据")]
     public async Task StoreAsync_ShouldCompleteSuccessfully()
     {
         const string content = nameof(StoreAsync_ShouldCompleteSuccessfully);
@@ -29,7 +30,7 @@ public class StorageTests
         await AssertFileAndClearAsync(hasher, dataStream, mediaType, info, TestContext.CancellationToken);
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "储存不可定位的流数, 则拷贝数据到(MemoryStream)后储存")]
     public async Task StoreAsync_WhenStreamIsNotSeekable_ShouldCopyToMemoryStream()
     {
         const string content = nameof(StoreAsync_WhenStreamIsNotSeekable_ShouldCopyToMemoryStream);

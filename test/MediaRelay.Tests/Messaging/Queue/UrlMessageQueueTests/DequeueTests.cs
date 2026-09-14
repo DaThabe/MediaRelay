@@ -48,7 +48,7 @@ public sealed class DequeueTests
     }
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "出队后消息一致")]
     public async Task ShouldReturnEnqueuedMessage()
     {
         // Act
@@ -58,8 +58,8 @@ public sealed class DequeueTests
         Assert.AreEqual(_enqueueMessage.Id, dequeueMessage.Id);
     }
 
-    [TestMethod]
-    public async Task Cancel_ThrowOperationCanceledException()
+    [TestMethod(DisplayName = "取消出队后抛出异常")]
+    public async Task CancelToken_ThrowOperationCanceledException()
     {
         // Ararnge
         using var cts = new CancellationTokenSource();

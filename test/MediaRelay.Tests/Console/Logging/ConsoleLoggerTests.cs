@@ -7,7 +7,7 @@ namespace MediaRelay.Console.Logging;
 [TestClass]
 public sealed class ConsoleLoggerTests
 {
-    [TestMethod]
+    [TestMethod(DisplayName = "异常深度格式效果")]
     [DataRow(3)]
     [DataRow(5)]
     [DataRow(10)]
@@ -24,9 +24,7 @@ public sealed class ConsoleLoggerTests
         System.Console.Write(console.Output);
     }
 
-
-
-    private Exception CreateExceptionRecursive(int deep)
+    private static Exception CreateExceptionRecursive(int deep)
     {
         if (deep == 1)
             return new Exception($"最内层异常 (深度: {deep})");

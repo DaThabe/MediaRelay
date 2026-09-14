@@ -50,7 +50,7 @@ public sealed class EnqueueTests
 
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "正常入队")]
     public async Task ShouldEnqueue()
     {
         // Ararnge
@@ -63,7 +63,7 @@ public sealed class EnqueueTests
         Assert.AreEqual(1, _queue.Count);
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "不支持的消息抛出异常(InvalidOperationException)")]
     public async Task UnsupportedMessage_ShouldThrowInvalidOperationException()
     {
         //Ararnge
@@ -77,7 +77,7 @@ public sealed class EnqueueTests
         Assert.AreEqual(0, _queue.Count);
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "空消息抛出异常(ArgumentNullException)")]
     public async Task NullMessage_ShouldThrowArgumentNullException()
     {
         // Act  
@@ -88,7 +88,7 @@ public sealed class EnqueueTests
         Assert.AreEqual(0, _queue.Count);
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "取消入队后抛出异常(OperationCanceledException)")]
     public async Task CanceledToken_ShouldThrowOperationCanceledException()
     {
         // Ararnge

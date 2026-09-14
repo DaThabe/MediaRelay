@@ -52,8 +52,8 @@ public sealed class RejectTests
 
 
 
-    [TestMethod]
-    public async Task RejectAsync_WithRetryRemaining_ShouldRequeue()
+    [TestMethod(DisplayName = "拒绝一次后进入重试队列")]
+    public async Task WithRetryRemaining_ShouldRequeue()
     {
         // Act
         await _queue.RejectAsync(_dequeueMessage.Id, TestContext.CancellationToken);
@@ -63,8 +63,8 @@ public sealed class RejectTests
     }
 
 
-    [TestMethod]
-    public async Task RejectAsync_WhenRetryExhausted_ShouldMoveToDead()
+    [TestMethod(DisplayName = "拒绝到重试耗尽时进入死信队列")]
+    public async Task WhenRetryExhausted_ShouldMoveToDead()
     {
         // Act - 反复出队 + 拒绝，直到重试耗尽
         for (var i = 0; i <= _retryCount; i++)

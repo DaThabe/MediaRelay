@@ -8,7 +8,7 @@ namespace MediaRelay.Browser;
 [TestClass]
 public sealed class ChromiumBrowserServiceTests
 {
-    [TestMethod]
+    [TestMethod(DisplayName = "并发获取共享浏览器无异常")]
     public async Task GetSharedAsync_WhenCalledConcurrently_ShouldLaunchOnce()
     {
         for (var i = 0; i < 100; i++)

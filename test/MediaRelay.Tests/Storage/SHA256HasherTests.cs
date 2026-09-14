@@ -6,7 +6,7 @@ namespace MediaRelay.Storage;
 [TestClass]
 public class SHA256HasherTests
 {
-    [TestMethod]
+    [TestMethod(DisplayName = "正常Hash数据")]
     public async Task HashAsync_ShouldCompleteSuccessfully()
     {
         // Data
@@ -25,7 +25,7 @@ public class SHA256HasherTests
         CollectionAssert.AreEqual(hashData, hashInfo.Data);
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "Hash了不可定位的流抛出异常(NotSupportedException)")]
     public async Task HashAsync_NonSeekableStream_ThrowsInvalidOperationException()
     {
         // Data
@@ -47,7 +47,7 @@ public class SHA256HasherTests
     }
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "Hash了空数据流抛出异常(ArgumentNullException)")]
     public async Task HashAsync_NullSream_ThrowsArgumentNullException()
     {
         var hasher = new SHA256Hasher();

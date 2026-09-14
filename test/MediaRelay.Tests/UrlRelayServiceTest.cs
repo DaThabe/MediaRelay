@@ -38,7 +38,7 @@ public class UrlRelayServiceTest
 
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "正常转发网址")]
     public async Task RelayAsync_ShouldCompleteSuccessfully()
     {
         // Arrange

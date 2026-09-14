@@ -50,7 +50,7 @@ public sealed class AcknowledgeTests
     }
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "确认消息后从队列删除")]
     public async Task Acknowledge_ShouldRemoveMessage()
     {
         // Act
@@ -60,8 +60,8 @@ public sealed class AcknowledgeTests
         Assert.AreEqual(0, _queue.Count);
     }
 
-    [TestMethod]
-    public async Task Cancel_ThrowOperationCanceledException()
+    [TestMethod(DisplayName = "取消确认后抛出异常")]
+    public async Task CanceledToken_ShouldThrowOperationCanceledException()
     {
         // Ararnge
         using var cts = new CancellationTokenSource();

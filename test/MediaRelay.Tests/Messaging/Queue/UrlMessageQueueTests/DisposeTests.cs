@@ -41,7 +41,7 @@ public sealed class DisposeTests
     }
 
 
-    [TestMethod]
+    [TestMethod(DisplayName = "释放后入队抛出异常(ObjectDisposedException)")]
     public async Task EnqueueShouldThrowObjectDisposedException()
     {
         // Act + Assert
@@ -49,7 +49,7 @@ public sealed class DisposeTests
             await _queue.EnqueueAsync(Uri.AboutBlank, TestContext.CancellationToken));
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "释放后出队抛出异常(ObjectDisposedException)")]
     public async Task DequeueShouldThrowObjectDisposedException()
     {
         // Act + Assert
@@ -57,7 +57,7 @@ public sealed class DisposeTests
             await _queue.DequeueAsync(TestContext.CancellationToken));
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "释放后同意抛出异常(ObjectDisposedException)")]
     public async Task AcknowledgeShouldThrowObjectDisposedException()
     {
         // Arrange
@@ -68,7 +68,7 @@ public sealed class DisposeTests
             await _queue.AcknowledgeAsync(message.Id, TestContext.CancellationToken));
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "释放后拒绝抛出异常(ObjectDisposedException)")]
     public async Task RejectShouldThrowObjectDisposedException()
     {
         // Arrange
@@ -79,7 +79,7 @@ public sealed class DisposeTests
             await _queue.RejectAsync(message.Id, TestContext.CancellationToken));
     }
 
-    [TestMethod]
+    [TestMethod(DisplayName = "重复释放没有问题")]
     public async Task DisposeAgainShouldNotThrow()
     {
         // Act + Assert
