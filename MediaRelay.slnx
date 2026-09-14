@@ -14,7 +14,6 @@
     <Project Path="src/MediaRelay.Twitter/MediaRelay.Twitter.csproj" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="test/MediaRelay.Mock/MediaRelay.Mock.csproj" />
     <Project Path="test/MediaRelay.Tests/MediaRelay.Tests.csproj" />
   </Folder>
   <Project Path="src/MediaRelay.Launcher/MediaRelay.Launcher.csproj" />
