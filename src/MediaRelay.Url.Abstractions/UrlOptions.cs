@@ -16,6 +16,10 @@ public sealed record class UrlMessageQueueOptions
     public const string SectionPath = $"{UrlOptions.SectionPath}:{SectionName}";
 
 
-    public string File { get; set; } = "UrlMessages.json";
-    public int MessageRetryCount { get; set; } = 5;
+    public string FilePath { get; set; } = "UrlMessages.json";
+
+    public int RetryCount { get; set; } = 5;
+    public TimeSpan ErrorRetryDelay { get; set; } = TimeSpan.FromSeconds(1);
+
+    public TimeSpan ProcessingTimeout { get; set; } = TimeSpan.FromMinutes(2);
 }

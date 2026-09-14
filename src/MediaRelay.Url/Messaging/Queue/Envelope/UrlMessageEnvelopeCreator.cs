@@ -10,6 +10,6 @@ internal sealed class UrlMessageEnvelopeCreator(IOptions<UrlMessageQueueOptions>
 
     public UrlMessageEnvelope Create(UrlMessage message)
     {
-        return UrlMessageEnvelope.Create(message, UrlMessageRetryCounter.FromCount(options.Value.MessageRetryCount));
+        return UrlMessageEnvelope.Create(message, UrlMessageRetryCounter.FromCount(options.Value.RetryCount));
     }
 }

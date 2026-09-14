@@ -10,7 +10,7 @@ internal sealed class UrlMessageEnvelopePersistence(IOptions<UrlMessageQueueOpti
 {
     public async ValueTask<IEnumerable<UrlMessageEnvelope>> LoadAsync(CancellationToken cancellationToken = default)
     {
-        var filePath = options.Value.File;
+        var filePath = options.Value.FilePath;
         if (!File.Exists(filePath)) return [];
 
         var json = await File.ReadAllTextAsync(filePath, cancellationToken);
@@ -20,7 +20,7 @@ internal sealed class UrlMessageEnvelopePersistence(IOptions<UrlMessageQueueOpti
 
     public async ValueTask SaveAsync(IEnumerable<UrlMessageEnvelope> envelopes, CancellationToken cancellationToken = default)
     {
-        var filePath = options.Value.File;
+        var filePath = options.Value.FilePath;
         var json = JsonSerializer.Serialize([.. envelopes], UrlMessageQueueJsonSerializerContext.Default.UrlMessageEnvelopeArray);
 
         var folder = Path.GetDirectoryName(filePath);
