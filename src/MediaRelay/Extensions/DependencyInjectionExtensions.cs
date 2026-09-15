@@ -116,7 +116,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IHasher, SHA256Hasher>();
 
             // Media
-            services.AddSingleton<IMediaRepository, Storage>();
+            services.AddSingleton<IMediaRepository, MediaRepository>();
             services.AddSingleton<IMediaStorageInfoRepository, MediaStorageInfoRepository>();
 
 

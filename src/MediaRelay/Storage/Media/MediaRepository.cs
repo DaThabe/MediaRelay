@@ -1,16 +1,15 @@
 ﻿using MediaRelay.Storage.Hash;
-using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Media;
 
 
-internal sealed class Storage(
+internal sealed class MediaRepository(
     IOptions<StorageOptions> options,
     IHasher hasher,
     IMediaStorageInfoRepository storageInfoRepository,
-    ILogger<Storage> logger) : IMediaRepository
+    ILogger<MediaRepository> logger) : IMediaRepository
 {
     public ValueTask<bool> ExistsAsync(MediaType mediaType, StorageFileName fileName, CancellationToken cancellationToken = default)
     {

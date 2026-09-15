@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Media;
 
 
 public sealed class MediaStorageInfoRepository(
