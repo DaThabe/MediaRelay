@@ -1,9 +1,9 @@
 ﻿using MediaRelay.Storage.Hash;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Media;
 
 
-public record StorageInfo
+public record MediaStorageInfo
 {
     public required Uri Uri { get; init; }
     public required MediaType MediaType { get; init; }

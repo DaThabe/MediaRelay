@@ -1,5 +1,7 @@
 ﻿using MediaRelay.Resource;
 using MediaRelay.Storage.Hash;
+using MediaRelay.Storage.Media;
+using MediaRelay.Storage.Resource;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -15,7 +17,7 @@ public class ResourceStorageTests
     [TestInitialize]
     public async Task SetupAsync()
     {
-        var storageInfo = new StorageInfo()
+        var storageInfo = new MediaStorageInfo()
         {
             HashInfo = HashInfo.FromSHA256([0, 1, 2, 3, 4, 5, 6]),
             MediaType = MediaType.Empty,
@@ -24,12 +26,12 @@ public class ResourceStorageTests
         };
 
         // Storage
-        var mockStorage = new Mock<IStorage>();
-        mockStorage.Setup(x => x.StoreAsync(It.IsAny<Stream>(), It.IsAny<MediaType>(), It.IsAny<StorageFileName>(), It.IsAny<CancellationToken>()))
-            .Returns(new ValueTask<StorageInfo>(storageInfo));
+        var mockStorage = new Mock<IMediaRepository>();
+        mockStorage.Setup(x => x.AddAsync(It.IsAny<Stream>(), It.IsAny<MediaType>(), It.IsAny<StorageFileName>(), It.IsAny<CancellationToken>()))
+            .Returns(new ValueTask<MediaStorageInfo>(storageInfo));
 
         // FileNameFactory
-        var mockFileNameFactory = new Mock<IFileNameFactory>();
+        var mockFileNameFactory = new Mock<IResourceFileNameFactory>();
 
         // Logger
         var logger = Logger<ResourceStorage>.Create();
@@ -62,7 +64,7 @@ public class ResourceStorageTests
 
         // Act
         var storageResources = await _resourceStorage
-            .StoreAllAsync(resources, TestContext.CancellationToken);
+            .AddRangeAsync(resources, TestContext.CancellationToken);
 
         // Assert
         CollectionAssert.AreEquivalent(
@@ -75,7 +77,7 @@ public class ResourceStorageTests
     {
         // Act
         var result = await _resourceStorage
-            .StoreAllAsync(null!, TestContext.CancellationToken);
+            .AddRangeAsync(null!, TestContext.CancellationToken);
 
         // Assert
         Assert.IsNotNull(result);
@@ -107,7 +109,7 @@ public class ResourceStorageTests
 
         // Act
         var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await _resourceStorage.StoreAllAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
+            await _resourceStorage.AddRangeAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
 
         // Assert
         Assert.IsInstanceOfType<InvalidOperationException>(ex);
@@ -142,7 +144,7 @@ public class ResourceStorageTests
 
         // Act
         var ex = await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await _resourceStorage.StoreAllAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
+            await _resourceStorage.AddRangeAsync([resource1.Object, resource2.Object, resource3.Object], cts.Token));
 
         // Assert
         Assert.IsInstanceOfType<OperationCanceledException>(ex);

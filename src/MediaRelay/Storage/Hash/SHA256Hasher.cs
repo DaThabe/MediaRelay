@@ -1,7 +1,6 @@
-﻿using MediaRelay.Storage.Hash;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Hash;
 
 
 internal sealed class SHA256Hasher : IHasher

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Media;
 
 
 public readonly record struct MediaType : IEquatable<MediaType>

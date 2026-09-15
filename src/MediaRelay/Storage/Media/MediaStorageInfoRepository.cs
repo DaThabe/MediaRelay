@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Storage.Hash;
+using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -7,12 +8,12 @@ using System.Text.Json.Serialization;
 namespace MediaRelay.Storage;
 
 
-public sealed class StorageInfoRepository(
+public sealed class MediaStorageInfoRepository(
     IOptions<StorageOptions> options,
-    ILogger<StorageInfoRepository> logger
-    ) : IStorageInfoRepository
+    ILogger<MediaStorageInfoRepository> logger
+    ) : IMediaStorageInfoRepository
 {
-    public async ValueTask<StorageInfo?> FindAsync(StorageFileName fileName, MediaType mediaType, CancellationToken cancellationToken)
+    public async ValueTask<MediaStorageInfo?> FindAsync(StorageFileName fileName, MediaType mediaType, CancellationToken cancellationToken)
     {
         var metadataFullPath = GetMetadataFullPath(fileName, mediaType);
         if (!File.Exists(metadataFullPath)) return null;
@@ -23,7 +24,7 @@ public sealed class StorageInfoRepository(
             var metadata = JsonSerializer.Deserialize(metadataString, StorageMetadataJsonSerializerContext.Default.StorageMetadata);
             ArgumentNullException.ThrowIfNull(metadata);
 
-            return new StorageInfo()
+            return new MediaStorageInfo()
             {
                 HashInfo = HashInfo.Create(metadata.HashAlgorithm, metadata.HashData),
                 MediaType = mediaType,
@@ -38,7 +39,7 @@ public sealed class StorageInfoRepository(
         }
     }
 
-    public async ValueTask SetAsync(StorageFileName fileName, MediaType mediaType, StorageInfo storageInfo, CancellationToken cancellationToken)
+    public async ValueTask SetAsync(StorageFileName fileName, MediaType mediaType, MediaStorageInfo storageInfo, CancellationToken cancellationToken)
     {
         var metadataFullPath = GetMetadataFullPath(fileName, mediaType);
 

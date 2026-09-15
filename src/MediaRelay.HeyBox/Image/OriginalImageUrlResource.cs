@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Http;
 using MediaRelay.Resource;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Media;
 
 namespace MediaRelay.HeyBox.Image;
 

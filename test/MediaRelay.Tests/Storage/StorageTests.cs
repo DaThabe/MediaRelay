@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Storage.Hash;
+using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -25,7 +26,7 @@ public class StorageTests
 
         // Storage
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(dataStream, mediaType, fileName, TestContext.CancellationToken);
+        var info = await storage.AddAsync(dataStream, mediaType, fileName, TestContext.CancellationToken);
 
         // Assert
         dataStream.EnsureAtStart();
@@ -48,7 +49,7 @@ public class StorageTests
 
         // Act
         var storage = GetStorage(hasher);
-        var info = await storage.StoreAsync(writeDataStream, mediaType, fileName, TestContext.CancellationToken);
+        var info = await storage.AddAsync(writeDataStream, mediaType, fileName, TestContext.CancellationToken);
 
         // Assert
         await AssertFileAndClearAsync(hasher, dataStream, mediaType, info, TestContext.CancellationToken);
@@ -62,7 +63,7 @@ public class StorageTests
         var options = IOptions<StorageOptions>.Mock(x => x.RootPath = tempFodler);
 
         // Options
-        var mockStorageInfoRepository = new Mock<IStorageInfoRepository>();
+        var mockStorageInfoRepository = new Mock<IMediaStorageInfoRepository>();
 
         // Logger
         var logger = ILogger<Storage>.Create();
@@ -71,7 +72,7 @@ public class StorageTests
         return new Storage(options, hasher, mockStorageInfoRepository.Object, logger);
     }
 
-    private static async Task AssertFileAndClearAsync(SHA256Hasher hasher, Stream content, MediaType mediaType, StorageInfo info, CancellationToken cancellationToken = default)
+    private static async Task AssertFileAndClearAsync(SHA256Hasher hasher, Stream content, MediaType mediaType, MediaStorageInfo info, CancellationToken cancellationToken = default)
     {
         // Data
         var filePath = info.Uri.LocalPath;

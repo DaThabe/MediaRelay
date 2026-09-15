@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Content;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Resource;
 
 namespace MediaRelay.Payload;
 
@@ -7,7 +7,7 @@ namespace MediaRelay.Payload;
 /// <inheritdoc/>
 /// <typeparam name="TUrlContent">网址内容类型</typeparam>
 public class UrlContentPayloadCreator<TUrlContent>(
-    IResourceStorage resourceStorage) : IPayloadCreator
+    IResourceRepository resourceStorage) : IPayloadCreator
     where TUrlContent : IUrlContent
 {
     /// <summary>
@@ -26,7 +26,7 @@ public class UrlContentPayloadCreator<TUrlContent>(
 
         // 储存所有资源
         var resourceUris = await resourceStorage
-            .StoreAllAsync(urlContent.Resources, cancellationToken);
+            .AddRangeAsync(urlContent.Resources, cancellationToken);
 
         return new DefaultUrlPayload()
         {

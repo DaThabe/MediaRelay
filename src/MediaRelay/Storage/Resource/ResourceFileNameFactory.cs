@@ -2,10 +2,10 @@
 using MediaRelay.Storage.Hash;
 using System.Text;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Resource;
 
 
-internal sealed class FileNameFactory(IHasher hasher) : IFileNameFactory
+internal sealed class ResourceFileNameFactory(IHasher hasher) : IResourceFileNameFactory
 {
     public StorageFileName Create(IResource resource)
     {

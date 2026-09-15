@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Content;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Resource;
 
 namespace MediaRelay.Payload;
 
 public sealed class DefaultUrlPayloadCreator(
-    IResourceStorage resourceStorage) : UrlContentPayloadCreator<DefaultUrlContent>(resourceStorage);
+    IResourceRepository resourceStorage) : UrlContentPayloadCreator<DefaultUrlContent>(resourceStorage);

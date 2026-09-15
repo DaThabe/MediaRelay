@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization.Metadata;
 
-namespace MediaRelay.Serializer;
+namespace MediaRelay.Serialization;
 
 
 public interface IJsonSerializerFactory

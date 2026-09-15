@@ -1,4 +1,4 @@
-﻿using MediaRelay.Storage;
+﻿using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 

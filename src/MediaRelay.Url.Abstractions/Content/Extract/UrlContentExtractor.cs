@@ -1,7 +1,7 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Content.Snapshot;
 using MediaRelay.Http;
-using MediaRelay.Serializer;
+using MediaRelay.Serialization;
 using MediaRelay.Source;
 
 namespace MediaRelay.Content.Extract;

@@ -2,7 +2,7 @@
 using MediaRelay.Content.Builder;
 using MediaRelay.Content.Snapshot;
 using MediaRelay.Resource;
-using MediaRelay.Serializer;
+using MediaRelay.Serialization;
 using MediaRelay.Source;
 
 namespace MediaRelay.Content.Extract;

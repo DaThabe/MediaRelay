@@ -1,4 +1,5 @@
 ﻿using MediaRelay.Storage.Hash;
+using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -8,8 +9,8 @@ namespace MediaRelay.Storage;
 internal sealed class Storage(
     IOptions<StorageOptions> options,
     IHasher hasher,
-    IStorageInfoRepository storageInfoRepository,
-    ILogger<Storage> logger) : IStorage
+    IMediaStorageInfoRepository storageInfoRepository,
+    ILogger<Storage> logger) : IMediaRepository
 {
     public ValueTask<bool> ExistsAsync(MediaType mediaType, StorageFileName fileName, CancellationToken cancellationToken = default)
     {
@@ -17,7 +18,7 @@ internal sealed class Storage(
         return ValueTask.FromResult(File.Exists(path));
     }
 
-    public async ValueTask<StorageInfo> StoreAsync(
+    public async ValueTask<MediaStorageInfo> AddAsync(
         Stream stream,
         MediaType mediaType,
         StorageFileName fileName,
@@ -36,7 +37,7 @@ internal sealed class Storage(
         return storageInfo;
     }
 
-    private async Task<StorageInfo> SaveMediaAsycn(Stream stream, StorageFileName fileName, MediaType mediaType, CancellationToken cancellationToken)
+    private async Task<MediaStorageInfo> SaveMediaAsycn(Stream stream, StorageFileName fileName, MediaType mediaType, CancellationToken cancellationToken)
     {
         bool createdMemoryStream = false;
 
@@ -63,7 +64,7 @@ internal sealed class Storage(
             // 保存流
             var fullUri = await SaveStreamToFileAsync(stream, fullPath, cancellationToken);
 
-            return new StorageInfo()
+            return new MediaStorageInfo()
             {
                 HashInfo = hashInfo,
                 Uri = fullUri,

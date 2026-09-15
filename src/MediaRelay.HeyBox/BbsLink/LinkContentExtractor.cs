@@ -2,7 +2,7 @@
 using MediaRelay.Content.Extract;
 using MediaRelay.HeyBox.Image;
 using MediaRelay.Http;
-using MediaRelay.Serializer;
+using MediaRelay.Serialization;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.HeyBox.BbsLink;

@@ -1,6 +1,6 @@
 ﻿using MediaRelay.Browser;
 using MediaRelay.Resource;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Media;
 using MediaRelay.Twitter.Tweet;
 using Microsoft.Extensions.Options;
 

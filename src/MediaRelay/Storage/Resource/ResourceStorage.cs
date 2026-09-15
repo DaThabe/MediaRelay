@@ -1,19 +1,18 @@
 ﻿using MediaRelay.Resource;
+using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
-using System.Security.Cryptography;
-using System.Text;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Resource;
 
 
 internal sealed class ResourceStorage(
-    IStorage storage,
-    IFileNameFactory fileNameCreator,
-    ILogger<ResourceStorage> logger) : IResourceStorage
+    IMediaRepository storage,
+    IResourceFileNameFactory fileNameCreator,
+    ILogger<ResourceStorage> logger) : IResourceRepository
 {
-    public async ValueTask<IReadOnlyDictionary<ResourceId, StorageInfo>> StoreAllAsync(
+    public async ValueTask<IReadOnlyDictionary<ResourceId, MediaStorageInfo>> AddRangeAsync(
         IEnumerable<IResource> resources,
         CancellationToken cancellationToken = default)
     {
@@ -21,14 +20,14 @@ internal sealed class ResourceStorage(
         if (resourcesArray.Length == 0)
         {
             logger.LogWarning("储存了0个资源");
-            return FrozenDictionary<ResourceId, StorageInfo>.Empty;
+            return FrozenDictionary<ResourceId, MediaStorageInfo>.Empty;
         }
 
         using var _ = logger.Scope("Total", resourcesArray.Length)
                 .Begin();
 
         var sequence = 0;
-        var uris = new ConcurrentDictionary<ResourceId, StorageInfo>();
+        var uris = new ConcurrentDictionary<ResourceId, MediaStorageInfo>();
         var parallelOptions = new ParallelOptions()
         {
             MaxDegreeOfParallelism = 6,
@@ -60,7 +59,7 @@ internal sealed class ResourceStorage(
     }
 
 
-    private async ValueTask<StorageInfo> StoreResourceAsync(IResource resource, CancellationToken cancellationToken)
+    private async ValueTask<MediaStorageInfo> StoreResourceAsync(IResource resource, CancellationToken cancellationToken)
     {
         await using var stream = await resource
                      .GetStreamAsync(cancellationToken);
@@ -69,6 +68,6 @@ internal sealed class ResourceStorage(
             .Create(resource);
 
         return await storage
-            .StoreAsync(stream, resource.Type, fileName, cancellationToken);
+            .AddAsync(stream, resource.Type, fileName, cancellationToken);
     }
 }

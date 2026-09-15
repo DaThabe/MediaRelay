@@ -1,7 +1,7 @@
 ﻿using Apigen.Immich.Client;
 using Apigen.Immich.Models;
 using MediaRelay.Payload;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Media;
 using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Immich;
@@ -57,7 +57,7 @@ internal sealed class ImmichRelayHandler(
 
 
     // 上传媒体
-    private async Task<Guid> UploadMediaAsync(IPayload payload, StorageInfo storageInfo, CancellationToken cancellationToken)
+    private async Task<Guid> UploadMediaAsync(IPayload payload, MediaStorageInfo storageInfo, CancellationToken cancellationToken)
     {
         logger.LogInformation("开始上传媒体");
 
@@ -128,7 +128,7 @@ internal sealed class ImmichRelayHandler(
     }
 
     // 获取媒体创建Dto
-    private static async Task<AssetMediaCreateDto> GetMediaCreateDtoAsync(IPayload publishContent, StorageInfo info, CancellationToken cancellationToken)
+    private static async Task<AssetMediaCreateDto> GetMediaCreateDtoAsync(IPayload publishContent, MediaStorageInfo info, CancellationToken cancellationToken)
     {
         var fileFullPath = info.Uri.AbsolutePath;
         var bytes = await File.ReadAllBytesAsync(fileFullPath, cancellationToken);

@@ -1,4 +1,4 @@
-﻿using MediaRelay.Serializer;
+﻿using MediaRelay.Serialization;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;

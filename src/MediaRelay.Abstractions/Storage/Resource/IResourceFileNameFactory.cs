@@ -1,9 +1,9 @@
 ﻿using MediaRelay.Resource;
 
-namespace MediaRelay.Storage;
+namespace MediaRelay.Storage.Resource;
 
 
-public interface IFileNameFactory
+public interface IResourceFileNameFactory
 {
     StorageFileName Create(IResource resource);
 }

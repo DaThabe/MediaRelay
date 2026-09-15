@@ -2,7 +2,7 @@
 using MediaRelay.Content.Extract;
 using MediaRelay.Http;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Serializer;
+using MediaRelay.Serialization;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.Pixiv.Artwork;

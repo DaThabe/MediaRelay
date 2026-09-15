@@ -1,5 +1,5 @@
 ﻿using MediaRelay.Resource;
-using MediaRelay.Storage;
+using MediaRelay.Storage.Media;
 
 namespace MediaRelay.Pixiv.Image;
 

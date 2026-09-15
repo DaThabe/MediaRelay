@@ -1,4 +1,4 @@
-﻿using MediaRelay.Serializer;
+﻿using MediaRelay.Serialization;
 using System.Diagnostics.CodeAnalysis;
 
 namespace MediaRelay.Browser.Shared;

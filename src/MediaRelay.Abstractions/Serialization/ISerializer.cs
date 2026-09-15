@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace MediaRelay.Serializer;
+namespace MediaRelay.Serialization;
 
 
 /// <summary>

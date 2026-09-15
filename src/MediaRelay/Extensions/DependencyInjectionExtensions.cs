@@ -6,9 +6,11 @@ using MediaRelay.Logging;
 using MediaRelay.Messaging;
 using MediaRelay.Payload;
 using MediaRelay.Playwright;
-using MediaRelay.Serializer;
+using MediaRelay.Serialization;
 using MediaRelay.Storage;
 using MediaRelay.Storage.Hash;
+using MediaRelay.Storage.Media;
+using MediaRelay.Storage.Resource;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -112,11 +114,15 @@ public static class DependencyInjectionExtensions
                     .Bind(options));
 
             services.AddSingleton<IHasher, SHA256Hasher>();
-            services.AddSingleton<IFileNameFactory, FileNameFactory>();
-            services.AddSingleton<IStorageInfoRepository, StorageInfoRepository>();
 
-            services.AddSingleton<IStorage, Storage>();
-            services.AddSingleton<IResourceStorage, ResourceStorage>();
+            // Media
+            services.AddSingleton<IMediaRepository, Storage>();
+            services.AddSingleton<IMediaStorageInfoRepository, MediaStorageInfoRepository>();
+
+
+            // Resource
+            services.AddSingleton<IResourceFileNameFactory, ResourceFileNameFactory>();
+            services.AddSingleton<IResourceRepository, ResourceStorage>();
 
             return services;
         }
