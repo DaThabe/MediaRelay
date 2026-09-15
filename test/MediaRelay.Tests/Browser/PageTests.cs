@@ -66,19 +66,21 @@ public sealed class PageTests
     public async Task EvaluateAsync_Cancel_ThrowOperationCanceledException()
     {
         // Arrange
-        _mockPage.Setup(x => x.EvaluateAsync(It.IsAny<string>(), It.IsAny<object>()))
+        _mockPage.Setup(x => x.EvaluateAsync<string>(It.IsAny<string>(), It.IsAny<object>()))
             .Returns(async () =>
             {
                 await Task.Delay(TimeSpan.FromMinutes(1), _mockCts.Token);
-                return new JsonElement();
+                return string.Empty;
             });
 
         // Act
         await using var page = new Page(_mockPage.Object, _logger);
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await page.EvaluateAsync("2+2", cancellationToken: cts.Token));
+            await page.EvaluateAsync<string>("2+2", cancellationToken: cts.Token));
 
         // Assert
         Assert.IsTrue(page.IsClosed);
@@ -98,7 +100,9 @@ public sealed class PageTests
         // Act
         await using var page = new Page(_mockPage.Object, _logger);
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(50));
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
             await page.EvaluateAsync<string>("2+2", cancellationToken: cts.Token));
 
