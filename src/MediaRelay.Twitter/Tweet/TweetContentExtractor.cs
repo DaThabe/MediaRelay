@@ -19,7 +19,7 @@ internal sealed class TweetContentExtractor(
     protected override IServiceProvider ServiceProvider => serviceProvider;
     protected override IReadOnlySet<HttpCookieOptions> Cookies { get; } = options.Value.Http.Cookies.ToHashSet().AsReadOnly();
     protected override string ScriptFilePath { get; } = options.Value.Tweet.ExtractScriptPath;
-    protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url));
+    protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url, ImageSize.Original));
 
 
     protected override async ValueTask ExtractAsync(BuildContext context, CancellationToken cancellationToken)

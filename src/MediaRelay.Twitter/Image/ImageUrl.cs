@@ -12,7 +12,7 @@ internal sealed partial class ImageUrl
     public required MediaType MediaType { get; init; }
     public ImageSize Size { get; init; } = ImageSize.Original;
 
-
+    
     private ImageUrl(Uri url) => Uri = url;
     public override string ToString() => Uri.ToString();
 }
