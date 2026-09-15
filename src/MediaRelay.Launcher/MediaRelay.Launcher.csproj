@@ -4,7 +4,7 @@
 		<OutputType>Exe</OutputType>
 		<UserSecretsId>5311a0ca-fb0e-452f-ba9c-dd10bb5c5b1b</UserSecretsId>
 		
-		<Version>0.1.2</Version>
+		<Version>0.1.0</Version>
 		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
