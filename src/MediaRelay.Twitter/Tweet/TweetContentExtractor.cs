@@ -1,24 +1,22 @@
-﻿using MediaRelay.Browser;
-using MediaRelay.Content.Extract;
+﻿using MediaRelay.Content.Extract;
 using MediaRelay.Http;
-using MediaRelay.Serialization;
 using MediaRelay.Twitter.Image;
 using MediaRelay.Twitter.Video;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 namespace MediaRelay.Twitter.Tweet;
 
 
 internal sealed class TweetContentExtractor(
-        IPageSessionFactory pageSessionFactory,
-        IJsonSerializerFactory jsonSerializerFactory,
+        IServiceProvider serviceProvider,
         ImageUrl.Parser parser,
         ImageUrlResource.Factory factory,
         ITwitterVideoResourceFactory videoResourceFactory,
-        IOptions<TwitterOptions> options
-    ) : UrlSourceContentExtractor<TweetSource>
+        IOptions<TwitterOptions> options,
+        ILogger<TweetContentExtractor> logger
+    ) : UrlSourceContentExtractor<TweetSource>(logger)
 {
-    protected override IPageSessionFactory PageSessionFactory { get; } = pageSessionFactory;
-    protected override IJsonSerializerFactory JsonSerializerFactory { get; } = jsonSerializerFactory;
+    protected override IServiceProvider ServiceProvider => serviceProvider;
     protected override IReadOnlySet<HttpCookieOptions> Cookies { get; } = options.Value.Http.Cookies.ToHashSet().AsReadOnly();
     protected override string ScriptFilePath { get; } = options.Value.Tweet.ExtractScriptPath;
     protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url));

@@ -4,6 +4,8 @@ using MediaRelay.Content.Snapshot;
 using MediaRelay.Resource;
 using MediaRelay.Serialization;
 using MediaRelay.Source;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Content.Extract;
 
@@ -15,38 +17,39 @@ namespace MediaRelay.Content.Extract;
 public abstract class UrlSourceContentExtractor<TUrlSource> : UrlContentExtractor<TUrlSource, DefaultUrlSnapshot>
     where TUrlSource : IUrlSource
 {
-    protected abstract IJsonSerializerFactory JsonSerializerFactory { get; }
     protected override ISerializer<DefaultUrlSnapshot> SnapshotSerializer { get; }
     protected abstract UrlResourceParserHandler UrlResourceParser { get; }
 
 
-    protected UrlSourceContentExtractor()
+    protected UrlSourceContentExtractor(ILogger logger) : base(logger)
     {
-        SnapshotSerializer = JsonSerializerFactory.Create(DefaultUrlSnapshotJsonSerializerContext.Default.DefaultUrlSnapshot);
+        SnapshotSerializer = ServiceProvider
+            .GetRequiredService<IJsonSerializerFactory>()
+            .Create(DefaultUrlSnapshotJsonSerializerContext.Default.DefaultUrlSnapshot);
     }
 
 
-    protected override async ValueTask<IUrlContent> ExtractAsync(ExtractContext context, CancellationToken cancellationToken)
+    protected override async ValueTask<IUrlContent> ExtractAsync(ExtractContext extractContext, CancellationToken cancellationToken)
     {
-        var builder = new DefaultUrlContentBuilder(ContentId.Create(context.Source.Id.ToString()), context.Source);
-        IUrlSnapshot urlSnapshot = context.ContentSnapshot;
+        var builder = new DefaultUrlContentBuilder(ContentId.Create(extractContext.Source.Id.ToString()), extractContext.Source);
+        IUrlSnapshot urlSnapshot = extractContext.ContentSnapshot;
 
         builder.AddResources(urlSnapshot.Resources.Select(x => UrlResourceParser(x)));
         builder.MetadataBuilder.FromSnapshot(urlSnapshot);
 
-        var newContext = new BuildContext()
+        var builderContext = new BuildContext()
         {
-            Source = context.Source,
-            PageSession = context.PageSession,
-            ContentSnapshot = context.ContentSnapshot,
+            Source = extractContext.Source,
+            PageSession = extractContext.PageSession,
+            ContentSnapshot = extractContext.ContentSnapshot,
             ContentBuilder = builder,
         };
 
-        await ExtractAsync(context, cancellationToken);
-        return newContext.ContentBuilder.Build();
+        await ExtractAsync(builderContext, cancellationToken);
+        return builderContext.ContentBuilder.Build();
     }
 
-    protected virtual ValueTask ExtractAsync(BuildContext context, CancellationToken cancellationToken) =>
+    protected virtual ValueTask ExtractAsync(BuildContext builderContext, CancellationToken cancellationToken) =>
         ValueTask.CompletedTask;
 
 

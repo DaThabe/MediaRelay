@@ -3,6 +3,8 @@ using MediaRelay.Content.Snapshot;
 using MediaRelay.Http;
 using MediaRelay.Serialization;
 using MediaRelay.Source;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Content.Extract;
 
@@ -17,12 +19,24 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
     where TSource : IUrlSource
     where TContentExtractorSnapshot : IUrlSnapshot
 {
-    protected abstract IReadOnlySet<HttpCookieOptions> Cookies { get; }
-    protected abstract IPageSessionFactory PageSessionFactory { get; }
-    protected abstract string ScriptFilePath { get; }
+    private readonly ILogger _logger;
+
+    protected abstract IServiceProvider ServiceProvider { get; }
+    protected virtual IPageSessionFactory PageSessionFactory { get; }
+    protected virtual IUrlContentRepository UrlContentRepository { get; }
+
+
     protected abstract ISerializer<TContentExtractorSnapshot> SnapshotSerializer { get; }
+    protected abstract IReadOnlySet<HttpCookieOptions> Cookies { get; }
+    protected abstract string ScriptFilePath { get; }
 
 
+    protected UrlContentExtractor(ILogger logger)
+    {
+        _logger = logger;
+        PageSessionFactory = ServiceProvider.GetRequiredService<IPageSessionFactory>();
+        UrlContentRepository = ServiceProvider.GetRequiredService<IUrlContentRepository>();
+    }
 
     public virtual bool CanExtract(IUrlSource source) =>
         source is TSource;
@@ -31,6 +45,16 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
     {
         if (source is not TSource targetSource)
             throw new NotSupportedException($"不支持的网址来源: {source}");
+
+        using var _ = _logger.BeginScope("SourceId", source.Id);
+
+        // 使用缓存
+        var content = await UrlContentRepository.FindAsync(source, cancellationToken);
+        if (content is not null)
+        {
+            _logger.LogInformation("已使用缓存内容");
+            return content;
+        }
 
         // Goto
         await using var pageSession = await PageSessionFactory.CreateAsync();
@@ -48,10 +72,15 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
             ContentSnapshot = snapshot
         };
 
-        return await ExtractAsync(context, cancellationToken);
+        // 缓存
+        content = await ExtractAsync(context, cancellationToken);
+        await UrlContentRepository.AddAsync(content, cancellationToken);
+        _logger.LogInformation("已经缓存内容");
+
+        return content;
     }
 
-    protected abstract ValueTask<IUrlContent> ExtractAsync(ExtractContext context, CancellationToken cancellationToken);
+    protected abstract ValueTask<IUrlContent> ExtractAsync(ExtractContext extractContext, CancellationToken cancellationToken);
 
 
     protected readonly struct ExtractContext

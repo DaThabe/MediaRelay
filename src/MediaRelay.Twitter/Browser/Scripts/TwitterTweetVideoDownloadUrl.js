@@ -4,7 +4,7 @@
     const waitForInput = () => {
         return new Promise((resolve) => {
             const check = () => {
-                const tweet = document.querySelector("input[id='s_input']");
+                const tweet = document.querySelector("input[type='text']");
                 if (tweet) {
                     resolve(true);
                 } else {
@@ -18,15 +18,14 @@
 
     // div.container-main button
     // 输入框
-    var inputBox = document.querySelector("input[id='s_input']");
+    var inputBox = document.querySelector("input[type='text']");
     // 搜索按钮
-    var searchButton = document.querySelector("button[class='btn-red']");
+    var searchButton = document.querySelector("button[type='button']");
 
     if (!inputBox || !searchButton) return;
 
     // 输入后点击
     inputBox.value = url;
-
     await new Promise(resolve => setTimeout(resolve, 1000));
     searchButton.click();
 

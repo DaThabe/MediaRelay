@@ -1,26 +1,27 @@
 ﻿using MediaRelay.Source;
-using MediaRelay.Storage.Hash;
+using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Content;
 
 
-//internal sealed class UrlContentRepository(IHasher hasher) : IUrlContentRepository
-//{
-//    public ValueTask<IUrlContent?> FindAsync(SourceId sourceId, CancellationToken cancellationToken = default)
-//    {
-//        hasher
-
-//        sourceId.ToString()
-//    }
-
-//    public ValueTask SetAsync(IUrlContent content, CancellationToken cancellationToken = default)
-//    {
-//        throw new NotImplementedException();
-//    }
+internal sealed class UrlContentRepository(ILogger<UrlContentRepository> logger) : IUrlContentRepository
+{
+    private readonly Dictionary<SourceId, IUrlContent> _cache = [];
 
 
-//    private void GetContentFilePath(SourceId sourceId)
-//    {
-//        sourceId.ToString();
-//    }
-//}
+    public ValueTask<IUrlContent?> FindAsync(IUrlSource source, CancellationToken cancellationToken = default)
+    {
+        _cache.TryGetValue(source.Id, out var content);
+        return new ValueTask<IUrlContent?>(content);
+    }
+
+    public ValueTask AddAsync(IUrlContent content, CancellationToken cancellationToken = default)
+    {
+        _cache.Add(content.Source.Id, content);
+
+        using var _ = logger.BeginScope("ContentId", content.Id);
+        logger.LogTrace("添加了网址内容");
+
+        return ValueTask.CompletedTask;
+    }
+}

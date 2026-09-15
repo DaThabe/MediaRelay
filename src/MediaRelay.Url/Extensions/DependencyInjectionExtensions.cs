@@ -1,4 +1,5 @@
 ﻿using MediaRelay;
+using MediaRelay.Content;
 using MediaRelay.Messaging;
 using MediaRelay.Messaging.Envelope;
 using MediaRelay.Messaging.Queue;
@@ -32,10 +33,12 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IUrlSourceFactory, UrlSourceFactory>();
             // Reource
             services.AddSingleton<IUrlResourceFactory, UrlResourceFactory>();
-            // Relay
-            services.AddSingleton<IUrlRelayService, UrlRelayService>();
+            // Content
+            services.AddSingleton<IUrlContentRepository, UrlContentRepository>();
             // Payload
             services.AddSingleton<IPayloadCreator, DefaultUrlPayloadCreator>();
+            // Relay
+            services.AddSingleton<IUrlRelayService, UrlRelayService>();
 
 
             // Messaging

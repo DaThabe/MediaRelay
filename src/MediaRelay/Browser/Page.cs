@@ -16,7 +16,7 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
     public async ValueTask<T> EvaluateAsync<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicProperties)] T>(
         string expression, object? arg = default, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         try
         {
@@ -36,15 +36,14 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
         }
     }
 
-    public async ValueTask<JsonElement?> EvaluateAsync(
-        string expression, object? arg = null, CancellationToken cancellationToken = default)
+    public async ValueTask<T> EvaluateAsync<T>(string expression, object? arg, ISerializer<T> serializer, CancellationToken cancellationToken = default) where T : notnull
     {
-        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         try
         {
-            return await page.EvaluateAsync(expression, arg)
-                .WaitAsync(cancellationToken);
+            var str = await EvaluateAsync<string>(expression, arg, cancellationToken);
+            return await serializer.DeserializeFromUTF8StringAsync(str, cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -62,10 +61,16 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
     public async ValueTask GotoAsync(
         string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(page.IsClosed, this);
+        ObjectDisposedException.ThrowIf(_disposed, this);
 
         try
         {
+            options ??= new()
+            {
+                Referer = new Uri(url).GetLeftPart(UriPartial.Authority),
+                WaitUntil = WaitUntilState.DOMContentLoaded
+            };
+
             await page.GotoAsync(url, Parse(options))
                 .WaitAsync(cancellationToken);
 
@@ -87,6 +92,8 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
 
     public ValueTask CloseAsync()
     {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+
         var task = page.CloseAsync();
         return new ValueTask(task);
     }
@@ -129,11 +136,5 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
             WaitUntilState.Load => Microsoft.Playwright.WaitUntilState.Load,
             _ => null
         };
-    }
-
-
-    public ValueTask<T> EvaluateAsync<T>(string expression, object? arg, ISerializer<T> serializer, CancellationToken cancellationToken = default) where T : notnull
-    {
-        throw new NotImplementedException();
     }
 }
