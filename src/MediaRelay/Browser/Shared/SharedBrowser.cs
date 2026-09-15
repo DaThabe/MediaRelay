@@ -1,7 +1,7 @@
 ﻿namespace MediaRelay.Browser.Shared;
 
 
-internal sealed class SharedBrowserWrapper(IBrowser inner) : IBrowser
+internal sealed class SharedBrowser(IBrowser inner) : IBrowser
 {
     public string Version => inner.Version;
 

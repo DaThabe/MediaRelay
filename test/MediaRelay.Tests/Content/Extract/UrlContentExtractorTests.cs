@@ -14,22 +14,3 @@ public sealed class UrlContentExtractorTests
         //var a = new DefaultUrlContentExtractor();
     }
 }
-
-
-file sealed class TestUrlContentExtractor(IBrowserService browserService) : DefaultUrlContentExtractor(browserService)
-{
-    protected override IEnumerable<HttpCookieOptions> GetCookies()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override string GetScriptFilePath()
-    {
-        throw new NotImplementedException();
-    }
-
-    protected override IResource ToResource(string resourceUrl)
-    {
-        throw new NotImplementedException();
-    }
-}

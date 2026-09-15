@@ -1,4 +1,5 @@
-﻿using MediaRelay.Metadata;
+﻿using MediaRelay.Content.Snapshot;
+using MediaRelay.Metadata;
 using MediaRelay.Resource;
 
 namespace MediaRelay.Content.Builder;
@@ -67,6 +68,16 @@ public static class UrlContentBuilderExtensions
                 .SetDescription(metadata.Description)
                 .SetPublishedAt(metadata.PublishedAt)
                 .AddTags(metadata.Tags);
+        }
+
+        public TMetadataBuilder FromSnapshot(IUrlSnapshot snapshot)
+        {
+            return builder
+                .SetAuthor(snapshot.AuthorName, snapshot.AuthorUrl)
+                .SetTitle(snapshot.Title)
+                .SetDescription(snapshot.Content)
+                .SetPublishedAt(snapshot.UploadAt)
+                .AddTags(snapshot.Tags);
         }
     }
 }

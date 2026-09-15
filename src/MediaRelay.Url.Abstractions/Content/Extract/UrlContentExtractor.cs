@@ -1,107 +1,63 @@
 ﻿using MediaRelay.Browser;
-using MediaRelay.Content.Builder;
 using MediaRelay.Content.Snapshot;
 using MediaRelay.Http;
-using MediaRelay.Metadata;
-using MediaRelay.Resource;
+using MediaRelay.Serializer;
 using MediaRelay.Source;
-using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 
 namespace MediaRelay.Content.Extract;
 
 
+
 /// <summary>
-/// 自定义网址内容提取器
+/// 从网址来源运行自动浏览器页面执行脚本后抓取内容快照
 /// </summary>
-/// <typeparam name="TSource">网址内容类型</typeparam>
+/// <typeparam name="TSource">网址来源类型</typeparam>
 /// <typeparam name="TContentExtractorSnapshot">网址内容提取快照类型</typeparam>
-/// <typeparam name="TContentBuilder">网址内容构建器类型</typeparam>
-/// <typeparam name="TContent">网址内容类型</typeparam>
-public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot, TContentBuilder, TContent, TMetadataBuilder, TMetadata>(IBrowserService browserService) : IContentExtractor
+public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : IUrlContentExtractor
     where TSource : IUrlSource
     where TContentExtractorSnapshot : IUrlSnapshot
-    where TContentBuilder : IUrlContentBuilder<TContentBuilder, TContent, TMetadataBuilder, TMetadata>
-    where TContent : IUrlContent
-    where TMetadataBuilder : IUrlMetadataBuilder<TMetadataBuilder, TMetadata, TContentBuilder, TContent>
-    where TMetadata : IUrlMetadata
 {
-    public virtual bool CanExtract(ISource source) =>
+    protected abstract IReadOnlySet<HttpCookieOptions> Cookies { get; }
+    protected abstract IPageSessionFactory PageSessionFactory { get; }
+    protected abstract string ScriptFilePath { get; }
+    protected abstract ISerializer<TContentExtractorSnapshot> SnapshotSerializer { get; }
+
+
+
+    public virtual bool CanExtract(IUrlSource source) =>
         source is TSource;
-    public virtual async ValueTask<IContent> ExtractAsync(ISource source, CancellationToken cancellationToken = default)
+
+    public virtual async ValueTask<IUrlContent> ExtractAsync(IUrlSource source, CancellationToken cancellationToken = default)
     {
         if (source is not TSource targetSource)
-            throw new NotSupportedException($"不支持的推文来源: {source}");
+            throw new NotSupportedException($"不支持的网址来源: {source}");
 
-        // Browser
-        await using var browser = await browserService.GetSharedAsync();
-        // Context
-        await using var context = await browser.NewContextAsync();
-        await context.AddCookiesAsync(GetCookies());
-        // Page
-        await using var page = await context.NewPageAsync();
         // Goto
-        var gotoOptions = new PageGotoOptions() { WaitUntil = WaitUntilState.DOMContentLoaded };
-        await page.GotoAsync(targetSource.Url.ToString(), gotoOptions, cancellationToken);
+        await using var pageSession = await PageSessionFactory.CreateAsync();
+        await pageSession.Context.AddCookiesAsync(Cookies);
+        await pageSession.GotoAsync(source.Url.ToString(), cancellationToken: cancellationToken);
 
         // Extract
-        var scriptFilePath = GetScriptFilePath();
-        var snapshotJsonTypeInfo = GetSnapshotJsonTypeInfo();
-        var scriptResultString = await page.EvaluateScriptFileAsync<string>(scriptFilePath, null, cancellationToken);
-        var snapshot = JsonSerializer.Deserialize(scriptResultString, snapshotJsonTypeInfo);
-
-        // Builder
-        ArgumentNullException.ThrowIfNull(snapshot);
-        var builder = CreateContentBuilder(targetSource)
-            .MetadataBuilder
-            .FromMetadata(snapshot.Metadata)
-            .ContentBuilder
-            .AddResources(snapshot.Resources.Select(ToResource));
+        var snapshot = await pageSession.EvaluateScriptFileAsync(ScriptFilePath, null, SnapshotSerializer, cancellationToken);
 
         // Context
-        var extractContext = new ExtractContext()
+        var context = new Context()
         {
             Source = targetSource,
-            Browser = browser,
-            BrowserContext = context,
-            Page = page,
-            ScriptFilePath = scriptFilePath,
-            SnapshotJsonTypeInfo = snapshotJsonTypeInfo,
-            ExtractorSnapshot = snapshot,
-            Builder = builder
+            PageSession = pageSession,
+            ContentSnapshot = snapshot
         };
-        await ExtractAsync(extractContext, cancellationToken);
 
-        return extractContext.Builder.Build();
+        return await ExtractAsync(context, cancellationToken);
     }
 
-    // 脚本文件路径
-    protected abstract string GetScriptFilePath();
-    // 脚本结果Json类型信息
-    protected abstract JsonTypeInfo<TContentExtractorSnapshot> GetSnapshotJsonTypeInfo();
-    protected abstract TContentBuilder CreateContentBuilder(TSource source);
-    // 资源转换
-    protected abstract IResource ToResource(string resourceUrl);
-    // 获取Cookie
-    protected abstract IEnumerable<HttpCookieOptions> GetCookies();
+    protected abstract ValueTask<IUrlContent> ExtractAsync(Context context, CancellationToken cancellationToken);
 
 
-    // 提取任务
-    protected virtual ValueTask ExtractAsync(ExtractContext context, CancellationToken cancellationToken) =>
-        ValueTask.CompletedTask;
-
-
-    protected sealed class ExtractContext
+    protected readonly struct Context
     {
         public required TSource Source { get; init; }
-        public required IBrowser Browser { get; init; }
-        public required IBrowserContext BrowserContext { get; init; }
-        public required IPage Page { get; init; }
-
-        public required string ScriptFilePath { get; init; }
-        public required TContentExtractorSnapshot ExtractorSnapshot { get; init; }
-        public required JsonTypeInfo<TContentExtractorSnapshot> SnapshotJsonTypeInfo { get; init; }
-
-        public required TContentBuilder Builder { get; init; }
+        public required IPageSession PageSession { get; init; }
+        public required TContentExtractorSnapshot ContentSnapshot { get; init; }
     }
 }

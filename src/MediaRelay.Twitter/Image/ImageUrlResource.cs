@@ -5,13 +5,15 @@ using MediaRelay.Storage;
 namespace MediaRelay.Twitter.Image;
 
 
-internal sealed partial class ImageUrlResource : IResource
+internal sealed partial class ImageUrlResource : IUrlResource
 {
     private readonly IHttpClient _httpClient;
 
     public ResourceId Id { get; init; }
     public required ImageUrl Url { get; init; }
     public MediaType Type => Url.MediaType;
+
+    Uri IUrlResource.Url => Url.Uri;
 
     private ImageUrlResource(IHttpClient httpClient) => _httpClient = httpClient;
 

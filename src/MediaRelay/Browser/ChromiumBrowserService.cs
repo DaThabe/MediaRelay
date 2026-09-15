@@ -13,8 +13,8 @@ internal sealed class ChromiumBrowserService(
     ) : IBrowserService, IAsyncDisposable
 {
     private bool _disposed;
-    private SharedBrowserWrapper? _sharedBrowser;
-    private SharedBrowserContextWrapper? _sharedBrowserContext;
+    private SharedBrowser? _sharedBrowser;
+    private SharedBrowserContext? _sharedBrowserContext;
     private readonly SemaphoreSlim _sharedBrowserLock = new(1, 1);
     private readonly SemaphoreSlim _sharedBrowserContextLock = new(1, 1);
 
@@ -34,7 +34,7 @@ internal sealed class ChromiumBrowserService(
             // 启动
             logger.LogInformation("正在启动共享浏览器");
             var browser = await playwright.Chromium.LaunchAsync(Parse(browserOptions.Value.Launch));
-            _sharedBrowser = new SharedBrowserWrapper(new Browser(browser, logger));
+            _sharedBrowser = new SharedBrowser(new Browser(browser, logger));
 
             // 完成
             using var __ = logger.BeginScope("BrowserVersion", _sharedBrowser.Version);
@@ -63,7 +63,7 @@ internal sealed class ChromiumBrowserService(
             var browserContext = await sharedBrowser.NewContextAsync(browserOptions.Value.NewContext);
             logger.LogInformation("浏览器共享上下文已创建");
 
-            return _sharedBrowserContext = new SharedBrowserContextWrapper(browserContext);
+            return _sharedBrowserContext = new SharedBrowserContext(browserContext);
         }
         finally
         {

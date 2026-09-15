@@ -2,26 +2,23 @@
 using MediaRelay.Content.Extract;
 using MediaRelay.Http;
 using MediaRelay.Pixiv.Image;
-using MediaRelay.Resource;
+using MediaRelay.Serializer;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.Pixiv.Artwork;
 
 
 internal sealed class ArtworkContentExtractor(
-        IBrowserService browserService,
+        IPageSessionFactory pageSessionFactory,
+        IJsonSerializerFactory jsonSerializerFactory,
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
         IOptions<PixivOptions> options
-    ) : UrlSourceContentExtractor<ArtworkSource>(browserService)
+    ) : UrlSourceContentExtractor<ArtworkSource>
 {
-    protected override IEnumerable<HttpCookieOptions> GetCookies() =>
-        options.Value.Http.Cookies;
-
-    protected override string GetScriptFilePath() =>
-        options.Value.Artwork.ExtractScriptPath;
-
-    protected override IResource ToResource(string resourceUrl) =>
-        factory.Create(parser.Parse(resourceUrl));
-
+    protected override IPageSessionFactory PageSessionFactory { get; } = pageSessionFactory;
+    protected override IJsonSerializerFactory JsonSerializerFactory { get; } = jsonSerializerFactory;
+    protected override IReadOnlySet<HttpCookieOptions> Cookies { get; } = options.Value.Http.Cookies.ToHashSet().AsReadOnly();
+    protected override string ScriptFilePath { get; } = options.Value.Artwork.ExtractScriptPath;
+    protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url));
 }

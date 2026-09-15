@@ -1,32 +1,33 @@
-﻿using MediaRelay.Metadata;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace MediaRelay.Content.Snapshot;
 
 
 public record class DefaultUrlSnapshot : IUrlSnapshot
 {
-    public required string[] Resources { get; init; }
-    public string? Title { get; init; }
-    public string? Content { get; init; }
+    public required HashSet<Uri> Resources { get; init; }
+
+    public string? Title { get; init => field = string.IsNullOrEmpty(value) ? null : value.Trim(); }
+    public string? Content { get; init => field = string.IsNullOrEmpty(value) ? null : value.Trim(); }
+
+    public Uri? AuthorUrl { get; init; }
+    public string? AuthorName { get; init => field = string.IsNullOrEmpty(value) ? null : value.Trim(); }
     public DateTimeOffset? UploadAt { get; init; }
-    public string? AuthorName { get; init; }
-    public string? AuthorUrl { get; init; }
-    public string[] Tags { get; init; } = [];
+
+    public HashSet<string> Tags { get; init => field = [.. value.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.Trim())]; } = [];
 
 
 
-    [JsonIgnore]
-    IReadOnlySet<string> IUrlSnapshot.Resources => Resources.ToHashSet();
-
-    [JsonIgnore]
-    IUrlMetadata IUrlSnapshot.Metadata => new DefaultUrlMetadata()
-    {
-        AuthorName = AuthorName,
-        AuthorUrl = AuthorUrl is null ? null : new Uri(AuthorUrl),
-        Title = Title,
-        Description = Content,
-        PublishedAt = UploadAt,
-        Tags = Tags.ToHashSet()
-    };
+    [JsonIgnore] IReadOnlySet<Uri> IUrlSnapshot.Resources => Resources;
+    [JsonIgnore] IReadOnlySet<string> IUrlSnapshot.Tags => Tags;
 }
+
+
+[JsonSourceGenerationOptions(
+    // 忽略大小写，允许驼峰和帕斯卡命名
+    PropertyNameCaseInsensitive = true,
+    // 格式化输出
+    WriteIndented = true
+)]
+[JsonSerializable(typeof(DefaultUrlSnapshot))]
+internal partial class DefaultUrlSnapshotJsonSerializerContext : JsonSerializerContext;

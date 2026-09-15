@@ -1,6 +1,4 @@
-﻿using MediaRelay.Metadata;
-
-namespace MediaRelay.Content.Snapshot;
+﻿namespace MediaRelay.Content.Snapshot;
 
 
 /// <summary>
@@ -8,6 +6,14 @@ namespace MediaRelay.Content.Snapshot;
 /// </summary>
 public interface IUrlSnapshot
 {
-    IReadOnlySet<string> Resources { get; }
-    IUrlMetadata Metadata { get; }
+    IReadOnlySet<Uri> Resources { get; }
+
+    string? Title { get; }
+    string? Content { get; }
+
+    string? AuthorName { get; }
+    Uri? AuthorUrl { get; }
+    DateTimeOffset? UploadAt { get; }
+
+    IReadOnlySet<string> Tags { get; }
 }

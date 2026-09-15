@@ -5,13 +5,15 @@ using MediaRelay.Storage;
 namespace MediaRelay.HeyBox.Image;
 
 
-internal sealed partial class OriginalImageUrlResource : IResource
+internal sealed partial class OriginalImageUrlResource : IUrlResource
 {
     private readonly IHttpClient _httpClient;
 
     public required ResourceId Id { get; init; }
     public required OriginalImageUrl Url { get; init; }
     public MediaType Type => Url.MediaType;
+
+    Uri IUrlResource.Url => Url.Uri;
 
     private OriginalImageUrlResource(IHttpClient downloader) => _httpClient = downloader;
 

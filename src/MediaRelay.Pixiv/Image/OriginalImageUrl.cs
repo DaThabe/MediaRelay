@@ -7,9 +7,7 @@ namespace MediaRelay.Pixiv.Image;
 
 internal sealed partial class OriginalImageUrl
 {
-    private readonly string _url;
-
-
+    public Uri Uri { get; }
     public required int ArtworkId { get; init; }
     public required string Hash { get; init; }
     public required MediaType MediaType { get; init; }
@@ -17,8 +15,8 @@ internal sealed partial class OriginalImageUrl
     public required DateTime UplaodAt { get; init; }
 
 
-    private OriginalImageUrl(string url) => _url = url;
-    public override string ToString() => _url;
+    private OriginalImageUrl(Uri url) => Uri = url;
+    public override string ToString() => Uri.ToString();
 }
 
 
@@ -36,16 +34,11 @@ internal sealed partial class OriginalImageUrl
         /// https://i.pximg.net/img-original/img/2026/09/07/02/12/24/123456789_0.png
         /// https://i.pximg.net/img-original/img/2025/03/24/16/55/53/123456789-485cfbf98914fba1ee83201341abaf19_p0.png
         /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
         /// <exception cref="FormatException"></exception>
         /// <exception cref="NotSupportedException"></exception>
-        public OriginalImageUrl Parse(string url)
+        public OriginalImageUrl Parse(Uri url)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out _))
-                throw new FormatException($"网址格式错误: {url}");
-
-            var result = _regex.Match(url);
+            var result = _regex.Match(url.ToString());
             if (!result.Success) throw new NotSupportedException($"不支持的原图网址:{url}");
 
             var urlRegexOptions = options.Value;
@@ -65,7 +58,7 @@ internal sealed partial class OriginalImageUrl
             var urlHash = string.IsNullOrWhiteSpace(hash) ? string.Empty : $"-{hash}";
             var compineUrl = string.Format(options.Value.Format, yyyy, MM, dd, HH, mm, ss, pid, urlHash, index, ext);
 
-            return new OriginalImageUrl(compineUrl)
+            return new OriginalImageUrl(new Uri(compineUrl))
             {
                 ArtworkId = pid,
                 Hash = hash,

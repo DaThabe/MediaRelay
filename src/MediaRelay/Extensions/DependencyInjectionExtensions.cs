@@ -6,6 +6,7 @@ using MediaRelay.Logging;
 using MediaRelay.Messaging;
 using MediaRelay.Payload;
 using MediaRelay.Playwright;
+using MediaRelay.Serializer;
 using MediaRelay.Storage;
 using MediaRelay.Storage.Hash;
 using Microsoft.Extensions.Configuration;
@@ -63,7 +64,8 @@ public static class DependencyInjectionExtensions
                 .AddHttpClient()
                 .AddBrowser()
                 .AddStorage()
-                .AddMessaging();
+                .AddMessaging()
+                .AddSerializer();
 
             return services;
         }
@@ -98,6 +100,7 @@ public static class DependencyInjectionExtensions
 
             services.AddSingleton<IPlaywrightService, PlaywrightService>();
             services.AddSingleton<IBrowserService, ChromiumBrowserService>();
+            services.AddTransient<IPageSessionFactory, PageSessionFactory>();
 
             return services;
         }
@@ -115,6 +118,12 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IStorage, Storage>();
             services.AddSingleton<IResourceStorage, ResourceStorage>();
 
+            return services;
+        }
+
+        private IServiceCollection AddSerializer()
+        {
+            services.AddSingleton<IJsonSerializerFactory, JsonSerializerFactory>();
             return services;
         }
     }

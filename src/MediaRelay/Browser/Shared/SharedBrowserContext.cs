@@ -2,7 +2,8 @@
 
 namespace MediaRelay.Browser.Shared;
 
-internal sealed class SharedBrowserContextWrapper(IBrowserContext inner) : IBrowserContext
+
+internal sealed class SharedBrowserContext(IBrowserContext inner) : IBrowserContext
 {
     public ValueTask<IPage> NewPageAsync()
         => inner.NewPageAsync();

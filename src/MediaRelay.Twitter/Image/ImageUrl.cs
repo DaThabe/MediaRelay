@@ -7,15 +7,14 @@ namespace MediaRelay.Twitter.Image;
 
 internal sealed partial class ImageUrl
 {
-    private readonly string _url;
-
+    public Uri Uri { get; }
     public required string MediaId { get; init; }
     public required MediaType MediaType { get; init; }
     public ImageSize Size { get; init; } = ImageSize.Original;
 
 
-    private ImageUrl(string url) => _url = url;
-    public override string ToString() => _url;
+    private ImageUrl(Uri url) => Uri = url;
+    public override string ToString() => Uri.ToString();
 }
 
 
@@ -33,12 +32,9 @@ internal sealed partial class ImageUrl
         /// 这种格式的网址 https://pbs.twimg.com/media/ABCD123456789?format=jpg&name=4096x4096
         /// </summary>
         /// <exception cref="FormatException"></exception>
-        public ImageUrl Parse(string url, ImageSize? size = null)
+        public ImageUrl Parse(Uri url, ImageSize? size = null)
         {
-            if (!Uri.TryCreate(url, UriKind.Absolute, out var _))
-                throw new FormatException($"不是有效的网址: {url}");
-
-            var result = _regex.Match(url);
+            var result = _regex.Match(url.ToString());
             if (!result.Success) throw new NotSupportedException($"不支持的推特图像网址: {url}");
 
             var urlRegexOptions = options.Value;
@@ -56,7 +52,7 @@ internal sealed partial class ImageUrl
                 .Begin();
             logger.LogInformation("已解析到推文媒体网址");
 
-            return new ImageUrl(originalUrl)
+            return new ImageUrl(new Uri(originalUrl))
             {
                 MediaId = mediaId,
                 MediaType = MediaType.FromExtensions(format),

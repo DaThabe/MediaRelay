@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using MediaRelay.Serializer;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
@@ -34,7 +35,9 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
             throw;
         }
     }
-    public async ValueTask<JsonElement?> EvaluateAsync(string expression, object? arg = null, CancellationToken cancellationToken = default)
+
+    public async ValueTask<JsonElement?> EvaluateAsync(
+        string expression, object? arg = null, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(page.IsClosed, this);
 
@@ -56,7 +59,8 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
         }
     }
 
-    public async ValueTask GotoAsync(string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
+    public async ValueTask GotoAsync(
+        string url, PageGotoOptions? options = null, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(page.IsClosed, this);
 
@@ -81,6 +85,11 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
         }
     }
 
+    public ValueTask CloseAsync()
+    {
+        var task = page.CloseAsync();
+        return new ValueTask(task);
+    }
     public async ValueTask DisposeAsync()
     {
         if (_disposed) return;
@@ -97,17 +106,6 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
         }
     }
 
-
-    private CancellationTokenRegistration BindingCancellationToken(CancellationToken cancellationToken)
-    {
-        ObjectDisposedException.ThrowIf(page.IsClosed, this);
-
-        return cancellationToken.Register(async () =>
-        {
-            await DisposeAsync();
-            logger.LogInformation("页面已取消");
-        });
-    }
 
 
     private static Microsoft.Playwright.PageGotoOptions? Parse(PageGotoOptions? options)
@@ -131,5 +129,11 @@ internal sealed class Page(Microsoft.Playwright.IPage page, ILogger logger) : IP
             WaitUntilState.Load => Microsoft.Playwright.WaitUntilState.Load,
             _ => null
         };
+    }
+
+
+    public ValueTask<T> EvaluateAsync<T>(string expression, object? arg, ISerializer<T> serializer, CancellationToken cancellationToken = default) where T : notnull
+    {
+        throw new NotImplementedException();
     }
 }

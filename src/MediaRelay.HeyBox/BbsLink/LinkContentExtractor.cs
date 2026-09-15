@@ -2,26 +2,24 @@
 using MediaRelay.Content.Extract;
 using MediaRelay.HeyBox.Image;
 using MediaRelay.Http;
-using MediaRelay.Resource;
+using MediaRelay.Serializer;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.HeyBox.BbsLink;
 
 
 internal sealed class LinkContentExtractor(
-        IBrowserService browserService,
+        IPageSessionFactory pageSessionFactory,
+        IJsonSerializerFactory jsonSerializerFactory,
         OriginalImageUrl.Parser parser,
         OriginalImageUrlResource.Factory factory,
         IOptions<HeyBoxOptions> options
-    ) : UrlSourceContentExtractor<LinkSource>(browserService)
+    ) : UrlSourceContentExtractor<LinkSource>
 {
-    protected override IEnumerable<HttpCookieOptions> GetCookies() =>
-        options.Value.Http.Cookies;
-
-    protected override string GetScriptFilePath() =>
-        options.Value.BbsLink.ExtractScriptPath;
-
-    protected override IResource ToResource(string resourceUrl) =>
-        factory.Create(parser.Parse(resourceUrl));
+    protected override IPageSessionFactory PageSessionFactory { get; } = pageSessionFactory;
+    protected override IJsonSerializerFactory JsonSerializerFactory { get; } = jsonSerializerFactory;
+    protected override IReadOnlySet<HttpCookieOptions> Cookies { get; } = options.Value.Http.Cookies.ToHashSet().AsReadOnly();
+    protected override string ScriptFilePath { get; } = options.Value.BbsLink.ExtractScriptPath;
+    protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url));
 
 }
