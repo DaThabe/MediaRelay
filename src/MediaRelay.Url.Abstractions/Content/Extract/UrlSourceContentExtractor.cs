@@ -26,7 +26,7 @@ public abstract class UrlSourceContentExtractor<TUrlSource> : UrlContentExtracto
     }
 
 
-    protected override async ValueTask<IUrlContent> ExtractAsync(UrlContentExtractor<TUrlSource, DefaultUrlSnapshot>.Context context, CancellationToken cancellationToken)
+    protected override async ValueTask<IUrlContent> ExtractAsync(ExtractContext context, CancellationToken cancellationToken)
     {
         var builder = new DefaultUrlContentBuilder(ContentId.Create(context.Source.Id.ToString()), context.Source);
         IUrlSnapshot urlSnapshot = context.ContentSnapshot;
@@ -34,7 +34,7 @@ public abstract class UrlSourceContentExtractor<TUrlSource> : UrlContentExtracto
         builder.AddResources(urlSnapshot.Resources.Select(x => UrlResourceParser(x)));
         builder.MetadataBuilder.FromSnapshot(urlSnapshot);
 
-        var newContext = new Context()
+        var newContext = new BuildContext()
         {
             Source = context.Source,
             PageSession = context.PageSession,
@@ -46,11 +46,11 @@ public abstract class UrlSourceContentExtractor<TUrlSource> : UrlContentExtracto
         return newContext.ContentBuilder.Build();
     }
 
-    protected virtual ValueTask ExtractAsync(Context context, CancellationToken cancellationToken) =>
+    protected virtual ValueTask ExtractAsync(BuildContext context, CancellationToken cancellationToken) =>
         ValueTask.CompletedTask;
 
 
-    protected new class Context
+    protected class BuildContext
     {
         public required TUrlSource Source { get; init; }
         public required IPageSession PageSession { get; init; }

@@ -24,7 +24,7 @@ internal sealed class TweetContentExtractor(
     protected override UrlResourceParserHandler UrlResourceParser { get; } = url => factory.Create(parser.Parse(url));
 
 
-    protected override async ValueTask ExtractAsync(Context context, CancellationToken cancellationToken)
+    protected override async ValueTask ExtractAsync(BuildContext context, CancellationToken cancellationToken)
     {
         if (context.ContentSnapshot.Resources.Count != 0) return;
 

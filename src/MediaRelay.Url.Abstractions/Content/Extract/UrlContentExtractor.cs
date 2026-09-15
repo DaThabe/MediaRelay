@@ -41,7 +41,7 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
         var snapshot = await pageSession.EvaluateScriptFileAsync(ScriptFilePath, null, SnapshotSerializer, cancellationToken);
 
         // Context
-        var context = new Context()
+        var context = new ExtractContext()
         {
             Source = targetSource,
             PageSession = pageSession,
@@ -51,10 +51,10 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
         return await ExtractAsync(context, cancellationToken);
     }
 
-    protected abstract ValueTask<IUrlContent> ExtractAsync(Context context, CancellationToken cancellationToken);
+    protected abstract ValueTask<IUrlContent> ExtractAsync(ExtractContext context, CancellationToken cancellationToken);
 
 
-    protected readonly struct Context
+    protected readonly struct ExtractContext
     {
         public required TSource Source { get; init; }
         public required IPageSession PageSession { get; init; }
