@@ -9,11 +9,11 @@ public abstract class UrlContentBuilder<TUrlContentBuilder, TContent, TMetadataB
     where TMetadataBuilder : IUrlMetadataBuilder<TMetadataBuilder, TMetadata, TUrlContentBuilder, TContent>
     where TMetadata : IUrlMetadata
 {
-    private readonly HashSet<IResource> _resources = [];
+    private readonly HashSet<IUrlResource> _resources = [];
 
 
     public TMetadataBuilder MetadataBuilder { get; private set; }
-    protected IReadOnlySet<IResource> Resources => _resources.AsReadOnly();
+    protected IReadOnlySet<IUrlResource> Resources => _resources.AsReadOnly();
 
 
     protected UrlContentBuilder()
@@ -21,7 +21,7 @@ public abstract class UrlContentBuilder<TUrlContentBuilder, TContent, TMetadataB
         MetadataBuilder = NewMetadataBuilder();
     }
 
-    public TUrlContentBuilder AddResources(params IEnumerable<IResource> resources)
+    public TUrlContentBuilder AddResources(params IEnumerable<IUrlResource> resources)
     {
         _resources.UnionWith(resources);
         return This();

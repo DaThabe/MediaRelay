@@ -21,6 +21,6 @@ public record class DefaultContent : IContent
 {
     public required ContentId Id { get; init; }
     public required ISource Source { get; init; }
-    public required IReadOnlySet<IResource> Resources { get; init; }
     public required IMetadata Metadata { get; init; }
+    public required IReadOnlySet<IResource> Resources { get; init; }
 }

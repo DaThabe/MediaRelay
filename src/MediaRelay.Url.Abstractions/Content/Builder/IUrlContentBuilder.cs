@@ -12,7 +12,7 @@ public interface IUrlContentBuilder<TUrlContentBuilder, TContent, TMetadataBuild
     where TMetadata : IUrlMetadata
 {
     TMetadataBuilder MetadataBuilder { get; }
-    TUrlContentBuilder AddResources(params IEnumerable<IResource> resources);
+    TUrlContentBuilder AddResources(params IEnumerable<IUrlResource> resources);
 
     TContent Build();
 }
