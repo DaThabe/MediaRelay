@@ -1,5 +1,4 @@
-﻿using MediaRelay.Extensions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MediaRelay.Http;
@@ -32,40 +31,16 @@ internal sealed class HttpClient : IHttpClient
         _logger = logger;
     }
 
-    public Task<HttpResponseMessage> GetAsync(string url, CancellationToken cancellationToken = default)
-    {
-        LogAction("Get", url);
-        return _inner.GetAsync(url, cancellationToken);
-    }
-
-    public Task<byte[]> GetByteArrayAsync(string url, CancellationToken cancellationToken = default)
-    {
-        LogAction("Get Bytes", url);
-        return _inner.GetByteArrayAsync(url, cancellationToken);
-    }
-
-    public Task<Stream> GetStreamAsync(string url, CancellationToken cancellationToken = default)
-    {
-        LogAction("Get Stream", url);
-        return _inner.GetStreamAsync(url, cancellationToken);
-    }
-
-    public Task<string> GetStringAsync(string url, CancellationToken cancellationToken = default)
-    {
-        LogAction("Get String", url);
-        return _inner.GetStringAsync(url, cancellationToken);
-    }
-
     public Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken = default)
     {
-        LogAction(request.Method.ToString(), request.RequestUri?.ToString() ?? "null");
+        LogReuqest(request);
         return _inner.SendAsync(request, cancellationToken);
     }
 
 
-    private void LogAction(string action, string url)
+    private void LogReuqest(HttpRequestMessage requestMessage)
     {
         if (_logger.IsEnabled(LogLevel.Debug))
-            _logger.LogDebug("{Action} Url={Url}", action, url);
+            _logger.LogDebug("{Method} Url={Url}", requestMessage.Method, requestMessage.RequestUri);
     }
 }
