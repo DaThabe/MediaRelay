@@ -52,7 +52,6 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
 
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
-        using var __ = _logger?.BeginScope("MessageId", message.Id);
 
         // 从死信队列删除
         int removeCount = _deads.RemoveAll(x => x.Message.Id == message.Id);
@@ -68,14 +67,14 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
             await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
 
             _newMessageEvent.Set();
-            _logger?.LogDebug("消息已入队");
+            LogMessageEnqueued(message.Id);
         }
         else
         {
-            _logger?.LogWarning("消息已存在");
             if (removeCount == 0) return;
-
             await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
+
+            LogMessageExists(message.Id);
         }
     }
     public async ValueTask<TMessage> DequeueAsync(CancellationToken cancellationToken = default)
@@ -92,10 +91,7 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
                     var envelope = _pendings[0];
                     envelope.MarkProcessing();
 
-                    using var _ = _logger?.BeginScope("MessageId", envelope.Message.Id);
-                    _logger?.LogDebug("消息已出队");
-
-
+                    LogMessageDequeued(envelope.Message.Id);
                     return envelope.Message;
                 }
             }
@@ -114,12 +110,11 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
-        using var __ = _logger?.BeginScope("MessageId", messageId);
 
         var envelope = _pendings.FirstOrDefault(x => x.Message.Id == messageId);
         if (envelope is null)
         {
-            _logger?.LogWarning("消息不存在");
+            LogMessageNotExists(messageId);
             return;
         }
 
@@ -128,31 +123,29 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
 
         // Save
         await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
-
-        _logger?.LogDebug("消息已确认");
+        LogMessageAcknowledged(messageId);
     }
     public async ValueTask RejectAsync(MessageId messageId, CancellationToken cancellationToken = default)
     {
         await WaitForInitAsync(cancellationToken);
         using var _ = await _lock.WaitScopeAsync(cancellationToken);
-        using var __ = _logger?.BeginScope("MessageId", messageId);
 
         // 查询信封
         var envelope = _pendings.Find(x => x.Message.Id == messageId);
         if (envelope is null)
         {
-            _logger?.LogWarning("消息已不存在");
+            LogMessageNotExists(messageId);
             return;
         }
         // 先删除
         _pendings.Remove(envelope);
 
-        var hasRetry = false;
+        var canRetry = false;
 
         if (envelope.TryRetry())
         {
             _pendings.Add(envelope);
-            hasRetry = true;
+            canRetry = true;
         }
         else
         {
@@ -161,9 +154,7 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
         }
 
         await _envelopePersistence.SaveAsync([.. _pendings, .. _deads], cancellationToken);
-
-        if (hasRetry) _logger?.LogDebug("消息将重试");
-        else _logger?.LogWarning("消息无法重试, 已拒绝");
+        LogMessageRejected(canRetry, messageId);
     }
 
 
@@ -251,5 +242,49 @@ public class PersistenceMessageQueue<TEnvelope, TMessage, TContent> :
                 _tcs = new TaskCompletionSource();
             }
         }
+    }
+
+
+
+    private void LogMessageDequeued(MessageId messageId)
+    {
+
+        if (_logger?.IsEnabled(LogLevel.Debug) == true)
+            _logger.LogDebug("消息已出队, MessageId={MessageId}", messageId);
+    }
+    private void LogMessageEnqueued(MessageId messageId)
+    {
+
+        if (_logger?.IsEnabled(LogLevel.Debug) == true)
+            _logger.LogDebug("消息已入队, MessageId={MessageId}", messageId);
+    }
+    private void LogMessageAcknowledged(MessageId messageId)
+    {
+        if (_logger?.IsEnabled(LogLevel.Debug) == true)
+            _logger.LogDebug("消息已确认, MessageId={MessageId}", messageId);
+    }
+    private void LogMessageRejected(bool canRetry, MessageId messageId)
+    {
+        if (canRetry)
+        {
+            if (_logger?.IsEnabled(LogLevel.Debug) == true)
+                _logger.LogDebug("消息已拒绝将重试, MessageId={MessageId}", messageId);
+
+            return;
+        }
+
+        if (_logger?.IsEnabled(LogLevel.Warning) == true)
+            _logger.LogWarning("消息已拒绝, 无法重试, MessageId={MessageId}", messageId);
+    }
+
+    private void LogMessageNotExists(MessageId messageId)
+    {
+        if (_logger?.IsEnabled(LogLevel.Warning) == true)
+            _logger.LogWarning("消息不存在, MessageId={MessageId}", messageId);
+    }
+    private void LogMessageExists(MessageId messageId)
+    {
+        if (_logger?.IsEnabled(LogLevel.Warning) == true)
+            _logger.LogWarning("消息已存在, MessageId={MessageId}", messageId);
     }
 }

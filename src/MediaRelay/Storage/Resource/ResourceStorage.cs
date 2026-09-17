@@ -54,7 +54,7 @@ internal sealed class ResourceStorage(
             }
         });
 
-        logger.LogWarning("资源下载完成");
+        logger.LogInformation("资源下载完成");
         return uris.AsReadOnly();
     }
 

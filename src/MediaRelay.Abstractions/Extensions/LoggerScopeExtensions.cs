@@ -3,15 +3,18 @@ namespace Microsoft.Extensions.Logging;
 #pragma warning restore IDE0130 // 命名空间与文件夹结构不匹配
 
 
+[Obsolete("不要使用Scope")]
 public static class LoggerScopeExtensions
 {
     extension(ILogger logger)
     {
+        [Obsolete("不要使用Scope")]
         public ScopeBuilder Scope()
         {
             return new ScopeBuilder(logger);
         }
 
+        [Obsolete("不要使用Scope")]
         public ScopeBuilder Scope(string name, object value)
         {
             var builder =  new ScopeBuilder(logger);
@@ -20,6 +23,7 @@ public static class LoggerScopeExtensions
             return builder;
         }
 
+        [Obsolete("不要使用Scope")]
         public IDisposable? BeginScope(string name, object value)
         {
             var builder = new ScopeBuilder(logger);
@@ -29,6 +33,7 @@ public static class LoggerScopeExtensions
         }
     }
 
+    [Obsolete("不要使用Scope")]
     public sealed class ScopeBuilder(ILogger logger)
     {
         private readonly Dictionary<string, object> _values = [];

@@ -13,18 +13,31 @@ internal sealed class PayloadRelayService(
 
     public async ValueTask RelayAsync(IPayload payload, CancellationToken cancellationToken = default)
     {
-        if (_payloadHandlers.Length == 0) return;
+        var canExecuteHandlers = _payloadHandlers.Where(x => x.CanHandle(payload)).ToArray();
+        if (canExecuteHandlers.Length == 0) return;
 
-        var tasks = new List<Task>();
 
-        foreach (var handler in _payloadHandlers)
+        if (logger.IsEnabled(LogLevel.Debug))
+            logger.LogDebug("等待转发, 共 {Count} 个可执行处理器", canExecuteHandlers.Length);
+
+        int count = 0;
+        foreach (var handler in canExecuteHandlers)
         {
-            if (!handler.CanHandle(payload)) continue;
-            using var _ = logger.BeginScope("Handler", handler.GetType().Name);
+            try
+            {
+                await handler.HandleAsync(payload, cancellationToken);
+                count++;
 
-            tasks.Add(handler.HandleAsync(payload, cancellationToken).AsTask());
+                if (logger.IsEnabled(LogLevel.Debug))
+                    logger.LogDebug("[{HandlerName}] 转发完成", handler.GetType().Name);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "[{HandlerName}] 转发失败", handler.GetType().Name);
+            }
         }
 
-        await Task.WhenAll(tasks);
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("转发结束, 已执行处理器 [{Count}/{Total}]", count, canExecuteHandlers.Length);
     }
 }
