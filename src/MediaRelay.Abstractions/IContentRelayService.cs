@@ -1,8 +1,8 @@
-﻿namespace MediaRelay.Content;
+﻿using MediaRelay.Content;
 
-/// <summary>
-/// 内容转发
-/// </summary>
+namespace MediaRelay;
+
+
 public interface IContentRelayService
 {
     ValueTask RelayAsync(IContent content, CancellationToken cancellationToken = default);
