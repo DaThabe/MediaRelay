@@ -37,8 +37,8 @@ internal sealed class ChromiumBrowserService(
             _sharedBrowser = new SharedBrowser(new Browser(browser, logger));
 
             // 完成
-            using var __ = logger.BeginScope("BrowserVersion", _sharedBrowser.Version);
-            logger.LogInformation("共享浏览器已启动");
+            if (logger.IsEnabled(LogLevel.Information))
+                logger.LogInformation("共享浏览器已启动, Version={Version}", _sharedBrowser.Version);
 
             return _sharedBrowser;
         }
@@ -83,7 +83,9 @@ internal sealed class ChromiumBrowserService(
 
         var playwright = await playwrightService.GetPlaywrightAsync();
         var browser = await playwright.Chromium.LaunchAsync(Parse(options));
-        logger.LogInformation("正在启动浏览器");
+
+        if (logger.IsEnabled(LogLevel.Information))
+            logger.LogInformation("浏览器已启动, Version={Version}", browser.Version);
 
         return new Browser(browser, logger);
     }

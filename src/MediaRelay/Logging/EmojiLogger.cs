@@ -41,9 +41,9 @@ internal sealed class EmojiLogger(string categoryName, ILoggerWriter writer) : I
         var level = $"[{GetLevelString(logLevel)}]";
         var message = $"👉 {formatter(state, exception)}";
         var category = $"[{categoryName}]";
-        var scopeData = GetScopeDataString(_currentScope?.ToFrozenDictionary());
+        //var scopeData = GetScopeDataString(_currentScope?.ToFrozenDictionary());
 
-        writer.WriteLine($"{time} {level} {category} {message} {scopeData}");
+        writer.WriteLine($"{time} {level} {category} {message}");
         if (exception is not null) writer.WriteLine(exception.ToString());
     }
 
@@ -58,6 +58,7 @@ internal sealed class EmojiLogger(string categoryName, ILoggerWriter writer) : I
         _ => "🫥NON"
     };
 
+    [Obsolete]
     private static string GetScopeDataString(FrozenDictionary<string, object>? datas)
     {
         if (datas is null || datas.Count == 0) return string.Empty;

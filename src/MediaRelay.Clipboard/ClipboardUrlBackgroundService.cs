@@ -33,8 +33,8 @@ internal sealed class ClipboardUrlBackgroundService(
                 {
                     if (lastUri == url) continue;
 
-                    using var _ = logger.BeginScope("Url", url);
-                    logger.LogInformation("检测到网址");
+                    if (logger.IsEnabled(LogLevel.Information))
+                        logger.LogInformation("检测到网址, Url={Url}", url);
 
                     lastUri = url;
                     await messageOrchestrator.SendAsnc<UrlMessage, Uri>(url, stoppingToken);
@@ -62,7 +62,7 @@ internal sealed class ClipboardUrlBackgroundService(
         {
             await Task.Delay(options.Value.PollingInterval, cancellationToken);
         }
-        catch(OperationCanceledException)
+        catch (OperationCanceledException)
         {
             logger.LogInformation("等待任务已取消");
         }

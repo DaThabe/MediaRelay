@@ -1,12 +1,10 @@
 ﻿using MediaRelay.Content;
-using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Payload;
 
 
 internal sealed class PayloadFactory(
-        IEnumerable<IPayloadCreator> relayContentCreators,
-        ILogger<PayloadFactory> logger
+        IEnumerable<IPayloadCreator> relayContentCreators
     ) : IPayloadFactory
 {
     private readonly IPayloadCreator[] _createtors = [.. relayContentCreators];
@@ -16,10 +14,6 @@ internal sealed class PayloadFactory(
         foreach (var creator in _createtors)
         {
             if (!creator.CanCreate(content)) continue;
-
-            using var _ = logger.BeginScope("Creator", creator.GetType().Name);
-            logger.LogDebug("正在创建");
-
             return await creator.CreateAsync(content, cancellationToken);
         }
 

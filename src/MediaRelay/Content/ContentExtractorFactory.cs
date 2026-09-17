@@ -1,12 +1,10 @@
 ﻿using MediaRelay.Source;
-using Microsoft.Extensions.Logging;
 
 namespace MediaRelay.Content;
 
 
 internal sealed class ContentExtractorFactory(
-        IEnumerable<IContentExtractor> extractors,
-        ILogger<ContentExtractorFactory> logger
+        IEnumerable<IContentExtractor> extractors
     ) : IContentExtractorFactory
 {
     private readonly IContentExtractor[] _extractors = [.. extractors];
@@ -16,10 +14,6 @@ internal sealed class ContentExtractorFactory(
         foreach (var extractor in _extractors)
         {
             if (!extractor.CanExtract(source)) continue;
-
-            using var _ = logger.BeginScope("Extractor", extractor.GetType().Name);
-            logger.LogDebug("开始提取");
-
             return await extractor.ExtractAsync(source, cancellationToken);
         }
 

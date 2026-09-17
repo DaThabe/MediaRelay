@@ -20,8 +20,6 @@ internal sealed class ImmichRelayHandler(
 
         foreach (var resource in payload.Resources.ToArray())
         {
-            using var _ = logger.BeginScope("Resource", resource);
-
             try
             {
                 // 媒体上传
@@ -40,18 +38,17 @@ internal sealed class ImmichRelayHandler(
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "资源处理失败");
+                logger.LogError(ex, "资源处理失败, ResourceUri={Uri}", resource.Uri);
             }
         }
 
-        using var __ = logger.BeginScope("MediaIds", $"[{string.Join(',', mediaIds)}]");
         try
         {
             await StackMediasAsync(mediaIds, cancellationToken);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "媒体堆叠失败");
+            logger.LogError(ex, "媒体堆叠失败, SourceId={SourceId}", payload.Source.Id);
         }
     }
 
@@ -59,7 +56,8 @@ internal sealed class ImmichRelayHandler(
     // 上传媒体
     private async Task<Guid> UploadMediaAsync(IPayload payload, MediaStorageInfo storageInfo, CancellationToken cancellationToken)
     {
-        logger.LogInformation("开始上传媒体");
+        if (logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information))
+            logger.LogInformation("开始上传媒体资源, Uri={Uri}", storageInfo.Uri);
 
         var media = await GetMediaCreateDtoAsync(payload, storageInfo, cancellationToken);
         var mediaUploadResult = await apiClient.Assets.UploadAssetAsync(media, cancellationToken: cancellationToken);
@@ -67,8 +65,8 @@ internal sealed class ImmichRelayHandler(
         ArgumentException.ThrowIfNullOrWhiteSpace(mediaUploadResult.Id);
         var id = Guid.Parse(mediaUploadResult.Id);
 
-        using var _ = logger.BeginScope("MediaId", id);
-        logger.LogInformation("媒体上传完成");
+        if (logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information))
+            logger.LogInformation("媒体资源上传完成, Uri={Uri}", storageInfo.Uri);
 
         return id;
     }
@@ -78,9 +76,18 @@ internal sealed class ImmichRelayHandler(
     {
         if (assetsIds.Count <= 1) return;
 
-        logger.LogInformation("开始堆叠媒体");
-        await apiClient.Stacks.CreateAsync(new() { AssetIds = assetsIds }, cancellationToken);
-        logger.LogInformation("媒体已堆叠");
+        try
+        {
+            logger.LogInformation("开始堆叠媒体");
+            await apiClient.Stacks.CreateAsync(new() { AssetIds = assetsIds }, cancellationToken);
+            logger.LogInformation("媒体已堆叠");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "媒体队列失败");
+
+            throw;
+        }
     }
 
     // 打标签
@@ -103,14 +110,17 @@ internal sealed class ImmichRelayHandler(
                     .TagAssetsAsync(result.Id!, new() { Ids = [assetsId] }, cancellationToken);
                 addedTags.Add(tagName ?? "Empty");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logger.LogError(ex, "媒体添加标签失败");
             }
         }
 
-        using var _ = logger.BeginScope("Tags", $"[{string.Join(',', addedTags)}]");
-        logger.LogInformation("已为媒体添加标签");
+        if (logger.IsEnabled(Microsoft.Extensions.Logging.LogLevel.Information))
+        {
+            var tagsString = string.Join(',', addedTags);
+            logger.LogInformation("已为媒体添加标签, Tags=[{Tags}]", tagsString);
+        }
     }
 
 

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Spectre.Console;
-using System.Collections.Frozen;
 using System.Text;
 
 namespace MediaRelay.Console.Logging;
@@ -8,44 +7,21 @@ namespace MediaRelay.Console.Logging;
 
 internal sealed class ConsoleLogger(string categoryName, IAnsiConsole ansiConsole) : ILogger
 {
-    private LoggerScope? _rootScope;
-    private LoggerScope? _currentScope;
-    private bool _useScopeData = true;
-
-
     public bool IsEnabled(LogLevel logLevel) => true;
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
     {
-        if (state is not IDictionary<string, object> dict) return null;
-
-        if (_rootScope is null)
-        {
-            _rootScope = new();
-            _rootScope.AddRange(dict);
-            _currentScope = _rootScope;
-        }
-        else
-        {
-            var childScope = _rootScope.CreateChildScope();
-            childScope.AddRange(dict);
-            _currentScope = childScope;
-        }
-
-        return _currentScope;
+        return null;
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        var scopeDatas = _useScopeData ? _currentScope?.ToFrozenDictionary() : null;
-
         var messageMarkupString = MessagaeStyle.ToMarkupString(
             timestamp: DateTime.Now,
             level: logLevel,
             categoryName: categoryName,
             message: formatter(state, exception),
-            exception: exception,
-            scopeDatas: scopeDatas);
+            exception: exception);
 
         ansiConsole.MarkupLine(messageMarkupString);
     }
@@ -80,8 +56,7 @@ file sealed class MessagaeStyle
         LogLevel level,
         string categoryName,
         string message,
-        Exception? exception = null,
-        IReadOnlyDictionary<string, object>? scopeDatas = null)
+        Exception? exception = null)
     {
         StringBuilder sb = new();
 
@@ -89,17 +64,13 @@ file sealed class MessagaeStyle
         var levelMarkup = GetLevelMarkup(level);
         var categoryNameMarkup = GetCategoryNameMarkup(categoryName);
         var messageMarkup = GetMessageMarkup(message);
-        var scopeDataMarkup = GetScopeDataMarkup(scopeDatas);
         var exceptionMarkup = GetExceptionMarkup(exception);
 
         // Title
         sb.AppendLine($"{timestampMarkup} {levelMarkup} {categoryNameMarkup}");
 
         // Message
-        if (scopeDataMarkup is null)
-            sb.Append($"    {messageMarkup}");
-        else
-            sb.Append($"    {messageMarkup} {scopeDataMarkup}");
+        sb.Append($"    {messageMarkup}");
 
         // Exception
         if (exceptionMarkup is not null)
@@ -144,7 +115,7 @@ file sealed class MessagaeStyle
         else
         {
             var @namespace = categoryName[..index];
-            var className = categoryName[(index+1)..];
+            var className = categoryName[(index + 1)..];
 
             message = $"{className} ← {@namespace}";
         }

@@ -22,9 +22,6 @@ public sealed class UrlMessageQueueConsumer(
             {
                 var message = await urlQueue.DequeueAsync(stoppingToken);
 
-                using var _ = logger.BeginScope("MessageId", message.Id);
-                logger.LogInformation("接收到消息");
-
                 using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
                 timeoutCts.CancelAfter(options.Value.ProcessingTimeout);
 
@@ -32,18 +29,16 @@ public sealed class UrlMessageQueueConsumer(
                 {
                     await urlRelayService.RelayAsync(message.Content, timeoutCts.Token);
                     await urlQueue.AcknowledgeAsync(message.Id, timeoutCts.Token);
-
-                    logger.LogInformation("消息处理完成");
                 }
                 catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
                 {
-                    logger.LogWarning("消息处理超时");
+                    LogMessageTimeout(message.Id);
                     await urlQueue.RejectAsync(message.Id, stoppingToken);
                 }
                 catch (Exception ex)
                 {
                     await urlQueue.RejectAsync(message.Id, cancellationToken: stoppingToken);
-                    logger.LogError(ex, "消息处理失败");
+                    LogMessageException(message.Id, ex);
                 }
             }
             catch (ObjectDisposedException)
@@ -62,5 +57,18 @@ public sealed class UrlMessageQueueConsumer(
                 await Task.Delay(options.Value.ErrorRetryDelay, stoppingToken);
             }
         }
+    }
+
+    private void LogMessageTimeout(MessageId messageId)
+    {
+        if (!logger.IsEnabled(LogLevel.Warning)) return;
+
+        logger.LogWarning("消息处理超时, MessageId={MessageId}", messageId);
+    }
+    private void LogMessageException(MessageId messageId, Exception exception)
+    {
+        if (!logger.IsEnabled(LogLevel.Error)) return;
+
+        logger.LogError(exception, "消息处理失败, MessageId={MessageId}", messageId);
     }
 }

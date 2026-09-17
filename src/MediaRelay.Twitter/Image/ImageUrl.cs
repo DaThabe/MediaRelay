@@ -12,7 +12,7 @@ internal sealed partial class ImageUrl
     public required MediaType MediaType { get; init; }
     public ImageSize Size { get; init; } = ImageSize.Original;
 
-    
+
     private ImageUrl(Uri url) => Uri = url;
     public override string ToString() => Uri.ToString();
 }
@@ -44,13 +44,6 @@ internal sealed partial class ImageUrl
             var sizeName = result.Groups[urlRegexOptions.SizeKey].Value;
             var useSize = size ?? ImageSize.FromName(sizeName);
             var originalUrl = string.Format(options.Value.Format, mediaId, format, useSize);
-
-            using var _ = logger.Scope("MediaId", mediaId)
-                .Add("Format", format)
-                .Add("Size", useSize)
-                .Add("Url", originalUrl)
-                .Begin();
-            logger.LogInformation("已解析到推文媒体网址");
 
             return new ImageUrl(new Uri(originalUrl))
             {

@@ -24,9 +24,7 @@ internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext contex
         var cookies = cookieOptions.Select(Parse).ToArray();
         await context.AddCookiesAsync(cookies);
 
-        var cookieString = string.Join(',', cookies.Select(x => $"{x.Domain}/{x.Name}"));
-        using var _ = logger.BeginScope("Cookies", $"[ {cookieString} ]");
-        logger.LogDebug("Cookie已添加");
+        LogCookieAdded(cookieOptions);
     }
     public async ValueTask DisposeAsync()
     {
@@ -68,5 +66,15 @@ internal sealed class BrowserContext(Microsoft.Playwright.IBrowserContext contex
             HttpCookieSameSite.None => Microsoft.Playwright.SameSiteAttribute.None,
             _ => null
         };
+    }
+
+
+
+    private void LogCookieAdded(IEnumerable<HttpCookieOptions> cookies)
+    {
+        if (!logger.IsEnabled(LogLevel.Debug)) return;
+
+        var cookieString = string.Join(',', cookies.Select(x => $"{x.Domain}/{x.Name}"));
+        logger.LogDebug("Cookie已添加, Cookies=[{Cookies}]", cookieString);
     }
 }

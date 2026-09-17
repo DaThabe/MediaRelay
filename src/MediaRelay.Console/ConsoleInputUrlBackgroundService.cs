@@ -24,11 +24,9 @@ internal sealed class ConsoleInputUrlBackgroundService(
                 var input = AsyncConsole.ReadLine(stoppingToken)?.Trim();
                 if (string.IsNullOrEmpty(input)) continue;
 
-                using var _ = logger.BeginScope("Input", input);
-
                 if (!Uri.TryCreate(input, UriKind.Absolute, out var url))
                 {
-                    logger.LogWarning("输入不是有效网址");
+                    logger.LogWarning("输入不是有效网址, Url={Url}", url);
                     continue;
                 }
 
