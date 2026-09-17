@@ -19,15 +19,13 @@ internal sealed class ResourceStorage(
         var resourcesArray = resources?.ToArray() ?? [];
         if (resourcesArray.Length == 0)
         {
-            logger.LogWarning("储存了0个资源");
+            LogZeroMediaResourceStored();
             return FrozenDictionary<ResourceId, MediaStorageInfo>.Empty;
         }
 
-        using var _ = logger.Scope("Total", resourcesArray.Length)
-                .Begin();
-
-        var sequence = 0;
-        var uris = new ConcurrentDictionary<ResourceId, MediaStorageInfo>();
+        var resourceTotalCount = resourcesArray.Length;
+        var resourceStorageSequence = 0;
+        var storageInfos = new ConcurrentDictionary<ResourceId, MediaStorageInfo>();
         var parallelOptions = new ParallelOptions()
         {
             MaxDegreeOfParallelism = 6,
@@ -36,30 +34,18 @@ internal sealed class ResourceStorage(
 
         await Parallel.ForEachAsync(resourcesArray, parallelOptions, async (resource, ct) =>
         {
-            var currentSequence = Interlocked.Increment(ref sequence);
+            var currentSequence = Interlocked.Increment(ref resourceStorageSequence);
 
-            try
-            {
-                uris[resource.Id] = await StoreResourceAsync(resource, ct);
-
-                if (logger.IsEnabled(LogLevel.Information))
-                {
-                    logger.LogInformation("资源已储存 ResourceId={ResourceId}, Sequence={Sequence}", resource.Id, currentSequence);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                logger.LogWarning("资源下载已取消 ResourceId={ResourceId}, Sequence={Sequence}", resource.Id, currentSequence);
-                throw;
-            }
+            storageInfos[resource.Id] = await StoreMediaResourceAsync(resource, ct);
+            LogMediaResourceStored(resource.Id, currentSequence, resourceTotalCount);
         });
 
-        logger.LogInformation("资源下载完成");
-        return uris.AsReadOnly();
+        LogAllMediaResourceStored(resourceTotalCount);
+        return storageInfos.AsReadOnly();
     }
 
 
-    private async ValueTask<MediaStorageInfo> StoreResourceAsync(IResource resource, CancellationToken cancellationToken)
+    private async ValueTask<MediaStorageInfo> StoreMediaResourceAsync(IResource resource, CancellationToken cancellationToken)
     {
         await using var stream = await resource
                      .GetStreamAsync(cancellationToken);
@@ -69,5 +55,29 @@ internal sealed class ResourceStorage(
 
         return await storage
             .AddAsync(stream, resource.Type, fileName, cancellationToken);
+    }
+
+
+
+    private void LogMediaResourceStored(ResourceId resourceId, int sequence, int total)
+    {
+        if (!logger.IsEnabled(LogLevel.Information)) return;
+
+        logger.LogInformation("媒体资源已储存 ResourceId={ResourceId}, Sequence={Sequence}, Total={Total}",
+            resourceId, sequence, total);
+    }
+
+    private void LogZeroMediaResourceStored()
+    {
+        if (!logger.IsEnabled(LogLevel.Warning)) return;
+
+        logger.LogWarning("资源列表为空, 未储存任何资源");
+    }
+
+    private void LogAllMediaResourceStored(int total)
+    {
+        if (!logger.IsEnabled(LogLevel.Information)) return;
+
+        logger.LogInformation("媒体资源已储存, Total={Total}", total);
     }
 }

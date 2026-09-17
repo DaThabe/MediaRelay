@@ -26,15 +26,18 @@ internal sealed class MediaRepository(
         var storageInfo = await storageInfoRepository.FindAsync(fileName, mediaType, cancellationToken);
         if (storageInfo is not null)
         {
-            logger.LogInformation("已使用本地储存信息");
+            LogUseCacheMediaStorageInfo(storageInfo);
             return storageInfo;
         }
 
         storageInfo = await SaveMediaAsycn(stream, fileName, mediaType, cancellationToken);
+        LogMediaStorageInfoSaved(storageInfo);
+
         await storageInfoRepository.SetAsync(fileName, mediaType, storageInfo, cancellationToken);
 
         return storageInfo;
     }
+
 
     private async Task<MediaStorageInfo> SaveMediaAsycn(Stream stream, StorageFileName fileName, MediaType mediaType, CancellationToken cancellationToken)
     {
@@ -52,12 +55,6 @@ internal sealed class MediaRepository(
 
             // Hash信息
             var hashInfo = await hasher.HashAsync(stream, cancellationToken);
-
-            using var _ = logger.Scope("Hash", hashInfo.HexString)
-                .Add("HashAlgorithm", hashInfo.Algorithm)
-                .Begin();
-            logger.LogInformation("文件Hash计算完成");
-
             // 完整路径
             var fullPath = GetMediaFullPath(fileName, mediaType);
             // 保存流
@@ -76,29 +73,21 @@ internal sealed class MediaRepository(
             if (createdMemoryStream) await stream.DisposeAsync();
         }
     }
-
-
     private string GetMediaFullPath(StorageFileName fileName, MediaType mediaType)
     {
         // 合并路径
         return Path.Combine(AppContext.BaseDirectory, options.Value.RootPath, $"{fileName}.{mediaType.Extensions}");
     }
-
-    private async Task<Uri> SaveStreamToFileAsync(Stream source, string fullPath, CancellationToken cancellationToken)
+    private static async Task<Uri> SaveStreamToFileAsync(Stream source, string fullPath, CancellationToken cancellationToken)
     {
         var uri = new Uri($"file://{fullPath.Replace('\\', '/')}");
-        using var _ = logger.BeginScope("Uri", uri);
 
         // 文件夹
         var folder = Path.GetDirectoryName(fullPath);
         if (!string.IsNullOrWhiteSpace(folder)) Directory.CreateDirectory(folder);
 
         // 文件存在
-        if (File.Exists(fullPath))
-        {
-            logger.LogInformation("文件已存在");
-            return uri;
-        }
+        if (File.Exists(fullPath)) return uri;
 
         // 保存
         source.EnsureAtStart();
@@ -106,7 +95,23 @@ internal sealed class MediaRepository(
         await source.CopyToAsync(fs, cancellationToken);
 
         // 储存路径
-        logger.LogInformation("文件已储存");
         return uri;
+    }
+
+
+
+    private void LogUseCacheMediaStorageInfo(MediaStorageInfo info)
+    {
+        if (!logger.IsEnabled(LogLevel.Information)) return;
+
+        logger.LogInformation("已使用本地媒体储存信息, Type={Type}, Hash[{HashAlgorithm}]={HashHexString}, Size={Size}, Uri={Uri}",
+            info.MediaType, info.HashInfo.Algorithm, info.HashInfo.HexString, info.Size, info.Uri);
+    }
+    private void LogMediaStorageInfoSaved(MediaStorageInfo info)
+    {
+        if (!logger.IsEnabled(LogLevel.Information)) return;
+
+        logger.LogInformation("媒体已储存, Type={Type}, Hash[{HashAlgorithm}]={HashHexString}, Size={Size}, Uri={Uri}",
+            info.MediaType, info.HashInfo.Algorithm, info.HashInfo.HexString, info.Size, info.Uri);
     }
 }
