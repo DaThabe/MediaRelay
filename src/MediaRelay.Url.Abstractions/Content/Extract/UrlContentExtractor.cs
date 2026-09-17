@@ -46,13 +46,11 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
         if (source is not TSource targetSource)
             throw new NotSupportedException($"不支持的网址来源: {source}");
 
-        using var _ = _logger.BeginScope("SourceId", source.Id);
-
         // 使用缓存
         var content = await UrlContentRepository.FindAsync(source, cancellationToken);
         if (content is not null)
         {
-            _logger.LogInformation("已使用缓存内容");
+            LogUseCacheUrlContent(content.Id);
             return content;
         }
 
@@ -63,19 +61,17 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
 
         // Extract
         var snapshot = await pageSession.EvaluateScriptFileAsync(ScriptFilePath, null, SnapshotSerializer, cancellationToken);
-
-        // Context
-        var context = new ExtractContext()
+        content = await ExtractAsync(new ExtractContext()
         {
             Source = targetSource,
             PageSession = pageSession,
             ContentSnapshot = snapshot
-        };
+
+        }, cancellationToken);
 
         // 缓存
-        content = await ExtractAsync(context, cancellationToken);
         await UrlContentRepository.AddAsync(content, cancellationToken);
-        _logger.LogInformation("已经缓存内容");
+        LogCachedUrlContent(content.Id);
 
         return content;
     }
@@ -88,5 +84,18 @@ public abstract class UrlContentExtractor<TSource, TContentExtractorSnapshot> : 
         public required TSource Source { get; init; }
         public required IPageSession PageSession { get; init; }
         public required TContentExtractorSnapshot ContentSnapshot { get; init; }
+    }
+
+
+    private void LogUseCacheUrlContent(ContentId contentId)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("已使用缓存网址内容, ContentId={ContentId}", contentId);
+    }
+
+    private void LogCachedUrlContent(ContentId contentId)
+    {
+        if (_logger.IsEnabled(LogLevel.Information))
+            _logger.LogInformation("已缓存网址内容, ContentId={ContentId}", contentId);
     }
 }
