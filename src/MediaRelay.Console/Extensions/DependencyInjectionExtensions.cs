@@ -36,7 +36,6 @@ public static class DependencyInjectionExtensions
         public IServiceCollection AddConsole()
         {
             services.AddHostedService<ConsoleInputUrlBackgroundService>();
-            services.AddHostedService<ConsoleJobViewUpdateBackgroundService>();
             return services;
         }
 
