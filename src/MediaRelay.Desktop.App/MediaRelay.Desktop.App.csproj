@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<UserSecretsId>5311a0ca-fb0e-452f-ba9c-dd10bb5c5b1b</UserSecretsId>
+		<Version>0.1.0</Version>
+
+		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Avalonia.Desktop" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" />
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\MediaRelay.Desktop\MediaRelay.Desktop.csproj" />
+		<ProjectReference Include="..\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
+		<ProjectReference Include="..\MediaRelay.HeyBox\MediaRelay.HeyBox.csproj" />
+		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
+		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
+		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
+		<ProjectReference Include="..\MediaRelay.Url\MediaRelay.Url.csproj" />
+		<ProjectReference Include="..\MediaRelay.ViewModels\MediaRelay.GUI.csproj" />
+		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="appsettings.Development.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="appsettings.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+</Project>
