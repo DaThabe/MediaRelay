@@ -1,4 +1,4 @@
-﻿using MediaRelay.Http;
+using MediaRelay.Http;
 
 namespace MediaRelay.HeyBox;
 
@@ -67,5 +67,5 @@ public sealed record class HeyBoxBbsLinkUrlOptions
 
     public string Format { get; set; } = "https://www.xiaoheihe.cn/app/bbs/link/{0}";
     public string Pattern { get; set; } = @"xiaoheihe\.cn/app/bbs/link/(?<id>\d+)";
-    public string LinkdKey { get; set; } = "id";
+    public string LinkIdKey { get; set; } = "id";
 }

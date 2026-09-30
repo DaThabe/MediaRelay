@@ -1,34 +1,37 @@
 ﻿using Avalonia.Collections;
-using Avalonia.Media.Imaging;
+using Avalonia.Controls;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediaRelay.Source;
 
-namespace MediaRelay.Desktop.ViewModels.Pages;
+namespace MediaRelay.GUI.ViewModels.Pages;
 
 
 internal sealed class MessagePageViewModel : ObservableObject
 {
-    public AvaloniaList<MessageViewModel> MessageItemsSource { get; } = [];
+    public AvaloniaList<MessageViewModel> ItemsSource { get; } = [];
 
 
     public MessagePageViewModel()
     {
-        //if (!Design.IsDesignMode) return;
+        if (!Design.IsDesignMode) return;
 
-        var vm = RelayInfoViewModel.CreateAsync(
-        [
-             new(@"D:\Src\Data\Code\VisualStudio\DaThabe\MediaRelay\src\MediaRelay.Launcher.Console\bin\Debug\net10.0\Storage\8ff3a0bafd2c7a4bb0b6306c1877971420cb3253fb7fe2f667ff5a49082aa5a5.jpg"),
-             new(@"D:\Src\Data\Code\VisualStudio\DaThabe\MediaRelay\src\MediaRelay.Launcher.Console\bin\Debug\net10.0\Storage\342b5ebd56357637f945de50f4906a1ad9b6199635ebf923067b3f671a33100c.jpg"),
-             new(@"D:\Src\Data\Code\VisualStudio\DaThabe\MediaRelay\src\MediaRelay.Launcher.Console\bin\Debug\net10.0\Storage\440302676a4e40e7f758c081c4dbd8a5373e61f40e20926aa2e1f883216f0184.jpg"),
-        ]).GetAwaiter().GetResult();
+        var vm = new RelayInfoViewModel
+        {
+            Title = "这是一个标题",
+            Description = "这是一段很长很长的描述, 真的很长很长很长很长很长很长很长很长很长很长很长, 到这里依然没有结束, 再来一段吧.",
+            PublishAt = DateTimeOffset.Now,
+            Tags = ["C#", "Avalonia", "MediaRelay", "Windows-Desktop", "GUI", "ViewModels", "Pages", "Url", "Clipboard", "HeyBox", "Immich", "Pixiv", "Immich", "Twitter"],
+            Resources =
+            [
+                new Uri("https://gd-hbimg-edge.huaban.com/9bd606efa293bcae22557db356b5bd9a407128839f76-ugolUR_fw480webp?auth_key=1790798400-99becdca6a5a401793117ec5eab127d0-0-4340e6936980b80ade8130dc3cc74b67"),
+                new Uri("https://gd-hbimg-edge.huaban.com/1c7c90fb63794a5975c6c2095713ce6e91dae58d1230a-JKztaz_fw480webp?auth_key=1790798400-99becdca6a5a401793117ec5eab127d0-0-d60c8c55a94efd9131f691650c0d4e49"),
+                new Uri("https://gd-hbimg-edge.huaban.com/b462becc364c2337f6b90b540d2ada359a2e87cd36222-yM9nxo_fw480webp?auth_key=1790798400-99becdca6a5a401793117ec5eab127d0-0-170324b0e320b8fd464bf58efd57952d"),
+                new Uri("https://gd-hbimg-edge.huaban.com/77b561783f9998a4a68dccbd1d537ccb8a3245ed1df14-s5fPEG_fw480webp?auth_key=1790798400-99becdca6a5a401793117ec5eab127d0-0-dfb1a9c680444a27fa393ed2b74a71a8")
+            ]
+        };
 
-        vm.Title = "标题";
-        vm.Description = "描述";
-        vm.PublishAt = DateTimeOffset.Now;
-        vm.Tags = ["C#", "Avalonia", "MediaRelay", "Windows-Desktop"];
-
-        MessageItemsSource =
+        ItemsSource =
         [
             new()
             {
@@ -66,7 +69,7 @@ public sealed partial class MessageViewModel : ObservableObject
 
 public sealed class RelayInfoViewModel : ObservableObject
 {
-    public required IReadOnlyList<Bitmap> Resources { get; init; }
+    public required IReadOnlyList<Uri> Resources { get; init; }
 
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -75,24 +78,4 @@ public sealed class RelayInfoViewModel : ObservableObject
     public AvaloniaList<string> Tags { get; set; } = [];
 
     public DateTimeOffset PublishAt { get; set; }
-
-
-    public static async ValueTask<RelayInfoViewModel> CreateAsync(IReadOnlyCollection<Uri> resourceUris)
-    {
-        if (resourceUris.Count == 0)
-            throw new InvalidOperationException("没有资源");
-
-        var bitmaps = new List<Bitmap>();
-
-        foreach (var i in resourceUris)
-        {
-            if (i.IsFile)
-            {
-                var bitmap = new Bitmap(i.LocalPath);
-                bitmaps.Add(bitmap);
-            }
-        }
-
-        return new() { Resources = bitmaps };
-    }
 }

@@ -24,4 +24,10 @@
 	  <ProjectReference Include="..\MediaRelay.Abstractions\MediaRelay.Abstractions.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Compile Update="Views\Pages\SettingPage.axaml.cs">
+	    <DependentUpon>SettingPage.axaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
 </Project>

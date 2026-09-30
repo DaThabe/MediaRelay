@@ -2,6 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
+		<RootNamespace>MediaRelay.Desktop</RootNamespace>
 		<UserSecretsId>5311a0ca-fb0e-452f-ba9c-dd10bb5c5b1b</UserSecretsId>
 		<Version>0.1.0</Version>
 
@@ -21,7 +22,7 @@
 		<ProjectReference Include="..\MediaRelay.Url\MediaRelay.Url.csproj" />
 		<ProjectReference Include="..\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
 		<ProjectReference Include="..\MediaRelay.GUI\MediaRelay.GUI.csproj" />
-		
+
 		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
 		<ProjectReference Include="..\MediaRelay.HeyBox\MediaRelay.HeyBox.csproj" />
 		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />

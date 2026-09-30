@@ -1,4 +1,4 @@
-﻿<Project Sdk="MSTest.Sdk/4.0.2">
+<Project Sdk="MSTest.Sdk/4.0.2">
 
 	<PropertyGroup>
 		<RootNamespace>MediaRelay</RootNamespace>
@@ -7,13 +7,21 @@
 	<ItemGroup>
 		<PackageReference Include="Moq" />
 		<PackageReference Include="Spectre.Console.Testing" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" />
 		<PackageReference Include="Microsoft.Extensions.Logging" />
 		<PackageReference Include="Microsoft.Extensions.Options" />
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- 校验真实 appsettings.json 的绑定, 而不是测试内的副本 -->
+		<None Include="..\..\src\MediaRelay.Console.App\appsettings.json" Link="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\src\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Console\MediaRelay.Console.csproj" />
+		<ProjectReference Include="..\..\src\MediaRelay.HeyBox\MediaRelay.HeyBox.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Immich\MediaRelay.Immich.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
 		<ProjectReference Include="..\..\src\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />

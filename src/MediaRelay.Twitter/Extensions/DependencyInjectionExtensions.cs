@@ -1,4 +1,4 @@
-﻿using MediaRelay;
+using MediaRelay;
 using MediaRelay.Content;
 using MediaRelay.Source;
 using MediaRelay.Twitter;
@@ -29,7 +29,7 @@ public static class DependencyInjectionExtensions
 
             services.AddOptions<TwitterImageUrlOptions>()
                 .Configure<IConfiguration>((options, configuration) => configuration
-                    .GetSection(TwitterOptions.SectionPath)
+                    .GetSection(TwitterImageUrlOptions.SectionPath)
                     .Bind(options));
 
             services.AddOptions<TwitterTweetOptions>()

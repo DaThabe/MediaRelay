@@ -1,4 +1,4 @@
-﻿using MediaRelay.Http;
+using MediaRelay.Http;
 using System.Text.Json.Serialization;
 
 namespace MediaRelay.Twitter;
@@ -22,7 +22,7 @@ public sealed record class TwitterOptions
 public sealed record class TwitterHttpOptions
 {
     public const string SectionName = nameof(TwitterOptions.Http);
-    public const string SectionPath = $"{TwitterOptions.SectionName}:{SectionName}";
+    public const string SectionPath = $"{TwitterOptions.SectionPath}:{SectionName}";
 
 
     public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(1);

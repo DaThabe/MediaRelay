@@ -1,4 +1,4 @@
-﻿using MediaRelay.Source;
+using MediaRelay.Source;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
 
@@ -29,7 +29,7 @@ internal sealed partial record class LinkSource
         {
             var result = _regex.Match(url.ToString());
 
-            var id = long.Parse(result.Groups[options.Value.LinkdKey].Value);
+            var id = long.Parse(result.Groups[options.Value.LinkIdKey].Value);
 
             return new LinkSource()
             {

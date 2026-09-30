@@ -9,6 +9,10 @@
              x:DataType="vm:MainViewModel"
              Background="#f5f5f5">
 
+    <UserControl.DataContext>
+        <vm:MainViewModel />
+    </UserControl.DataContext>
+
     <TabControl>
         <TabItem Header="任务">
             <pages:MessagePage DataContext="{Binding MessagePage}"></pages:MessagePage>
