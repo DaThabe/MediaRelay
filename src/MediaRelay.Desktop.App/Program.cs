@@ -1,9 +1,8 @@
 ﻿using Avalonia;
-using MediaRelay.GUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace MediaRelay.Launcher.Desktop;
+namespace MediaRelay.Desktop.App;
 
 static class Program
 {
@@ -26,7 +25,7 @@ static class Program
                 .AddHeyBox()
                 .AddImmich()
                 .AddClipboard()
-                .AddDesktop()
+                //.AddDesktop()
                 // Launcher
                 .AddSingleton(new CommandLineArgs(args))
                 .AddSingleton(BuildAvaloniaApp())
@@ -40,7 +39,7 @@ static class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
+        => AppBuilder.Configure<GUI.App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

@@ -13,6 +13,12 @@
 
 	</PropertyGroup>
 
+	<!--Avalonia-->
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<AvaloniaVersion>11.1.0</AvaloniaVersion>
+	</PropertyGroup>
+
 	<!--调试文件-->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<DebugType>none</DebugType>

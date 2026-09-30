@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 
-namespace MediaRelay.Desktop.Views.Pages;
+namespace MediaRelay.GUI.Views.Pages;
 
 
-public partial class MessagePage : UserControl
+internal partial class MessagePage : UserControl
 {
     public MessagePage()
     {

@@ -30,7 +30,7 @@ public readonly record struct ContentId : IEquatable<ContentId>
 
 
 
-    public bool Equals(ContentId? other) => _value.Equals(other?._value, StringComparison.OrdinalIgnoreCase);
-    public override int GetHashCode() => _value.GetHashCode(StringComparison.OrdinalIgnoreCase);
-    public override string ToString() => _value;
+    public bool Equals(ContentId? other) => (_value ?? string.Empty).Equals(other?._value ?? string.Empty, StringComparison.OrdinalIgnoreCase);
+    public override int GetHashCode() => (_value ?? string.Empty).GetHashCode(StringComparison.OrdinalIgnoreCase);
+    public override string ToString() => _value ?? string.Empty;
 }

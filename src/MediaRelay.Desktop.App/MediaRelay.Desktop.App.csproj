@@ -17,15 +17,15 @@
 
 
 	<ItemGroup>
-		<ProjectReference Include="..\MediaRelay.Desktop\MediaRelay.Desktop.csproj" />
+		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
+		<ProjectReference Include="..\MediaRelay.Url\MediaRelay.Url.csproj" />
 		<ProjectReference Include="..\MediaRelay.Clipboard\MediaRelay.Clipboard.csproj" />
+		<ProjectReference Include="..\MediaRelay.GUI\MediaRelay.GUI.csproj" />
+		
+		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
 		<ProjectReference Include="..\MediaRelay.HeyBox\MediaRelay.HeyBox.csproj" />
 		<ProjectReference Include="..\MediaRelay.Twitter\MediaRelay.Twitter.csproj" />
 		<ProjectReference Include="..\MediaRelay.Immich\MediaRelay.Immich.csproj" />
-		<ProjectReference Include="..\MediaRelay.Pixiv\MediaRelay.Pixiv.csproj" />
-		<ProjectReference Include="..\MediaRelay.Url\MediaRelay.Url.csproj" />
-		<ProjectReference Include="..\MediaRelay.ViewModels\MediaRelay.GUI.csproj" />
-		<ProjectReference Include="..\MediaRelay\MediaRelay.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
